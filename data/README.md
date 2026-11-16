@@ -15,5 +15,5 @@ In Colab: `DATA = '/content/drive/MyDrive/TwinCheck'`.
 Check a file against the shared format:
 
 ```bash
-python -m src.eval.io --check data/processed/en/multifc_train.jsonl
+python -m src.eval.loaders --check data/processed/en/multifc_train.jsonl
 ```

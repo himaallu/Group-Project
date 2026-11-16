@@ -14,7 +14,7 @@ UOWD group project for MAAI902 (NLP & LLMs) and MAAI901 (Deep Learning for Visua
 ```bash
 python3.11 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-pytest -q
+python -m pytest -q
 ```
 
 Data, features and models are not in git. They live in the shared Drive folder
@@ -32,7 +32,7 @@ Data, features and models are not in git. They live in the shared Drive folder
 | `src/explain/` | cited explanations + faithfulness |
 | `src/claims/` | claim extraction |
 | `src/vision/` | image embeddings, authenticity detector, image twins |
-| `src/eval/` | `io.py` (format checks), `metrics.py` (all metrics), `report.py` (tables), `baselines/` |
+| `src/eval/` | `loaders.py` (format checks), `metrics.py` (all metrics), `report.py` (tables), `baselines/` |
 | `src/demo/` | Gradio demo |
 | `results/<task-id>/` | small result files + `README.md` |
 | `reports/{tables,figures}/` | generated LaTeX/CSV tables and figures |

@@ -3,7 +3,7 @@
 set -euo pipefail
 
 echo "[run_all] unit tests"
-pytest -q
+python -m pytest -q
 
 echo "[run_all] evaluation tables"
 python -m src.eval.report \
