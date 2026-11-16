@@ -1,0 +1,27 @@
+# TwinCheck — Python 3.11
+# Core ML
+torch>=2.3
+transformers>=4.46
+sentence-transformers>=3.2
+datasets>=3.0
+peft>=0.13
+diffusers>=0.31
+open_clip_torch>=2.26
+onnxruntime>=1.19
+
+# NLP / retrieval
+spacy>=3.7
+rank_bm25>=0.2.2
+faiss-cpu>=1.8
+
+# Classical ML + data
+numpy>=1.26
+pandas>=2.2
+pyarrow>=16.0
+scikit-learn>=1.5
+lightgbm>=4.5
+
+# Tracking, demo, tests
+wandb>=0.18
+gradio>=4.44
+pytest>=8.0

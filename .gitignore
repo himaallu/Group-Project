@@ -1,0 +1,38 @@
+# --- Data, features and models never go into git (they live in Drive: TwinCheck/) ---
+data/*
+!data/README.md
+features/
+models/
+
+# --- Experiment tracking / caches ---
+wandb/
+.cache/
+*.ckpt
+*.pt
+*.bin
+*.safetensors
+*.onnx
+*.parquet
+*.npy
+
+# Big files inside results/ (only small CSV/JSON/PNG < 10 MB belong there)
+results/**/*.zip
+results/**/*.tar*
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+.venv/
+venv/
+
+# --- Notebooks / editors / OS ---
+.ipynb_checkpoints/
+.vscode/
+.idea/
+.DS_Store
+
+# --- Secrets ---
+.env
+*.key
