@@ -36,3 +36,4 @@ venv/
 # --- Secrets ---
 .env
 *.key
+results/H1/smoke/
