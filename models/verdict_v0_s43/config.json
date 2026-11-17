@@ -1,0 +1,53 @@
+{
+  "features": [
+    "w_entail",
+    "w_contradict",
+    "w_neutral",
+    "max_entail",
+    "max_contradict",
+    "share_relevant",
+    "match_place",
+    "match_date",
+    "match_person",
+    "n_snippets"
+  ],
+  "mean": [
+    0.24860821329409866,
+    0.2594729481066288,
+    0.49191883836319467,
+    0.5966791129203615,
+    0.6202816119041207,
+    0.9739181343576783,
+    0.9702412044535271,
+    0.9404038305534121,
+    0.9825984985316024,
+    0.7314833501513622
+  ],
+  "sd": [
+    0.22802207894818885,
+    0.2188639158784853,
+    0.2555487103230456,
+    0.3772068969946196,
+    0.3519580227707518,
+    0.08344922373603117,
+    0.16235759862789417,
+    0.23076372826682737,
+    0.12662870996237816,
+    0.1966661700012652
+  ],
+  "name": "v0",
+  "seed": 43,
+  "lambda_inv": 0.0,
+  "lambda_sens": 0.0,
+  "no_relevance": false,
+  "drop_entity": false,
+  "nli_files": [
+    "features/nli_zeroshot/multifc_train.parquet",
+    "features/nli_zeroshot/multifc_val.parquet",
+    "features/nli_zeroshot/multifc_test.parquet"
+  ],
+  "lr": 0.001,
+  "batch_groups": 64,
+  "best_epoch": 12,
+  "val_macro_f1": 0.37272164997041024
+}

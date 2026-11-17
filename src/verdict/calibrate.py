@@ -22,6 +22,10 @@ Outputs
 How to run
     python -m src.verdict.calibrate --val-logits results/H3/val_logits.jsonl \
         --out models/verdict_calib.json
+    # also write calibrated copies of prediction files:
+    python -m src.verdict.calibrate --val-logits results/H4/val_logits_twin_s42.jsonl \
+        --out models/verdict_calib.json \
+        --apply results/H4/preds_twin_s42.jsonl results/H4/preds_twin_cal_s42.jsonl
 
     In code:
         from src.verdict.calibrate import load_settings, apply_calibration
@@ -210,16 +214,50 @@ def load_settings(path: str | Path) -> dict:
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
+def calibrate_pred_file(settings: dict, in_path: str | Path, out_path: str | Path) -> int:
+    """Apply fitted settings to a §5 predictions file and write a calibrated copy.
+
+    The head's probabilities are softmax(logits), so log(probs) are valid logits
+    (they differ only by a constant per row): temperature and threshold apply
+    exactly as fitted on the validation logits.
+
+    Args:
+        settings: {"T", "tau"} from ``fit`` / ``load_settings``.
+        in_path: predictions JSONL ``{"id", "pred_label", "probs"}``.
+        out_path: where to write the calibrated predictions (same format).
+
+    Returns:
+        Number of predictions written.
+    """
+    rows = [json.loads(line) for line in open(in_path, encoding="utf-8") if line.strip()]
+    probs = np.array([[r["probs"][lab] for lab in LABELS] for r in rows], dtype=float)
+    labels, cal = apply_calibration(np.log(probs + 1e-12), settings["T"], settings["tau"])
+    out_path = Path(out_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(out_path, "w", encoding="utf-8") as f:
+        for r, lab, p in zip(rows, labels, cal):
+            p = np.round(p, 6)
+            p = p / p.sum()
+            f.write(json.dumps({"id": r["id"], "pred_label": lab,
+                                "probs": {k: float(v) for k, v in zip(LABELS, p)}}) + "\n")
+    return len(rows)
+
+
 def main() -> None:
-    """CLI: fit on a validation logits file and save the settings."""
+    """CLI: fit on a validation logits file, save the settings, optionally calibrate predictions."""
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--val-logits", required=True, help="validation logits JSONL")
     ap.add_argument("--out", default="models/verdict_calib.json")
+    ap.add_argument("--apply", nargs=2, action="append", metavar=("PREDS_IN", "PREDS_OUT"),
+                    default=[], help="calibrate a predictions file (repeatable)")
     args = ap.parse_args()
     _, logits, gold = load_logits(args.val_logits)
     settings = fit(logits, gold)
     save_settings(settings, args.out)
     print(json.dumps(settings, indent=2))
+    for in_path, out_path in args.apply:
+        n = calibrate_pred_file(settings, in_path, out_path)
+        print(f"calibrated {n} predictions: {in_path} -> {out_path}")
 
 
 if __name__ == "__main__":
