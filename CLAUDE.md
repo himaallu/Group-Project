@@ -230,7 +230,7 @@ twincheck/
 - **Commits start with the task ID:** `[R3] Add evidence-swap twin generator (Copy B)`.
 - **Results:** small files only in `results/<task-id>/` (CSV/JSON, PNG, < 10 MB) + `README.md`.
 - **Notebooks:** finished code moves into `src/*.py`; pushed notebooks have outputs cleared.
-- **Pull request** to `main` titled `[R3] English twins`: what was built, how to run, output paths, key numbers. **Any other teammate** runs it on the 10-row sample and approves.
+- **Pull request** to `main` titled `[R3] English twins`: what was built, how to run, output paths, key numbers. The **author reviews and merges it themselves** after running the tests and the 10-row sample (no second reviewer needed); post the merged PR link in the group.
 - **By 23:00 every day:** push your branch, update Status in the tracker, add a line to `notes/contributions.md`.
 - **Post a 10-row sample** of every hand-off file before the full file.
 
