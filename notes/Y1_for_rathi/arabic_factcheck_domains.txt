@@ -1,0 +1,12 @@
+# Arabic fact-check domains to add to src/data/clean.py (rule 1). Match the domain and any subdomain.
+# Number = links to this domain found in X-FACT Arabic evidence (train+dev+test, 10,165 links).
+misbar.com          # 1,943 incl. seo./beta./www.  (the site X-FACT Arabic claims come from)
+falsoo.com          # 232
+afp.com             # 176 (factuel., factual., checamos., fakty., periksafakta. are AFP fact-check desks)
+fatabyyano.net      # 134 (incl. cdn4.; also the main M4FC Arabic source)
+verify-sy.com       # 25
+dabegad.com         # 18
+akeed.jo            # 1
+icheck.tn           # 1
+matsda2sh.com       # 0 here, Egyptian fact-checker
+kashif.ps           # 0 here, Palestinian fact-checker
