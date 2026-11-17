@@ -1,0 +1,64 @@
+{
+  "split_mode": "own",
+  "seed": 42,
+  "counts": {
+    "claims_in": 21556,
+    "snippets_in": 197258,
+    "snippets_out": 154277,
+    "rule1_factcheck_site": 25993,
+    "rule2_overlap_gt_90": 16769,
+    "rule3_duplicate_or_empty_snippet": 219,
+    "rule3_duplicate_claims": 73,
+    "rule3_duplicate_claims_with_other_label": 5,
+    "rule4_claims_without_snippets": 426
+  },
+  "per_split_label": {
+    "train": {
+      "supported": 5691,
+      "contradicted": 10561,
+      "unverified": 595
+    },
+    "val": {
+      "supported": 713,
+      "contradicted": 1317,
+      "unverified": 74
+    },
+    "test": {
+      "supported": 705,
+      "contradicted": 1325,
+      "unverified": 76
+    }
+  },
+  "no_snippets_per_label": {
+    "supported": 172,
+    "contradicted": 214,
+    "unverified": 40
+  },
+  "rule1_top_domains": {
+    "politifact.com": 13585,
+    "snopes.com": 4002,
+    "factcheck.org": 1847,
+    "hoax-slayer.net": 1340,
+    "washingtonpost.com": 835,
+    "hoax-slayer.com": 546,
+    "truthorfiction.com": 500,
+    "abc.net.au": 261,
+    "npr.org": 235,
+    "hoax-alert.leadstories.com": 220,
+    "verafiles.org": 178,
+    "nytimes.com": 140,
+    "usatoday.com": 99,
+    "message.snopes.com": 80,
+    "weeklystandard.com": 80,
+    "leadstories.com": 72,
+    "cnn.com": 71,
+    "nbcnews.com": 58,
+    "factscan.ca": 57,
+    "africacheck.org": 54,
+    "cbsnews.com": 53,
+    "facebook.com": 49,
+    "chicagotribune.com": 43,
+    "pesacheck.org": 42,
+    "thatsnonsense.com": 41
+  }
+}
