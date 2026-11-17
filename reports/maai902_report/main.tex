@@ -1,0 +1,153 @@
+% =====================================================================
+% TwinCheck — MAAI902 (NLP & LLMs) group report. Lead: Himasri.
+% Skeleton created in H2. Upload this file + references.bib + the
+% tables/ folder (from reports/tables/, made by src/eval/report.py)
+% to the Overleaf project "TwinCheck – MAAI902 Report".
+%
+% Rules (CLAUDE.md §10): every number comes from a file in results/;
+% never copy paragraphs from the MAAI901 documents or into the paper;
+% say "to our knowledge" for novelty claims.
+% If Arabic script is needed in the text, switch the compiler to XeLaTeX
+% and add polyglossia (Youssef's sections, Fri).
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=2.5cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{booktabs}        % tables from report.py use \toprule etc.
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor}
+\usepackage[numbers]{natbib}
+\usepackage[hidelinks]{hyperref}
+
+% Placeholder marker: shows what still has to be written. Remove before submission.
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+% Include a generated table if it exists, otherwise show a placeholder.
+\newcommand{\gentable}[1]{\IfFileExists{tables/#1.tex}{\input{tables/#1.tex}}{\todo{table \detokenize{#1}.tex from src/eval/report.py}}}
+
+\title{TwinCheck: Testing Whether Bilingual Fact-Checking Models Read the Evidence\\
+\large MAAI902 Natural Language Processing and Large Language Models}
+\author{Rathi \and Youssef \and Himasri \and Feba\\
+University of Wollongong in Dubai}
+\date{November 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\todo{150--200 words, written last: problem, twins idea, model, main numbers
+(macro-F1, ESR, cross-lingual consistency, ECE) from results/H5 and results/Y5.}
+\end{abstract}
+
+% ---------------------------------------------------------------------
+\section{Introduction}
+\label{sec:intro}
+\todo{Motivation: misinformation in the UAE, bilingual Arabic--English messages.}
+\todo{Problem: models reach correct verdicts through shortcuts (claim--evidence
+similarity, claim plausibility) rather than reading evidence \citep{papadopoulos2025similarity};
+little testing on Arabic or mixed content.}
+\todo{Our approach in one paragraph: twins that change exactly one thing.}
+\todo{Contributions as a short list (audit, twin-trained verdict head, EN/AR/mixed evaluation),
+each with "to our knowledge" where it claims novelty.}
+
+% ---------------------------------------------------------------------
+\section{Related Work}
+\label{sec:related}
+\todo{Evidence-based fact checking datasets: MultiFC \citep{augenstein2019multifc}, AVeriTeC, X-FACT.}
+\todo{Contrastive / counterfactual evidence: VitaminC \citep{schuster2021vitaminc} (clean English Wikipedia only).}
+\todo{Real news + web evidence: CCN \citep{abdelnabi2022ccn} (with vs without evidence only).}
+\todo{Shortcut analyses: \citet{papadopoulos2025similarity}; FakeWorld \citep{fakeworld2026}
+already unifies authenticity and truth, so it is not our claim.}
+\todo{Arabic fact checking and cross-lingual NLI.}
+\todo{Position: what we add relative to each line of work.}
+
+% ---------------------------------------------------------------------
+\section{Data and Twins}
+\label{sec:data}
+\subsection{Datasets}
+\todo{MultiFC (own 80/10/10 split, seed 42; official test labels are dummy values),
+AVeriTeC, X-FACT Arabic, M4FC Arabic. Counts per split and label from results/R1/counts.csv
+and notes/Y1.md. Licences.}
+\subsection{Label mapping and cleaning}
+\todo{Mapping to supported / contradicted / unverified; dropped labels and counts;
+the five cleaning rules and how many snippets each removed (results/R1/clean\_report\_*.json).}
+\subsection{Twins}
+\todo{Table: the six twin types (P, A, M, B, C, V), what changes, expected verdict.}
+\todo{How each is generated (R3, Y4) and auto-checked; source selection (500 test + 3,000 train, seed 42).}
+\todo{Human check: 150 test twins, Cohen's kappa (H4).}
+\subsection{NLI gold pairs}
+\todo{150 English (H2) + 150 Arabic (Y2) hand-labelled pairs; guideline
+(notes/H2\_labelling\_guide.md); label distribution.}
+
+% ---------------------------------------------------------------------
+\section{Method}
+\label{sec:method}
+\todo{Pipeline figure (claim extraction $\rightarrow$ retrieval $\rightarrow$ reranker
+$\rightarrow$ NLI $\rightarrow$ verdict head $\rightarrow$ calibration $\rightarrow$ cited explanation).}
+\subsection{Claim extraction}
+\todo{Qwen3-8B few-shot vs LoRA Qwen3-4B (Y3).}
+\subsection{Evidence relevance and entities}
+\todo{Fine-tuned bge-reranker-v2-m3; spaCy entities (R2).}
+\subsection{Natural language inference}
+\todo{mDeBERTa-v3 fine-tuning on weak EN + AR pairs; XLM-R-large comparison (R4).}
+\subsection{Verdict head and twin loss}
+\todo{Features (relevance-weighted support/contradict/neutral, max scores, entity match).}
+\todo{Loss: $\mathcal{L} = \mathcal{L}_{\text{CE}} + \lambda_{\text{inv}}\,\mathrm{KL}(\cdot) + \lambda_{\text{sens}}\,\mathcal{L}_{\text{CE}}^{B,C}$; $\lambda$ grid and selection rule (H3, H4).}
+\subsection{Calibration and Unverified threshold}
+\todo{Temperature scaling; threshold choice (notes/H4.md).}
+\subsection{Cited explanations}
+\todo{Qwen3-8B citing only retrieved snippets [1]--[3]; faithfulness check (R5).}
+
+% ---------------------------------------------------------------------
+\section{Experimental Setup}
+\label{sec:setup}
+\todo{Metrics with definitions (macro-F1, AUROC, ESR, unrelated rate, paraphrase and
+cross-lingual consistency, ECE with 15 bins, faithfulness, citation accuracy,
+claim-extraction F1, recall@5) — as implemented in src/eval/metrics.py.}
+\todo{Baselines: claim-only, zero-shot NLI, similarity + LightGBM, LLM judge (F4).}
+\todo{Ablations: no reranker, zero-shot NLI, no twin loss, no entity match.}
+\todo{Seeds 42/43/44 (mean $\pm$ sd); paired bootstrap with 1,000 resamples; hardware and W\&B project.}
+
+% ---------------------------------------------------------------------
+\section{Results}
+\label{sec:results}
+\subsection{Audit of existing approaches (E0)}
+\todo{Twin metrics of baselines — results/F4/audit\_E0.csv.}
+\subsection{Main results (E1)}
+\gentable{main_results}
+\todo{Text: our model vs baselines on MultiFC test and AVeriTeC, with CIs and p-values.}
+\subsection{Twin metrics with and without twin loss (E2)}
+\gentable{twin_results}
+\subsection{Arabic and mixed-language evaluation (E7)}
+\todo{Per-language table from results/Y5/arabic\_E7.csv (Youssef's section, placed Fri).}
+\subsection{Calibration (E5)}
+\todo{ECE before/after temperature scaling; reliability diagram from reports/figures/.}
+\subsection{Explanations and human evaluation (T1)}
+\todo{Faithfulness, citation accuracy; 60 rated notes, kappa (results/T1/human\_eval.csv).}
+
+% ---------------------------------------------------------------------
+\section{Analysis and Limitations}
+\label{sec:analysis}
+\todo{English error analysis, 10 cases (H6); Arabic error analysis, 20 cases (Y6).}
+\todo{Limitations: weak NLI labels, small unverified class (~3.5\% of MultiFC),
+M4FC context is near-gold evidence, translation-based Arabic twins, offline index only.}
+\todo{Ethics: illustrative demo examples, licences, research use only.}
+
+% ---------------------------------------------------------------------
+\section{Conclusion}
+\label{sec:conclusion}
+\todo{Three to five sentences: what we found and what it means; future work.}
+
+% ---------------------------------------------------------------------
+\section*{Team Contributions}
+\todo{From notes/contributions.md: one or two sentences per member, with task IDs.}
+
+\section*{Code and Data Availability}
+\todo{GitHub repository link (tag v1.0) and W\&B project.}
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}
