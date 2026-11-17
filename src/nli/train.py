@@ -5,9 +5,11 @@ What it does
        hand-labelled gold pairs (``data/nli/gold_val.jsonl``, H2 + Y2).
     2. Scores gold + weak val with the model as it is (zero-shot).
     3. Fine-tunes it: cross-entropy over entail / neutral / contradict, AdamW lr 2e-5,
-       batch 16, max length 256, 2 epochs, 10% linear warmup, seed 42. Mixed precision
-       is bf16 on GPUs that support it (A100, L4) and fp16 otherwise: DeBERTa-v3 can
-       overflow in fp16, bf16 cannot. Loss goes to W&B (project ``twincheck``).
+       batch 16, max length 256, 2 epochs, 10% linear warmup, seed 42. Training runs in
+       fp32 (with TF32 matrix maths on A100/L4) by default: DeBERTa-v3 gave a NaN loss
+       with mixed precision in our first run. ``--precision bf16`` / ``fp16`` are kept
+       for other models. A batch with a non-finite loss is skipped and counted; the run
+       stops if more than 1% of batches are skipped. Loss goes to W&B (``twincheck``).
     4. Scores gold + weak val again and saves the model and the before/after numbers:
        macro-F1, per-class precision / recall / F1 and the confusion matrix, for
        English and Arabic gold separately.
@@ -84,14 +86,18 @@ def class_report(gold: list[str], pred: list[str]) -> dict:
 
 
 def encode(tokenizer, pairs: list[dict], max_len: int, device: str):
-    """Tokenize (snippet, claim) pairs; only the snippet is truncated."""
+    """Tokenize (snippet, claim) pairs, cutting the longer text first.
+
+    "longest_first" cuts the snippet in almost every pair (snippets are longer), and
+    unlike "only_first" it does not crash when a claim alone is close to ``max_len``.
+    """
     return tokenizer([p["snippet"] for p in pairs], [p["claim"] for p in pairs],
-                     truncation="only_first", max_length=max_len, padding=True,
+                     truncation="longest_first", max_length=max_len, padding=True,
                      return_tensors="pt").to(device)
 
 
 def predict(model, tokenizer, pairs: list[dict], max_len: int, device: str, dtype,
-            batch_size: int = 64) -> list[str]:
+            mixed: bool, batch_size: int = 64) -> list[str]:
     """Predicted class name (entail / contradict / neutral) for every pair."""
     import torch
 
@@ -99,8 +105,7 @@ def predict(model, tokenizer, pairs: list[dict], max_len: int, device: str, dtyp
     name_of = {index_of[COLUMN_OF[c]]: c for c in CLASSES}
     model.eval()
     preds = []
-    with torch.no_grad(), torch.autocast(device_type="cuda", dtype=dtype,
-                                         enabled=device == "cuda"):
+    with torch.no_grad(), torch.autocast(device_type="cuda", dtype=dtype, enabled=mixed):
         for start in range(0, len(pairs), batch_size):
             logits = model(**encode(tokenizer, pairs[start:start + batch_size],
                                     max_len, device)).logits
@@ -110,16 +115,16 @@ def predict(model, tokenizer, pairs: list[dict], max_len: int, device: str, dtyp
 
 
 def evaluate(model, tokenizer, gold: list[dict], val: list[dict], max_len: int,
-             device: str, dtype) -> dict:
+             device: str, dtype, mixed: bool) -> dict:
     """Class reports on gold (per language) and on the weak val pairs."""
     result = {}
     for lang in sorted({p.get("language", "en") for p in gold}):
         rows = [p for p in gold if p.get("language", "en") == lang]
         result[f"gold_{lang}"] = class_report(
-            [p["label"] for p in rows], predict(model, tokenizer, rows, max_len, device, dtype))
+            [p["label"] for p in rows], predict(model, tokenizer, rows, max_len, device, dtype, mixed))
     if val:
         result["val_weak"] = class_report(
-            [p["label"] for p in val], predict(model, tokenizer, val, max_len, device, dtype))
+            [p["label"] for p in val], predict(model, tokenizer, val, max_len, device, dtype, mixed))
     return result
 
 
@@ -148,8 +153,12 @@ def train(args: argparse.Namespace) -> dict:
 
     set_seed(args.seed)
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    use_bf16 = device == "cuda" and torch.cuda.is_bf16_supported()
-    dtype = torch.bfloat16 if use_bf16 else torch.float16
+    torch.backends.cuda.matmul.allow_tf32 = True     # fast fp32 on A100 / L4
+    torch.backends.cudnn.allow_tf32 = True
+    if args.precision == "bf16" and device == "cuda" and not torch.cuda.is_bf16_supported():
+        args.precision = "fp16"
+    mixed = device == "cuda" and args.precision != "fp32"
+    dtype = torch.bfloat16 if args.precision == "bf16" else torch.float16
 
     train_pairs = load_jsonl(args.train)
     if args.n_train:
@@ -157,7 +166,7 @@ def train(args: argparse.Namespace) -> dict:
     val = load_jsonl(args.val)[:args.n_val] if Path(args.val).exists() else []
     gold = load_jsonl(args.gold)
     print(f"{len(train_pairs)} train, {len(val)} weak val, {len(gold)} gold pairs; "
-          f"device {device}, {'bf16' if use_bf16 else 'fp16'}")
+          f"device {device}, {args.precision if mixed else 'fp32'}")
 
     tokenizer = AutoTokenizer.from_pretrained(args.model)
     model = AutoModelForSequenceClassification.from_pretrained(args.model).to(device)
@@ -171,7 +180,7 @@ def train(args: argparse.Namespace) -> dict:
         run = wandb.init(project="twincheck", name=f"R4-nli-{short}-seed{args.seed}",
                          config=vars(args), tags=["R4", "nli"])
 
-    before = evaluate(model, tokenizer, gold, val, args.max_len, device, dtype)
+    before = evaluate(model, tokenizer, gold, val, args.max_len, device, dtype, mixed)
     print("zero-shot:", json.dumps({k: v["macro_f1"] for k, v in before.items()}))
 
     steps_per_epoch = (len(train_pairs) + args.batch_size - 1) // args.batch_size
@@ -179,8 +188,8 @@ def train(args: argparse.Namespace) -> dict:
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=0.01)
     scheduler = get_linear_schedule_with_warmup(
         optimizer, int(args.warmup * total_steps), total_steps)
-    # A grad scaler is only needed for fp16; with bf16 (or on CPU) it does nothing.
-    scaler = torch.amp.GradScaler("cuda", enabled=device == "cuda" and not use_bf16)
+    # A grad scaler is only needed for fp16; for fp32 / bf16 (or on CPU) it does nothing.
+    scaler = torch.amp.GradScaler("cuda", enabled=mixed and args.precision == "fp16")
     loss_fn = torch.nn.CrossEntropyLoss()
 
     step, ckpt = 0, Path(args.ckpt_dir) / "state.pt"
@@ -194,6 +203,7 @@ def train(args: argparse.Namespace) -> dict:
         print(f"resumed from step {step}")
 
     model.train()
+    skipped = 0
     start, last_ckpt = time.time(), time.time()
     for epoch in range(args.epochs):
         order = list(range(len(train_pairs)))
@@ -205,10 +215,19 @@ def train(args: argparse.Namespace) -> dict:
             batch = [train_pairs[i] for i in
                      order[batch_no * args.batch_size:(batch_no + 1) * args.batch_size]]
             labels = torch.tensor([target[p["label"]] for p in batch], device=device)
-            with torch.autocast(device_type="cuda", dtype=dtype, enabled=device == "cuda"):
+            with torch.autocast(device_type="cuda", dtype=dtype, enabled=mixed):
                 logits = model(**encode(tokenizer, batch, args.max_len, device)).logits
             loss = loss_fn(logits.float(), labels)
             optimizer.zero_grad()
+            if not torch.isfinite(loss):
+                # Skip the batch instead of letting one NaN spoil every weight.
+                skipped += 1
+                scheduler.step()
+                step = global_step + 1
+                print(f"  step {step}: non-finite loss, batch skipped ({skipped} so far)")
+                if skipped > max(10, total_steps // 100):
+                    raise RuntimeError("too many non-finite losses; try --lr 1e-5")
+                continue
             scaler.scale(loss).backward()
             scaler.unscale_(optimizer)
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
@@ -227,7 +246,7 @@ def train(args: argparse.Namespace) -> dict:
                 last_ckpt = time.time()
 
     train_minutes = (time.time() - start) / 60
-    after = evaluate(model, tokenizer, gold, val, args.max_len, device, dtype)
+    after = evaluate(model, tokenizer, gold, val, args.max_len, device, dtype, mixed)
     print("fine-tuned:", json.dumps({k: v["macro_f1"] for k, v in after.items()}))
 
     Path(args.out).mkdir(parents=True, exist_ok=True)
@@ -237,7 +256,8 @@ def train(args: argparse.Namespace) -> dict:
     metrics = {"base_model": args.model, "seed": args.seed, "n_train_pairs": len(train_pairs),
                "lr": args.lr, "batch_size": args.batch_size, "max_len": args.max_len,
                "epochs": args.epochs, "warmup": args.warmup,
-               "precision": "bf16" if use_bf16 else "fp16",
+               "precision": args.precision if mixed else "fp32 (tf32)",
+               "skipped_batches": skipped,
                "train_minutes": round(train_minutes, 1),
                "gpu": torch.cuda.get_device_name(0) if device == "cuda" else "cpu",
                "zero_shot": before, "fine_tuned": after,
@@ -272,6 +292,7 @@ def main() -> None:
     ap.add_argument("--epochs", type=int, default=2)
     ap.add_argument("--warmup", type=float, default=0.1)
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--precision", choices=["fp32", "bf16", "fp16"], default="fp32")
     ap.add_argument("--no-wandb", dest="wandb", action="store_false")
     train(ap.parse_args())
 
