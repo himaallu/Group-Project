@@ -1,0 +1,7 @@
+# R2 · Reranker + entities (Rathi)
+
+- **What ran:** `notebooks/R2_reranker_colab.ipynb` on Colab (A100): `src/retrieval/train_reranker.py` fine-tunes `BAAI/bge-reranker-v2-m3` on 20,000 (claim, snippet) pairs from MultiFC + AVeriTeC train (own snippet = relevant, random other claim's snippet = irrelevant); `src/retrieval/rerank.py` scores every snippet of all English splits; `src/data/entities.py` (spaCy) extracts PERSON/GPE/LOC/ORG/DATE/EVENT with character offsets.
+- **Settings:** 1 epoch, lr 2e-5, batch 16, max length 256, 10% warmup, fp16, seed 42, BCE on the single logit; val = 2,000 pairs from the val splits (no claim overlap with train). Training took 2.6 min on an A100.
+- **W&B:** reported run https://forge.coreweave.com/wandb/rathiabeth-uowd/twincheck/runs/aihv3ag6 (numbers below). The weights on Hugging Face come from run `yftu2n5c` (same data, settings and seed; val AUROC also 0.998). Run `jlzvxy3h` crashed after training (W&B API change) and is not used.
+- **Key numbers (val pairs):** accuracy 0.719 → **0.980**, AUROC 0.980 → **0.998**; mean relevance of own snippets 0.44 → 0.97, of random snippets 0.0001 → 0.02. Entities: 24,047 claims, 161,375 snippets; 232k DATE, 191k PERSON, 144k ORG, 129k GPE, 11k LOC, 10k EVENT mentions. Full numbers: `reranker_eval.json`.
+- **Files:** `features/relevance_en.parquet` (`id, snippet_idx, relevance`), `features/entities_en.jsonl` (49.6 MB) in git; model (1.1 GB, too big for git LFS quota) at https://huggingface.co/RathiAbeth/twincheck-reranker-v1, pointer in `models/reranker_v1/README.md`.
