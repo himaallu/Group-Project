@@ -91,7 +91,7 @@ if wants nli; then
   step "H3 zero-shot NLI scores" src.nli.score_zeroshot $NLI_FILES --out-dir features/nli_zeroshot
   step "R4 weak NLI pairs" src.nli.build_pairs
   step "R4 NLI fine-tuning" src.nli.train
-  step "R4 fine-tuned NLI scores" src.nli.score_zeroshot $NLI_FILES --model models/nli_v1 \
+  step "R4 fine-tuned NLI scores" src.nli.score $NLI_FILES --model models/nli_v1 \
     --out-dir features/nli_v1
 fi
 
