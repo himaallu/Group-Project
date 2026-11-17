@@ -1,0 +1,69 @@
+{
+  "test": {
+    "n_orig": 2106,
+    "macro_f1": 0.3572348128655045,
+    "auroc": 0.6122108081833502,
+    "ece": 0.05327093298392191,
+    "esr": null,
+    "unrelated_rate": null,
+    "paraphrase_consistency": null,
+    "crosslingual_consistency": null,
+    "crosslingual_A": null,
+    "crosslingual_M": null,
+    "alr": null,
+    "n_P": 0,
+    "n_A": 0,
+    "n_M": 0,
+    "n_B": 0,
+    "n_C": 0,
+    "n_V": 0
+  },
+  "val": {
+    "n_orig": 2104,
+    "macro_f1": 0.3776250141043455,
+    "auroc": 0.6129482148965995,
+    "ece": 0.05368104072804687,
+    "esr": null,
+    "unrelated_rate": null,
+    "paraphrase_consistency": null,
+    "crosslingual_consistency": null,
+    "crosslingual_A": null,
+    "crosslingual_M": null,
+    "alr": null,
+    "n_P": 0,
+    "n_A": 0,
+    "n_M": 0,
+    "n_B": 0,
+    "n_C": 0,
+    "n_V": 0
+  },
+  "config": {
+    "features": [
+      "w_entail",
+      "w_contradict",
+      "w_neutral",
+      "max_entail",
+      "max_contradict",
+      "share_relevant",
+      "match_place",
+      "match_date",
+      "match_person",
+      "n_snippets"
+    ],
+    "name": "v0",
+    "seed": 44,
+    "lambda_inv": 0.0,
+    "lambda_sens": 0.0,
+    "no_relevance": false,
+    "drop_entity": false,
+    "nli_files": [
+      "features/nli_zeroshot/multifc_train.parquet",
+      "features/nli_zeroshot/multifc_val.parquet",
+      "features/nli_zeroshot/multifc_test.parquet"
+    ],
+    "lr": 0.001,
+    "batch_groups": 64,
+    "best_epoch": 10,
+    "val_macro_f1": 0.3776250141043455
+  }
+}
