@@ -6,9 +6,10 @@ What it does
     2. Scores gold + weak val with the model as it is (zero-shot).
     3. Fine-tunes it: cross-entropy over entail / neutral / contradict, AdamW lr 2e-5,
        batch 16, max length 256, 2 epochs, 10% linear warmup, seed 42. Training runs in
-       fp32 (with TF32 matrix maths on A100/L4) by default: DeBERTa-v3 gave a NaN loss
-       with mixed precision in our first run. ``--precision bf16`` / ``fp16`` are kept
-       for other models. A batch with a non-finite loss is skipped and counted; the run
+       fp32 (with TF32 matrix maths on A100/L4) by default, and the weights are cast to
+       fp32 after loading (the checkpoint is stored in fp16, which newer transformers
+       keep; training fp16 weights gave NaN in our first runs). ``--precision bf16`` / ``fp16`` are kept
+       for other models. A batch with a non-finite loss or gradient is skipped and counted; the run
        stops if more than 1% of batches are skipped. Loss goes to W&B (``twincheck``).
     4. Scores gold + weak val again and saves the model and the before/after numbers:
        macro-F1, per-class precision / recall / F1 and the confusion matrix, for
@@ -169,7 +170,9 @@ def train(args: argparse.Namespace) -> dict:
           f"device {device}, {args.precision if mixed else 'fp32'}")
 
     tokenizer = AutoTokenizer.from_pretrained(args.model)
-    model = AutoModelForSequenceClassification.from_pretrained(args.model).to(device)
+    # .float(): newer transformers keep the checkpoint's own dtype (fp16 for mDeBERTa),
+    # and training fp16 weights directly overflows (NaN). Master weights must be fp32.
+    model = AutoModelForSequenceClassification.from_pretrained(args.model).float().to(device)
     index_of = label_columns(model.config.id2label)
     target = {c: index_of[COLUMN_OF[c]] for c in CLASSES}   # our label -> model output
 
@@ -230,12 +233,22 @@ def train(args: argparse.Namespace) -> dict:
                 continue
             scaler.scale(loss).backward()
             scaler.unscale_(optimizer)
-            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+            grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+            if not scaler.is_enabled() and not torch.isfinite(grad_norm):
+                # A NaN gradient would poison AdamW's state even at lr 0: skip the step.
+                optimizer.zero_grad()
+                skipped += 1
+                scheduler.step()
+                step = global_step + 1
+                print(f"  step {step}: non-finite gradient, step skipped ({skipped} so far)")
+                if skipped > max(10, total_steps // 100):
+                    raise RuntimeError("too many non-finite gradients; try --lr 1e-5")
+                continue
             scaler.step(optimizer)
             scaler.update()
             scheduler.step()
             step = global_step + 1
-            if step % 50 == 0 or step == total_steps:
+            if step == 1 or step % 50 == 0 or step == total_steps:
                 print(f"epoch {epoch + 1} step {step}/{total_steps} loss {loss.item():.4f} "
                       f"({time.time() - start:.0f}s)")
                 if run:
