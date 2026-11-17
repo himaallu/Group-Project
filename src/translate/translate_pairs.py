@@ -9,8 +9,9 @@ What it does
          (4-bit, greedy, thinking off). The prompt keeps names, numbers and dates
          unchanged in meaning; an optional glossary (CSV en,ar) fixes how names are
          written, so the same person is spelled the same way everywhere;
-      3. --merge: joins the X-FACT weak pairs and the translated pairs into the final
-         data/nli/ar_train.jsonl, keeping the three classes balanced.
+      3. --merge: drops translations that drifted into another script (Cyrillic,
+         Chinese) or stayed mostly English, then joins the X-FACT weak pairs and the
+         good translated pairs into data/nli/ar_train.jsonl, keeping classes balanced.
     Translation writes one line per finished pair, so a re-run after a Colab
     disconnect continues where it stopped.
 
@@ -147,10 +148,26 @@ def run_translation(args) -> None:
             print(f"{min(start + args.batch, len(todo))}/{len(todo)} translated")
 
 
+ARABIC = re.compile(r"[\u0600-\u06FF]")
+OTHER_SCRIPT = re.compile(r"[\u0400-\u04FF\u4E00-\u9FFF\u3040-\u30FF]")  # Cyrillic, Chinese, Japanese
+
+
+def good_translation(p: dict) -> bool:
+    """False when the model drifted into another script or left the text mostly untranslated."""
+    for text in (p["claim"], p["snippet"]):
+        if OTHER_SCRIPT.search(text) or len(ARABIC.findall(text)) < 0.3 * len(text):
+            return False
+    return True
+
+
 def merge(args) -> None:
-    """Join X-FACT weak pairs and translated pairs into data/nli/ar_train.jsonl (balanced)."""
+    """Join X-FACT weak pairs and good translated pairs into data/nli/ar_train.jsonl (balanced)."""
     rng = random.Random(SEED)
-    pairs = read_jsonl(args.xfact_pairs) + read_jsonl(args.out)
+    translated = read_jsonl(args.out)
+    kept = [p for p in translated if good_translation(p)]
+    print(f"translated pairs: {len(translated)}, kept {len(kept)} "
+          f"(dropped {len(translated) - len(kept)} with another script or little Arabic)")
+    pairs = read_jsonl(args.xfact_pairs) + kept
     by_label = {lab: [p for p in pairs if p["label"] == lab] for lab in ("entail", "contradict", "neutral")}
     cap = max(len(by_label["entail"]), 1)  # entail is the smallest class after the top-up
     final = []

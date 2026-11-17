@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import glob
 import os
 import random
 import re
@@ -57,12 +58,20 @@ AR = {
 
 def usable(text: str, lo: int = 5, hi: int = 25) -> bool:
     """True for a clean, short, single statement (5-25 words; no links, questions,
-    'Says ...', 'FACT CHECK' headlines or unbalanced quotes)."""
+    'Says ...', 'FACT CHECK' or Title-Case headlines, unbalanced quotes, or Arabic
+    'photo/video of ...' captions)."""
     n = len(WORD.findall(text))
     return (lo <= n <= hi and "http" not in text and "not enough information" not in text
             and not text.lower().startswith(("say", "claim")) and "\n" not in text
             and "?" not in text and "؟" not in text and "fact check" not in text.lower()
-            and text.count('"') % 2 == 0)
+            and text.count('"') % 2 == 0 and not headline(text)
+            and not text.startswith(("صورة", "فيديو", "مقطع", "شاهد")))
+
+
+def headline(text: str) -> bool:
+    """True for Title-Case headlines ("Jury Duty Phone Scam Warning"), which are not full claims."""
+    words = [w for w in re.findall(r"[A-Za-z][A-Za-z']*", text) if len(w) > 3]
+    return len(words) >= 3 and sum(w[0].isupper() for w in words) / len(words) > 0.6
 
 
 def tidy(text: str) -> str:
@@ -143,7 +152,10 @@ def main() -> None:
     rng = random.Random(args.seed + args.start)  # different parts get different claims
     pools = load_pools(args.multifc, args.xfact_ar)
     langs = (["en", "ar", "mixed"] * args.n)[: args.n]
-    used: set = set()
+    # never reuse a claim already used in another part (gold_draft_*.jsonl)
+    used: set = {sid for path in sorted(glob.glob("data/claims/gold_draft_*.jsonl"))
+                 if not path.endswith(f"_{args.start:04d}.jsonl")
+                 for r in read_jsonl(path) for sid in r["source_ids"]}
     rows = [make_example(args.start + i, lang, pools, rng, used) for i, lang in enumerate(langs)]
 
     out = f"data/claims/gold_draft_{args.start:04d}.jsonl"
