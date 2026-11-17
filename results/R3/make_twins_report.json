@@ -1,0 +1,37 @@
+{
+  "test": {
+    "n_sources": 500,
+    "sources_by_dataset": {
+      "multifc": 500
+    },
+    "n_twins": 955,
+    "B_made": 281,
+    "C_made": 500,
+    "B_no_twin": 219,
+    "P_made": 174,
+    "P_accepted_attempt_1": 161,
+    "P_accepted_attempt_2": 6,
+    "P_accepted_attempt_3": 7,
+    "P_dropped_failed_checks": 326
+  },
+  "train": {
+    "n_sources": 3000,
+    "sources_by_dataset": {
+      "multifc": 3000
+    },
+    "n_twins": 5705,
+    "B_made": 1719,
+    "C_made": 3000,
+    "B_no_twin": 1281,
+    "P_made": 986,
+    "P_accepted_attempt_1": 915,
+    "P_accepted_attempt_2": 45,
+    "P_accepted_attempt_3": 26,
+    "P_dropped_failed_checks": 2014
+  },
+  "swap_kinds": {
+    "place": 904,
+    "person": 898,
+    "date": 198
+  }
+}
