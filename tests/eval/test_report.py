@@ -65,3 +65,18 @@ def test_smoke_test_runs_on_fixture(tmp_path):
     metrics = run([FIXTURES / "fake_gold.jsonl"], tmp_path)
     assert metrics["n_orig"] == 10 and metrics["n_B"] == 5
     assert (tmp_path / "preds_random.jsonl").exists()
+
+
+def test_report_skips_non_verdict_pred_files(tmp_path):
+    """Other tasks' preds_*.jsonl (e.g. claim extraction) must not break the report."""
+    import json
+    from pathlib import Path
+    from src.eval.report import build_report
+    fixtures = Path("tests/fixtures")
+    (tmp_path / "H5").mkdir()
+    (tmp_path / "H5" / "preds_ours.jsonl").write_text((fixtures / "fake_preds.jsonl").read_text())
+    (tmp_path / "Y3").mkdir()
+    (tmp_path / "Y3" / "preds_qwen.jsonl").write_text(
+        json.dumps({"id": "claims_0101", "language": "en", "pred_claims": ["x"]}) + "\n")
+    table = build_report(tmp_path, [fixtures / "fake_gold.jsonl"], tmp_path / "out")
+    assert list(table["model"]) == ["ours"]
