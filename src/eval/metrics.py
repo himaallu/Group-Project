@@ -236,6 +236,42 @@ def citation_accuracy(citation_supports: Sequence[bool]) -> float | None:
 
 
 # --------------------------------------------------------------------------
+# Agreement between human raters (twin hand-check H4, human evaluation T1)
+# --------------------------------------------------------------------------
+
+def cohen_kappa(rater_a: Sequence, rater_b: Sequence) -> float | None:
+    """Cohen's kappa between two raters who labelled the same items.
+
+    kappa = (p_o - p_e) / (1 - p_e), where p_o is the share of items both raters
+    labelled the same and p_e is the agreement expected by chance from each rater's
+    own label frequencies. Target for the twin hand-check: >= 0.7 (CLAUDE.md §4).
+
+    Args:
+        rater_a: labels from the first rater (any hashable values, e.g. "y"/"n").
+        rater_b: labels from the second rater, same items in the same order.
+
+    Returns:
+        Kappa in [-1, 1]; 1.0 when both raters give every item the same single
+        label (p_e = 1, perfect agreement); None for empty input.
+
+    Raises:
+        ValueError: if the two lists have different lengths.
+    """
+    if len(rater_a) != len(rater_b):
+        raise ValueError(f"raters labelled different numbers of items: "
+                         f"{len(rater_a)} vs {len(rater_b)}")
+    if len(rater_a) == 0:
+        return None
+    a, b = np.asarray(rater_a, dtype=object), np.asarray(rater_b, dtype=object)
+    p_o = float(np.mean(a == b))
+    labels = set(a) | set(b)
+    p_e = sum(float(np.mean(a == lab)) * float(np.mean(b == lab)) for lab in labels)
+    if p_e == 1.0:  # both raters used one and the same label for everything
+        return 1.0
+    return (p_o - p_e) / (1.0 - p_e)
+
+
+# --------------------------------------------------------------------------
 # Claim extraction and retrieval
 # --------------------------------------------------------------------------
 
