@@ -69,7 +69,7 @@ def load(name: str):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     torch.backends.cuda.matmul.allow_tf32 = True
     tok = AutoTokenizer.from_pretrained(name)
-    model = AutoModelForSequenceClassification.from_pretrained(name).to(device).eval()
+    model = AutoModelForSequenceClassification.from_pretrained(name).float().to(device).eval()
     return tok, model, device
 
 
