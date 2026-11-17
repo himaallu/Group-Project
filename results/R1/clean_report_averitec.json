@@ -1,0 +1,65 @@
+{
+  "split_mode": "keep",
+  "seed": 42,
+  "counts": {
+    "claims_in": 3334,
+    "snippets_in": 8546,
+    "snippets_out": 7671,
+    "rule2_overlap_gt_90": 331,
+    "rule1_factcheck_site": 483,
+    "rule3_over_10_snippets": 24,
+    "rule3_duplicate_or_empty_snippet": 37,
+    "rule3_duplicate_claims": 122,
+    "rule3_duplicate_claims_with_other_label": 20,
+    "rule4_claims_without_snippets": 222
+  },
+  "per_split_label": {
+    "train": {
+      "supported": 636,
+      "contradicted": 1449,
+      "unverified": 224
+    },
+    "val": {
+      "supported": 71,
+      "contradicted": 156,
+      "unverified": 25
+    },
+    "test": {
+      "supported": 106,
+      "contradicted": 290,
+      "unverified": 33
+    }
+  },
+  "no_snippets_per_label": {
+    "supported": 76,
+    "contradicted": 128,
+    "unverified": 18
+  },
+  "rule1_top_domains": {
+    "africacheck.org": 235,
+    "politifact.com": 44,
+    "altnews.in": 19,
+    "factcheck.org": 15,
+    "cdn.factcheck.org": 13,
+    "factcheck.afp.com": 13,
+    "leadstories.com": 12,
+    "boomlive.in": 12,
+    "snopes.com": 11,
+    "reuters.com": 10,
+    "fullfact.org": 9,
+    "aap.com.au": 9,
+    "twitter.com": 8,
+    "factly.in": 8,
+    "washingtonpost.com": 8,
+    "polygraph.info": 6,
+    "gdb.polygraph.info": 5,
+    "images-prod.misbar.com": 4,
+    "indiatoday.in": 3,
+    "vishvasnews.com": 3,
+    "checkyourfact.com": 3,
+    "eu.detroitnews.com": 3,
+    "sciencefeedback.co": 2,
+    "media.snopes.com": 2,
+    "businessday.ng": 2
+  }
+}

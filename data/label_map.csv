@@ -1,0 +1,168 @@
+# TwinCheck label map (owner: Rathi, R1). Columns: source, orig_label, label.
+# label is one of supported / contradicted / unverified / dropped.
+# Rule (CLAUDE.md section 4): clear true -> supported, clear false -> contradicted,
+# no evidence -> unverified; half true, mixed, misleading, satire, unclear -> dropped.
+# When a label's meaning is not clear we drop it rather than guess.
+# orig_label is matched lower-case with spaces collapsed. Labels not listed here are
+# dropped by the loaders and counted as "unmapped".
+source,orig_label,label
+# ---------------- MultiFC (all 116 labels found in train + dev) ----------------
+# clear true
+multifc,true,supported
+multifc,mostly true,supported
+multifc,mostly_true,supported
+multifc,truth!,supported
+multifc,mostly truth!,supported
+multifc,true messages,supported
+multifc,verdict: true,supported
+multifc,determination: true,supported
+multifc,determination: mostly true,supported
+multifc,correct,supported
+multifc,mostly-correct,supported
+multifc,accurate,supported
+multifc,conclusion: accurate,supported
+multifc,factscan score: true,supported
+multifc,in-the-green,supported
+multifc,verified,supported
+multifc,fact,supported
+multifc,correct attribution,supported
+multifc,correct attribution!,supported
+multifc,authorship confirmed!,supported
+multifc,confirmed authorship!,supported
+# clear false
+multifc,false,contradicted
+multifc,mostly false,contradicted
+multifc,mostly_false,contradicted
+multifc,pants on fire!,contradicted
+multifc,fiction!,contradicted
+multifc,mostly fiction!,contradicted
+multifc,fiction,contradicted
+multifc,verdict: false,contradicted
+multifc,determination: false,contradicted
+multifc,determination: barely true,contradicted
+multifc,rating: false,contradicted
+multifc,conclusion: false,contradicted
+multifc,we rate this claim false,contradicted
+multifc,factscan score: false,contradicted
+multifc,incorrect,contradicted
+multifc,in-the-red,contradicted
+multifc,fake,contradicted
+multifc,fake news,contradicted
+multifc,bogus warning,contradicted
+multifc,scam,contradicted
+multifc,scam!,contradicted
+multifc,facebook scams,contradicted
+multifc,misattributed,contradicted
+multifc,incorrect attribution!,contradicted
+multifc,inaccurate attribution!,contradicted
+multifc,4 pinnochios,contradicted
+multifc,3 pinnochios,contradicted
+multifc,a lot of baloney,contradicted
+# no evidence either way
+multifc,unproven,unverified
+multifc,unproven!,unverified
+multifc,unverified,unverified
+multifc,unsubstantiated messages,unverified
+multifc,verdict: unsubstantiated,unverified
+multifc,unsupported,unverified
+multifc,no evidence,unverified
+# dropped: half true / mixed
+multifc,half-true,dropped
+multifc,half true,dropped
+multifc,mixture,dropped
+multifc,in-between,dropped
+multifc,partly true,dropped
+multifc,partially true,dropped
+multifc,2 pinnochios,dropped
+multifc,some baloney,dropped
+multifc,a little baloney,dropped
+multifc,truth! & fiction!,dropped
+multifc,truth! & misleading!,dropped
+multifc,truth! & outdated!,dropped
+multifc,truth! & unproven!,dropped
+multifc,truth! & disputed!,dropped
+multifc,previously truth! now resolved!,dropped
+# dropped: misleading / missing context
+multifc,misleading,dropped
+multifc,misleading!,dropped
+multifc,determination: misleading,dropped
+multifc,factscan score: misleading,dropped
+multifc,misleading recommendations,dropped
+multifc,miscaptioned,dropped
+multifc,not the whole story,dropped
+multifc,needs context,dropped
+multifc,cherry picks,dropped
+multifc,distorts the facts,dropped
+multifc,spins the facts,dropped
+multifc,exaggerated,dropped
+multifc,exaggerates,dropped
+multifc,understated,dropped
+multifc,determination: a stretch,dropped
+multifc,determination: huckster propaganda,dropped
+multifc,outdated,dropped
+multifc,outdated!,dropped
+# dropped: satire, opinion, legend, categories that are not verdicts
+multifc,statirical reports,dropped
+multifc,fiction! & satire!,dropped
+multifc,opinion!,dropped
+multifc,commentary!,dropped
+multifc,legend,dropped
+multifc,virus!,dropped
+multifc,grass roots movement!,dropped
+multifc,disputed!,dropped
+multifc,investigation pending!,dropped
+multifc,unobservable,dropped
+multifc,conclusion: unclear,dropped
+multifc,none,dropped
+# dropped: PolitiFact promise / flip-o-meter ratings (about promises, not facts)
+multifc,promise kept,dropped
+multifc,promise broken,dropped
+multifc,compromise,dropped
+multifc,stalled,dropped
+multifc,in the works,dropped
+multifc,not yet rated,dropped
+multifc,full flop,dropped
+multifc,half flip,dropped
+multifc,no flip,dropped
+# dropped: GossipCop 0-10 scores (meaning of each score not documented in the release)
+multifc,0,dropped
+multifc,1,dropped
+multifc,2,dropped
+multifc,3,dropped
+multifc,4,dropped
+multifc,10,dropped
+# ---------------- AVeriTeC ----------------
+averitec,supported,supported
+averitec,refuted,contradicted
+averitec,not enough evidence,unverified
+averitec,conflicting evidence/cherrypicking,dropped
+# ---------------- Arabic (from Youssef, Y1: notes/Y1_for_rathi/label_map_arabic_rows.csv) ----------------
+xfact,true,supported
+xfact,mostly true,supported
+xfact,false,contradicted
+xfact,mostly false,contradicted
+xfact,complicated/hard to categorise,unverified
+xfact,partly true/misleading,dropped
+xfact,other,dropped
+m4fc,true,supported
+m4fc,false (out-of-context),contradicted
+m4fc,false (manipulated/fake),contradicted
+m4fc,false (ai-generated),contradicted
+m4fc,not enough information,unverified
+m4fc,true_caption,supported
+ar,صحيح,supported
+ar,زائف,contradicted
+ar,كاذب,contradicted
+ar,خاطئ,contradicted
+ar,مفبرك,contradicted
+ar,ملفق,contradicted
+ar,مشكوك فيه,unverified
+ar,غير مؤكد,unverified
+ar,لا يمكن التحقق,unverified
+ar,مضلل,dropped
+ar,انتقائي,dropped
+ar,عنوان مضلل,dropped
+ar,محتوى ناقص,dropped
+ar,ساخر,dropped
+ar,إثارة,dropped
+ar,خرافة,dropped
