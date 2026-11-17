@@ -1,0 +1,12 @@
+{
+  "what": "base mDeBERTa-v3 XNLI (no fine-tuning) on data/nli/gold_val.jsonl, 150 EN pairs, argmax label",
+  "model": "MoritzLaurer/mDeBERTa-v3-base-xnli-multilingual-nli-2mil7",
+  "macro_f1": 0.367,
+  "accuracy": 0.513,
+  "confusion_rows_gold_cols_pred": {
+    "labels": ["entail", "contradict", "neutral"],
+    "entail": [9, 0, 1],
+    "contradict": [3, 3, 2],
+    "neutral": [37, 30, 65]
+  }
+}

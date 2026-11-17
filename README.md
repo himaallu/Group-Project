@@ -35,6 +35,7 @@ download scripts. Files over 100 MB need Git LFS.
 | `src/vision/` | image embeddings, authenticity detector, image twins |
 | `src/eval/` | `loaders.py` (format checks), `metrics.py` (all metrics), `report.py` (tables), `baselines/` |
 | `src/demo/` | Gradio demo |
+| `src/pipeline.py` | `check(message, evidence=None, lang=None)`: the end-to-end entry point |
 | `results/<task-id>/` | small result files + `README.md` |
 | `reports/{tables,figures}/` | generated LaTeX/CSV tables and figures |
 | `notes/` | per-task notes and `contributions.md` |

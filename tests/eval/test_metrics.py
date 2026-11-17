@@ -172,3 +172,30 @@ def test_bootstrap_is_reproducible_with_seed(fake_df):
 def test_mean_sd():
     assert M.mean_sd([0.70, 0.72, 0.74]) == pytest.approx((0.72, 0.02))
     assert M.mean_sd([0.5]) == (0.5, 0.0)
+
+
+# ---------- Cohen's kappa ----------
+
+def test_kappa_matches_sklearn():
+    from sklearn.metrics import cohen_kappa_score
+    a = ["y", "y", "n", "y", "n", "n", "y", "y", "n", "y"]
+    b = ["y", "n", "n", "y", "n", "y", "y", "y", "n", "y"]
+    assert M.cohen_kappa(a, b) == pytest.approx(cohen_kappa_score(a, b))
+
+
+def test_kappa_hand_computed():
+    # p_o = 0.8; p_e = 0.6*0.6 + 0.4*0.4 = 0.52 -> (0.8-0.52)/0.48
+    a = ["y"] * 6 + ["n"] * 4
+    b = ["y"] * 5 + ["n"] + ["y"] + ["n"] * 3
+    assert M.cohen_kappa(a, b) == pytest.approx(0.28 / 0.48)
+
+
+def test_kappa_perfect_and_single_label():
+    assert M.cohen_kappa(["y", "n", "y"], ["y", "n", "y"]) == pytest.approx(1.0)
+    assert M.cohen_kappa(["y", "y"], ["y", "y"]) == 1.0
+
+
+def test_kappa_errors_and_empty():
+    assert M.cohen_kappa([], []) is None
+    with pytest.raises(ValueError):
+        M.cohen_kappa(["y"], ["y", "n"])
