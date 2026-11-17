@@ -10,3 +10,4 @@ contribution statement.
 | H4 (prep) | Himasri | 2026-11-17 | branch `himasri/H4-prep`: calibration, twin hand-check sheets + kappa, `pipeline.py` interface, zero-shot NLI script |
 | R1 | Rathi | 2026-11-17 | PR #2 + #7: `src/data/` loaders + `clean.py`, `data/label_map.csv`, `data/processed/en/` (MultiFC 21,057 + AVeriTeC 2,990 claims) |
 | R2 | Rathi | 2026-11-17 | branch `rathi/R2-reranker`: reranker AUROC 0.980 → 0.998, `features/relevance_en.parquet`, `features/entities_en.jsonl`; W&B https://forge.coreweave.com/wandb/rathiabeth-uowd/twincheck/runs/aihv3ag6 |
+| R3 | Rathi | 2026-11-17 | branch `rathi/R3-twins` (dc1bd8b): `data/copies/en/` test 955 twins (174 P, 281 B, 500 C), train 5,705 (986 P, 1,719 B, 3,000 C); checks 0/1 failures |
