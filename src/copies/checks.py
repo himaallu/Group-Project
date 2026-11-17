@@ -31,7 +31,7 @@ import json
 from collections import Counter
 from pathlib import Path
 
-from src.copies.swap import mention_pattern
+from src.copies.swap import apply_swap, swap_pairs
 from src.copies.unrelated import MAX_DONOR_RELEVANCE, entity_texts
 from src.eval.loaders import load_jsonl, split_twin_id, validate_record
 
@@ -68,9 +68,8 @@ def check_twin(twin: dict, originals: dict, logs: dict, entities: dict | None) -
     elif kind == "B":
         if twin["claim"] != orig["claim"]:
             problems.append("_B claim changed")
-        pattern = mention_pattern(log.get("old", ""))
-        new = log.get("new", "")
-        expected = [pattern.sub(lambda _: new, t) for t in texts(orig)]
+        pairs = swap_pairs(log.get("kind", ""), log.get("old", ""), log.get("new", ""))
+        expected = [apply_swap(t, pairs) for t in texts(orig)]
         if not log or texts(twin) != expected:
             problems.append("_B evidence differs from the logged swap")
         if texts(twin) == texts(orig):

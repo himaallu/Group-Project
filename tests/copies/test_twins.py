@@ -60,7 +60,7 @@ def test_sources_need_supported_and_two_relevant_snippets():
 
 
 def test_build_pools_min_count_and_names():
-    rows = [{"claim_entities": [{"text": "Paris", "label": "GPE"},
+    rows = [{"claim_entities": [{"text": "Paris", "label": "GPE"}, {"text": "Gulf", "label": "LOC"},
                                 {"text": "Bob", "label": "PERSON"},
                                 {"text": "Jane Smith", "label": "PERSON"}],
              "snippet_entities": []}] * 5
@@ -159,3 +159,19 @@ def test_paraphrase_retry_then_drop():
     assert pairs[0][0]["evidence"] == recs[0]["evidence"]
     assert stats["accepted_attempt_1"] == 1 and stats["dropped_failed_checks"] == 1
     assert calls == [False, True, True]
+
+
+def test_person_swap_also_replaces_surname_only_mentions():
+    from src.copies.swap import apply_swap, swap_pairs
+    pairs = swap_pairs("person", "Barack Obama", "Jane Smith")
+    text = "Barack Obama spoke. Later President Obama left. Obamacare stayed. Michelle Obama too."
+    assert apply_swap(text, pairs) ==         "Jane Smith spoke. Later President Smith left. Obamacare stayed. Michelle Obama too."
+    # surname-only claim: only the surname is swapped
+    assert apply_swap("Mitt Romney won", swap_pairs("person", "Romney", "Jane Smith")) == \
+        "Mitt Smith won"
+
+
+def test_pools_skip_abbreviations():
+    rows = [{"claim_entities": [{"text": "AK", "label": "GPE"}, {"text": "Alaska", "label": "GPE"}],
+             "snippet_entities": []}] * 5
+    assert build_pools(rows)["place"] == ["Alaska"]
