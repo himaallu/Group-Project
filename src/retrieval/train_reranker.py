@@ -136,7 +136,7 @@ def train(args: argparse.Namespace) -> dict:
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=0.01)
     scheduler = get_linear_schedule_with_warmup(
         optimizer, int(args.warmup * total_steps), total_steps)
-    scaler = torch.cuda.amp.GradScaler(enabled=device == "cuda")
+    scaler = torch.amp.GradScaler("cuda", enabled=device == "cuda")
     loss_fn = torch.nn.BCEWithLogitsLoss()
 
     # Resume from the last checkpoint if this run was interrupted.
@@ -197,7 +197,7 @@ def train(args: argparse.Namespace) -> dict:
                "epochs": args.epochs, "train_minutes": round(train_minutes, 1),
                "gpu": torch.cuda.get_device_name(0) if device == "cuda" else "cpu",
                "val_zero_shot": before, "val_fine_tuned": after,
-               "wandb_url": run.get_url() if run else None}
+               "wandb_url": getattr(run, "url", None) if run else None}
     Path(args.metrics).parent.mkdir(parents=True, exist_ok=True)
     with open(args.metrics, "w", encoding="utf-8") as f:
         json.dump(metrics, f, indent=2)
