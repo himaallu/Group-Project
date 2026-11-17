@@ -230,25 +230,30 @@ twincheck/
 - **Commits start with the task ID:** `[R3] Add evidence-swap twin generator (Copy B)`.
 - **Results:** small files only in `results/<task-id>/` (CSV/JSON, PNG, < 10 MB) + `README.md`.
 - **Notebooks:** finished code moves into `src/*.py`; pushed notebooks have outputs cleared.
-- **Pull request** to `main` titled `[R3] English twins`: what was built, how to run, output paths, key numbers. Someone from the **other team** runs it on the 10-row sample and approves.
+- **Pull request** to `main` titled `[R3] English twins`: what was built, how to run, output paths, key numbers. The **author reviews and merges it themselves** after running the tests and the 10-row sample (no second reviewer needed); post the merged PR link in the group.
 - **By 23:00 every day:** push your branch, update Status in the tracker, add a line to `notes/contributions.md`.
 - **Post a 10-row sample** of every hand-off file before the full file.
 
 ---
 
-## 7. Teams and GPUs
+## 7. People and GPUs
 
-| Team | Members | Owns | GPU |
-|---|---|---|---|
-| **Team B** | Rathi (code), Youssef (all Arabic + claim extraction) | data, NLP twins, NLI, reranker, explanations, demo, Arabic experiments | Colab Pro **Account B** |
-| **Team A** | Himasri (integration, eval, MAAI902 lead), Feba (vision, baselines, MAAI901 lead) | metrics, verdict head, pipeline, baselines, image side, reports, slides | Colab Pro **Account A** + Kaggle |
+There are **no sub-teams and no shared Colab accounts**. Everyone works individually,
+on their own schedule, in their own Colab (or Kaggle) account. Collaboration happens
+only through GitHub (pushed files, PRs) and the group chat.
 
-(If the team ends up with only one Colab account: Team B's jobs stay on it; Feba and
-Himasri move their GPU jobs to Kaggle free notebooks. Check the tracker's GPU column.)
+| Person | Owns | GPU |
+|---|---|---|
+| Rathi (code) | data, NLP twins, NLI, reranker, explanations, demo | own Colab account |
+| Youssef (all Arabic + claim extraction) | Arabic data, Arabic twins, claim extraction, Arabic experiments | own Colab account |
+| Himasri (integration, eval, MAAI902 lead) | metrics, verdict head, pipeline, MAAI902 report | own Colab account (+ Kaggle) |
+| Feba (vision, baselines, MAAI901 lead) | baselines, image side, MAAI901 report | own Colab account (+ Kaggle) |
 
-**Rules:** book GPU time in the group ("Account B: starting R4, ~2 h" / "done,
-runtime stopped"); one GPU job per account at a time; overnight jobs need the browser
-tab open and the laptop awake; save checkpoints every ~20 minutes (to the Colab
+Wherever this file says "Account A", "Account B" or that a job runs for someone else,
+read it as: **each person runs their own jobs in their own account.**
+
+**Rules:** post in the group when a hand-off file is pushed (path + commit); overnight
+jobs need the browser tab open and the laptop awake; save checkpoints every ~20 minutes (to the Colab
 session, and download/push the last one so a disconnect does not lose the run); stop the
 runtime when the job ends; run Qwen3-8B in 4-bit or with vLLM; base models download
 from Hugging Face into `/content`, only our fine-tuned checkpoints go to `models/` in git
@@ -290,18 +295,18 @@ group before the due time, with a new ETA.
 
 **Milestones:** results freeze **Wed 18, 23:00** · everything finished **Sun 22, 21:00**
 in `Final/` in the repo · rehearsals **Mon 23** · submit **Tue 24 by noon**.
-Calls: pair check-in 09:00; team calls 13:00 + 21:00 (Mon–Wed), 21:00 only (Thu–Sun).
+Calls: optional; schedules differ, so status goes in the group chat and the tracker instead. Hand-offs happen by pushing to GitHub and posting the path.
 
 ---
 
 ## 9. Every person's tasks (steps)
 
-### Rathi (Team B, code)
+### Rathi (code)
 
 - **R1 · Mon 23:00–01:30 · English data.** Download MultiFC + AVeriTeC to `data/raw/`; `src/data/load_multifc.py`, `load_averitec.py` (each AVeriTeC QA answer → one snippet) → shared format; write `data/label_map.csv`; `src/data/clean.py` (rules in §4); own 80/10/10 split for MultiFC; save `data/processed/en/{multifc,averitec}_{train,val,test}.jsonl`; post 10-row sample + counts; `notes/R1.md` with counts per label/split and how many snippets each cleaning rule removed.
 - **R2 · Mon 01:30 → overnight · Reranker + entities.** Fine-tune `BAAI/bge-reranker-v2-m3` 1 epoch on ~20k pairs (own snippets = relevant, random claim's snippets = irrelevant; lr 2e-5) → `models/reranker_v1/`; score every (claim, snippet) → `features/relevance_en.parquet` (`id, snippet_idx, relevance`); spaCy entities (PERSON, GPE, LOC, ORG, DATE, EVENT) → `features/entities_en.jsonl`; reusable `src/retrieval/rerank.py`, `src/data/entities.py`.
 - **R3 · Tue 09:30–14:00 · English twins.** Sources list (§4) → `sources.csv`; `_P` paraphrase, `_B` swap, `_C` unrelated (rules in §4) for 500 test + 3,000 train; auto-checks; save `data/copies/en/{test,train}.jsonl`; post 10 examples of each type.
-- **R4 · Tue 14:00 → Wed 09:00 · NLI.** ~30k balanced English weak pairs (supported claim + relevant snippet → entail; contradicted claim + relevant snippet → contradict; random snippet → neutral; `_B` snippets → contradict) + ~3k Arabic pairs; fine-tune mDeBERTa-v3 (lr 2e-5, batch 16, max len 256, 2 epochs, warmup 10%, fp16, seed 42); macro-F1 on 300 gold pairs (EN and AR separately) zero-shot vs fine-tuned; score every pair in all splits and twins → `features/nli_*.parquet` (`id, snippet_idx, p_entail, p_contradict, p_neutral`); XLM-R-large comparison overnight on Account A.
+- **R4 · Tue 14:00 → Wed 09:00 · NLI.** ~30k balanced English weak pairs (supported claim + relevant snippet → entail; contradicted claim + relevant snippet → contradict; random snippet → neutral; `_B` snippets → contradict) + ~3k Arabic pairs; fine-tune mDeBERTa-v3 (lr 2e-5, batch 16, max len 256, 2 epochs, warmup 10%, fp16, seed 42); macro-F1 on 300 gold pairs (EN and AR separately) zero-shot vs fine-tuned; score every pair in all splits and twins → `features/nli_*.parquet` (`id, snippet_idx, p_entail, p_contradict, p_neutral`); XLM-R-large comparison overnight (own account).
 - **R5 · Wed 09:30–16:00 · Explanations + offline index.** `src/explain/generate.py` (claim, verdict, top-3 snippets [1]–[3]; 1–2 sentences in the claim's language, cite only those numbers); `src/explain/faithfulness.py` (NLI on cited snippet vs each sentence; faithfulness + citation accuracy on 200 test claims); `src/retrieval/index.py` (BM25 + BGE-M3 FAISS over all cleaned snippets from MultiFC, AVeriTeC, X-FACT AR; top 20 → reranker → best 5; recall@5 on 200 claims); save 5 good and 5 bad notes.
 - **R6 · Wed 16:00–19:00 · Demo.** `src/demo/app.py` (Gradio): message → claims → offline evidence → verdict per claim + cited note + confidence; 6 ready examples (2 Supported, 2 Contradicted, 2 Unverified; ≥ 2 Arabic, 1 mixed); made-up UAE examples labelled "illustrative example" on screen.
 - **R7 · Wed 19:00–23:00 · Cleanup.** `run_all.sh`, README draft, fix teammates' bugs before freeze.
@@ -310,20 +315,20 @@ Calls: pair check-in 09:00; team calls 13:00 + 21:00 (Mon–Wed), 21:00 only (Th
 - **R10 · Sat · Demo polish + video + slides.** Arabic right-to-left, confidence bar, cited links; 2–3 min demo video; 3 slides (data + twins, demo, repo); technical review of the MAAI901 draft.
 - **R11 · Sun · Repo v1.0.** Merge all branches; `run_all.sh` reproduces main tables; README with results table; tag `v1.0`; check contribution log.
 
-### Youssef (Team B, all Arabic + claim extraction)
+### Youssef (all Arabic + claim extraction)
 
 - **Y1 · Mon 23:00 → Tue 10:30 · Arabic data.** X-FACT (Arabic) + M4FC → shared format, `language: ar`; M4FC images to `data/processed/vision/m4fc_images/` for Feba by 01:00; add Arabic-site labels to `label_map.csv` (sync with Rathi); run `clean.py` with Arabic fact-check sites added; save `data/processed/ar/{xfact_ar,m4fc_ar}_*.jsonl` (M4FC = test only); post counts.
 - **Y3 (part 1) · Mon 01:00–02:00 + Tue 14:00–15:30 · Claim-extraction examples.** 300 WhatsApp-style messages (~100 EN, ~100 AR, ~100 mixed), each combining 1–3 real claims, with gold claims → `data/claims/gold.jsonl` (`id, language, message, claims[]`); LLM can draft, you check every one.
 - **Y2 · Tue 10:30–14:00 · Arabic NLI data.** Weak pairs from X-FACT Arabic train (top up to ~3k by translating English pairs with Qwen3-8B + glossary) → `data/nli/ar_train.jsonl`; hand-label 150 Arabic gold pairs → append to `data/nli/gold_val.jsonl` with `language: ar`. Due 14:00.
 - **Y3 (part 2) · Tue 15:30–18:00 · Extractor.** `src/claims/extract.py`: Qwen3-8B few-shot (6 examples, 2 per language), JSON list of claims in the original language; F1 on 200 held-out examples per language. **Wed 10:00–12:00:** LoRA Qwen3-4B on the other 100, compare.
-- **Y4 · Tue 18:30 → Wed 10:00 · Arabic twins (on Account A, lent).** 200 of the 500 test sources: `_A` (claim + snippets translated), `_M` (Arabic claim, English snippets), and Arabic versions of their `_B`/`_C`; check 50 translations; `data/copies/ar/test.jsonl`; error notes in `notes/Y4.md`.
+- **Y4 · Tue 18:30 → Wed 10:00 · Arabic twins (own account).** 200 of the 500 test sources: `_A` (claim + snippets translated), `_M` (Arabic claim, English snippets), and Arabic versions of their `_B`/`_C`; check 50 translations; `data/copies/ar/test.jsonl`; error notes in `notes/Y4.md`.
 - **Y5 · Wed 12:00–23:00 · Arabic experiments E7.** Our pipeline + Feba's baselines on Arabic twins, mixed twins, X-FACT AR test, M4FC AR; per language (EN / AR / mixed): macro-F1, ESR, unrelated rate, cross-lingual consistency → `results/Y5/arabic_E7.csv`.
 - **Y6 · Wed eve + Thu · Arabic error analysis + sections.** 20 failures by cause (dialect, translation, name spelling, missing evidence, other); T1 rate 20 Arabic notes; Arabic section for each report, worded differently, to Himasri + Feba by Thu 20:00.
 - **Y7 · Fri · Arabic integration.** Place Arabic sections in both drafts (10:00 Himasri, 11:00 Feba); Arabic slide images; Arabic part of presentation script; comment on Arabic terms.
 - **Y8 · Sat · Numbers check.** Check every number in both report drafts against `results/` (list to writers by 14:00); Arabic human-eval paragraph; Arabic slides.
 - **Y9 · Sun · Sign-off.** Demo with 5 Arabic messages; papers vs reports consistency; final Arabic check of final docs + slides; post sign-off.
 
-### Himasri (Team A, integration, evaluation, MAAI902 lead)
+### Himasri (integration, evaluation, MAAI902 lead)
 
 - **H1 · Mon 23:00–02:00 · Repo + metrics.** Repo with the §6 layout, `requirements.txt`, `.gitignore`, W&B project, Overleaf projects (one per course), `references.bib`, `notes/contributions.md`; invite all; `src/eval/metrics.py` (all §5 metrics) + unit tests on fake predictions; `src/eval/report.py` (predictions → CSV + LaTeX tables).
 - **H2 · Tue 09:10–13:00 · Gold pairs + skeleton.** Hand-label 150 English (snippet, claim) pairs from the R1 val split → `data/nli/gold_val.jsonl` (`language: en`) by 12:00; MAAI902 report skeleton (8 sections).
@@ -336,11 +341,11 @@ Calls: pair check-in 09:00; team calls 13:00 + 21:00 (Mon–Wed), 21:00 only (Th
 - **H8 · Sun · Finalise.** Report + paper from comments and Youssef's mismatch list; Turnitin < 10%; assemble the full slide deck (slides from everyone by 15:00); upload to `Final/` by 21:00.
 - **H9 · Tue 24 · Submit** all four documents by noon after a final read with Feba.
 
-### Feba (Team A, vision, baselines, MAAI901 lead)
+### Feba (vision, baselines, MAAI901 lead)
 
 - **F1 · Mon 23:00–02:00 · Vision data.** VERITE (+ image script; count failures); check if RED-DOT VERITE evidence is public; GenImage subset (real + 2–3 generators, ~10k each, one generator held out); VERITE → `data/processed/vision/verite.jsonl`.
 - **F2 · Mon night → Tue 11:30 · Features + image twins.** Cache SigLIP 2 + CLIP ViT-L/14 embeddings (VERITE, M4FC, GenImage) → `features/vision/*.npy`; `_V` twins: VAE round-trip for all true images + SDXL img2img (0.15–0.25) for 500 test; save originals and twins as JPEG 85; keep twins with SigLIP cosine ≥ 0.92; check 30 by eye; skip large identifiable faces.
-- **F3 · Tue 11:30–18:30 · Detector + leakage + skeleton.** MAAI901 report skeleton (12 sections); logistic probe on CLIP features (camera / AI / edited), seen vs unseen generator; leakage test on VERITE: fused model (sees image embedding + authenticity) vs our decoupled model → ALR; claim-only + similarity baselines on English originals. 18:30 hand Account A to Youssef; 22:00 start Rathi's XLM-R job.
+- **F3 · Tue 11:30–18:30 · Detector + leakage + skeleton.** MAAI901 report skeleton (12 sections); logistic probe on CLIP features (camera / AI / edited), seen vs unseen generator; leakage test on VERITE: fused model (sees image embedding + authenticity) vs our decoupled model → ALR; claim-only + similarity baselines on English originals.
 - **F4 · Wed 08:00–13:00 · Baselines audit.** 08:00 hand-check 75 twins; baselines in `src/eval/baselines/` (claim-only, zero-shot NLI, similarity + LightGBM, LLM judge on Kaggle) on originals + all English twins → `results/F4/audit_E0.csv`; scripts take any twin file so Youssef can rerun them on Arabic.
 - **F5 · Wed 13:15–23:00 · Vision experiments.** Grad-CAM (8 examples); robustness (JPEG 50/70, 20% crop); ONNX export + ms per image; **CNN vs ViT:** ResNet-50 and ViT-B/16 (last 4 blocks) on GenImage with augmentation (crop, flip, JPEG 60–95, blur), 3 epochs each, vs CLIP probe on seen/unseen generators and under JPEG/crop; freeze 23:00.
 - **F6 · Thu · Writing + analysis.** Vision error analysis (8 cases with Grad-CAM); T1 rate 40 English notes; MAAI901 introduction, related work, methods, results.
@@ -371,6 +376,6 @@ Calls: pair check-in 09:00; team calls 13:00 + 21:00 (Mon–Wed), 21:00 only (Th
 3. Sample first (10 rows), then the full file.
 4. If it is not logged in W&B, it did not happen.
 5. Push daily to your own branch; data, features and models go in git too (no file over 100 MB without Git LFS; no `data/raw/`).
-6. Blocked for 2 hours? Ask your partner, then the group.
+6. Blocked for 2 hours? Ask in the group (name the person whose file you need).
 7. Changes to datasets, models or this plan are agreed in the group first.
 8. Results freeze Wed 18, 23:00. After that: analysis, writing and fixes only.
