@@ -1,0 +1,53 @@
+{
+  "split_mode": "keep",
+  "seed": 42,
+  "counts": {
+    "claims_in": 919,
+    "snippets_in": 4463,
+    "rule1_factcheck_site": 1120,
+    "snippets_out": 2978,
+    "rule2_overlap_gt_90": 224,
+    "rule3_duplicate_or_empty_snippet": 141,
+    "rule4_claims_without_snippets": 21
+  },
+  "per_split_label": {
+    "train": {
+      "supported": 34,
+      "contradicted": 622,
+      "unverified": 14
+    },
+    "val": {
+      "supported": 10,
+      "contradicted": 76,
+      "unverified": 7
+    },
+    "test": {
+      "supported": 8,
+      "contradicted": 123,
+      "unverified": 4
+    }
+  },
+  "no_snippets_per_label": {
+    "supported": 3,
+    "contradicted": 17,
+    "unverified": 1
+  },
+  "rule1_top_domains": {
+    "misbar.com": 794,
+    "falsoo.com": 101,
+    "factuel.afp.com": 49,
+    "seo.misbar.com": 48,
+    "fatabyyano.net": 45,
+    "shop2party.com": 33,
+    "annahar.com": 22,
+    "factual.afp.com": 8,
+    "verify-sy.com": 7,
+    "dabegad.com": 5,
+    "toolbox.google.com": 2,
+    "beta.misbar.com": 2,
+    "checamos.afp.com": 1,
+    "akeed.jo": 1,
+    "icheck.tn": 1,
+    "periksafakta.afp.com": 1
+  }
+}
