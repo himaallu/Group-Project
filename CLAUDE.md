@@ -225,7 +225,7 @@ twincheck/
 ```
 
 - Python 3.11, `requirements.txt` (torch, transformers, sentence-transformers, datasets, spacy, rank_bm25, faiss-cpu, scikit-learn, lightgbm, wandb, gradio, diffusers, open_clip_torch, onnxruntime, peft).
-- **Data, features and models never go into git** (`.gitignore` covers `data/`, `features/`, `models/`). They live in the shared Drive folder `TwinCheck/` with the same paths.
+- **Data, features and models are shared through git** (no shared Drive). Push them under `data/`, `features/`, `models/` with the paths in this file. GitHub refuses any single file over 100 MB (warns over 50 MB): split large outputs (e.g. one file per split) or track them with Git LFS (`git lfs track "*.safetensors"`). Raw downloads (`data/raw/`) and staging files stay out of git; rebuild them with the download scripts. The repo is public: only push data whose licence allows it (MultiFC: research use, cite the paper).
 - **Branch per task:** `<name>/<task-id>-<short-name>`, e.g. `rathi/R3-twins`.
 - **Commits start with the task ID:** `[R3] Add evidence-swap twin generator (Copy B)`.
 - **Results:** small files only in `results/<task-id>/` (CSV/JSON, PNG, < 10 MB) + `README.md`.
@@ -248,15 +248,15 @@ Himasri move their GPU jobs to Kaggle free notebooks. Check the tracker's GPU co
 
 **Rules:** book GPU time in the group ("Account B: starting R4, ~2 h" / "done,
 runtime stopped"); one GPU job per account at a time; overnight jobs need the browser
-tab open and the laptop awake; save checkpoints to Drive every ~20 minutes; stop the
+tab open and the laptop awake; save checkpoints every ~20 minutes (to the Colab
+session, and download/push the last one so a disconnect does not lose the run); stop the
 runtime when the job ends; run Qwen3-8B in 4-bit or with vLLM; base models download
-from Hugging Face into `/content`, only our fine-tuned checkpoints go to Drive.
+from Hugging Face into `/content`, only our fine-tuned checkpoints go to `models/` in git
+(Git LFS if a file is over 100 MB).
 
 **First cell of every Colab notebook**
 
 ```python
-from google.colab import drive; drive.mount('/content/drive')
-DATA = '/content/drive/MyDrive/TwinCheck'          # shared folder (shortcut)
 !git clone https://<github-token>@github.com/<org>/twincheck.git /content/twincheck
 %cd /content/twincheck
 !git checkout <name>/<task-id>-<short-name>
@@ -289,7 +289,7 @@ If a hand-off is late, build against the 10-row sample and rerun later. Say so i
 group before the due time, with a new ETA.
 
 **Milestones:** results freeze **Wed 18, 23:00** · everything finished **Sun 22, 21:00**
-in `TwinCheck/Final/` · rehearsals **Mon 23** · submit **Tue 24 by noon**.
+in `Final/` in the repo · rehearsals **Mon 23** · submit **Tue 24 by noon**.
 Calls: pair check-in 09:00; team calls 13:00 + 21:00 (Mon–Wed), 21:00 only (Thu–Sun).
 
 ---
@@ -370,7 +370,7 @@ Calls: pair check-in 09:00; team calls 13:00 + 21:00 (Mon–Wed), 21:00 only (Th
 2. Train data never touches test data.
 3. Sample first (10 rows), then the full file.
 4. If it is not logged in W&B, it did not happen.
-5. Push daily to your own branch; no data or models in git.
+5. Push daily to your own branch; data, features and models go in git too (no file over 100 MB without Git LFS; no `data/raw/`).
 6. Blocked for 2 hours? Ask your partner, then the group.
 7. Changes to datasets, models or this plan are agreed in the group first.
 8. Results freeze Wed 18, 23:00. After that: analysis, writing and fixes only.

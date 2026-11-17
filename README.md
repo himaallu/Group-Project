@@ -17,8 +17,9 @@ pip install -r requirements.txt
 python -m pytest -q
 ```
 
-Data, features and models are not in git. They live in the shared Drive folder
-`TwinCheck/` under the same paths (see `data/README.md`).
+Data, features and models are shared through git under `data/`, `features/` and
+`models/` (see `data/README.md`). Raw downloads are not: rebuild them with the
+download scripts. Files over 100 MB need Git LFS.
 
 ## Folder map
 

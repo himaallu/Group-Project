@@ -1,24 +1,14 @@
-# --- Data, features and models never go into git (they live in Drive: TwinCheck/) ---
-data/*
-!data/README.md
-!data/label_map.csv
-features/
-models/
+# --- Data, features and models ARE shared through git (no shared Drive). ---
+# GitHub refuses single files over 100 MB: split them or use Git LFS.
+# Raw downloads and staging files are rebuilt by the download scripts instead.
+data/raw/
+data/**/staging/
+data/**/test10/
 
 # --- Experiment tracking / caches ---
 wandb/
 .cache/
-*.ckpt
-*.pt
-*.bin
-*.safetensors
-*.onnx
-*.parquet
-*.npy
-
-# Big files inside results/ (only small CSV/JSON/PNG < 10 MB belong there)
-results/**/*.zip
-results/**/*.tar*
+results/H1/smoke/
 
 # --- Python ---
 __pycache__/
@@ -34,7 +24,14 @@ venv/
 .idea/
 .DS_Store
 
+# --- LaTeX build files ---
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.synctex.gz
+
 # --- Secrets ---
 .env
 *.key
-results/H1/smoke/
