@@ -1,0 +1,13 @@
+\begin{table}[t]
+\centering
+\caption{Reranker on 2,000 validation pairs before and after fine-tuning.}
+\label{tab:tab_reranker}
+\begin{tabular}{lrrrr}
+\toprule
+model & accuracy & AUROC & mean rel. (own) & mean rel. (random) \\
+\midrule
+zero-shot & 0.719 & 0.980 & 0.436 & 0.000 \\
+fine-tuned & 0.980 & 0.998 & 0.974 & 0.020 \\
+\bottomrule
+\end{tabular}
+\end{table}
