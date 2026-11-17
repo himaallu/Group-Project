@@ -25,7 +25,7 @@
 % Placeholder marker: shows what still has to be written. Remove before submission.
 \newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
 % Include a generated table if it exists, otherwise show a placeholder.
-\newcommand{\gentable}[1]{\IfFileExists{tables/#1.tex}{\input{tables/#1.tex}}{\todo{table #1.tex from src/eval/report.py}}}
+\newcommand{\gentable}[1]{\IfFileExists{tables/#1.tex}{\input{tables/#1.tex}}{\todo{table \detokenize{#1}.tex from src/eval/report.py}}}
 
 \title{TwinCheck: Testing Whether Bilingual Fact-Checking Models Read the Evidence\\
 \large MAAI902 Natural Language Processing and Large Language Models}
