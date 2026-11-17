@@ -1,6 +1,7 @@
 # --- Data, features and models never go into git (they live in Drive: TwinCheck/) ---
 data/*
 !data/README.md
+!data/label_map.csv
 features/
 models/
 
