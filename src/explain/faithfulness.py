@@ -14,7 +14,7 @@ What it does
 
 Inputs
     --notes results/R5/notes.jsonl (from src/explain/generate.py)
-    --model NLI model (default: src.nli.score.model_name(), i.e. models/nli_v1 or the Hub copy)
+    --model NLI model (default: src.nli.score.model_name(), zero-shot until R4 v2 beats it)
 
 Outputs
     results/R5/explain_eval.json, results/R5/notes_scored.jsonl,
