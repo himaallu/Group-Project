@@ -11,8 +11,10 @@ What it does
     as the maximum length (seen on some Arabic pairs in R4).
 
     Which model: the ``--model`` / ``model`` argument; else the ``TWINCHECK_NLI``
-    environment variable; else ``models/nli_v1`` if it holds weights; else the copy on
-    Hugging Face Hub (``RathiAbeth/twincheck-nli-v1``; too big for the repo).
+    environment variable; else the zero-shot base model (``DEFAULT_MODEL``).
+    The default is zero-shot because the fine-tuned v1 scored below it on the gold
+    pairs (results/R4/v1_gold_eval.json). If v2 (``RathiAbeth/twincheck-nli-v2``) beats
+    zero-shot, DEFAULT_MODEL is switched to it.
 
     Importing this module needs torch; without it the import fails on purpose (see
     the import below), and the pipeline falls back to its word-overlap stand-in.
@@ -27,8 +29,8 @@ Outputs
 
 How to run (repo root)
     python -m src.nli.score data/processed/en/multifc_val.jsonl --limit 10 --out-dir /tmp/nli10
-    python -m src.nli.score data/processed/en/multifc_test.jsonl --model models/nli_v1 \
-        --out-dir features/nli_v1
+    python -m src.nli.score data/processed/en/multifc_test.jsonl --model models/nli_v2 \
+        --out-dir features/nli_v2
 """
 
 from __future__ import annotations
@@ -45,17 +47,13 @@ import torch
 
 from src.nli.score_zeroshot import OUT_COLUMNS, build_pairs, label_columns
 
-LOCAL_MODEL = Path("models/nli_v1")
-HUB_MODEL = "RathiAbeth/twincheck-nli-v1"
+ZERO_SHOT = "MoritzLaurer/mDeBERTa-v3-base-xnli-multilingual-nli-2mil7"
+DEFAULT_MODEL = ZERO_SHOT    # switch to "RathiAbeth/twincheck-nli-v2" if it beats zero-shot
 
 
 def model_name() -> str:
-    """The NLI model to use (see the module docstring for the order)."""
-    if os.environ.get("TWINCHECK_NLI"):
-        return os.environ["TWINCHECK_NLI"]
-    if any(LOCAL_MODEL.glob("*.safetensors")):
-        return str(LOCAL_MODEL)
-    return HUB_MODEL
+    """The NLI model to use: TWINCHECK_NLI if set, else DEFAULT_MODEL."""
+    return os.environ.get("TWINCHECK_NLI") or DEFAULT_MODEL
 
 
 @functools.lru_cache(maxsize=2)
@@ -126,8 +124,8 @@ def main() -> None:
     """CLI: score one or more data files."""
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("files", nargs="+", help="JSONL files in the shared record format")
-    ap.add_argument("--model", help="default: TWINCHECK_NLI, models/nli_v1 or the Hub copy")
-    ap.add_argument("--out-dir", default="features/nli_v1")
+    ap.add_argument("--model", help="default: TWINCHECK_NLI, else DEFAULT_MODEL")
+    ap.add_argument("--out-dir", default="features/nli_v2")
     ap.add_argument("--limit", type=int, help="first N records only (10-row check)")
     args = ap.parse_args()
     for path in args.files:
