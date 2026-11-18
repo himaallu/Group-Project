@@ -1,0 +1,42 @@
+{
+  "train": {
+    "n_pairs": 32658,
+    "per_label": {
+      "entail": 10886,
+      "neutral": 10886,
+      "contradict": 10886
+    },
+    "per_language": {
+      "en": 30000,
+      "ar": 2658
+    },
+    "per_origin": {
+      "en_supported": 10000,
+      "en_random": 10000,
+      "xfact_weak": 1818,
+      "en_swap_B": 3226,
+      "multifc_translated": 840,
+      "en_contradicted": 6774
+    }
+  },
+  "val_weak": {
+    "n_pairs": 1500,
+    "per_label": {
+      "contradict": 500,
+      "neutral": 500,
+      "entail": 500
+    },
+    "per_language": {
+      "en": 1500
+    },
+    "per_origin": {
+      "en_contradicted": 500,
+      "en_random": 500,
+      "en_supported": 500
+    }
+  },
+  "arabic_file": "data/nli/ar_train.jsonl",
+  "seed": 42,
+  "relevance_min": 0.3,
+  "per_claim": 2
+}
