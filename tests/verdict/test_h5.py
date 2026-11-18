@@ -71,3 +71,11 @@ def test_predict_matches_training_predictions(tmp_path):
                            load_entities(p["ent"]))
     trained = [json.loads(l) for l in open(tmp_path / "r" / "preds_x_s42.jsonl")]
     assert rows == trained
+
+
+def test_nli_files_accepts_flat_twin_layout(tmp_path):
+    """Rathi's score.py writes twin scores as <dir>/{train,test}.parquet (no copies_en/)."""
+    for name in ("multifc_train", "multifc_val", "multifc_test", "averitec_test", "train", "test"):
+        (tmp_path / f"{name}.parquet").write_bytes(b"")
+    files = run_h5.nli_files(tmp_path)
+    assert files["train"][-2:] == [str(tmp_path / "train.parquet"), str(tmp_path / "test.parquet")]
