@@ -1,0 +1,146 @@
+% =====================================================================
+% TwinCheck — MAAI901 (Deep Learning for Visual Data) group report.
+% Lead: Feba. Skeleton created in F3 (12 numbered sections).
+% Upload this file + references.bib + the tables/ folder to the Overleaf
+% project "TwinCheck – MAAI901 Report".
+%
+% Rules (CLAUDE.md §10): every number comes from a file in results/
+% (the file is named in each TODO); never copy paragraphs from the MAAI902
+% documents or into the MAAI901 paper (Turnitin < 10% each); say
+% "to our knowledge" for novelty claims. Vision references (CLIP, SigLIP 2,
+% UnivFD, GenImage, VERITE, Grad-CAM, ResNet, ViT, Stable Diffusion/SDXL) are
+% not in references.bib yet: add them with checked details before citing.
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=2.5cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor}
+\usepackage[numbers]{natbib}
+\usepackage[hidelinks]{hyperref}
+
+% Placeholder marker: shows what still has to be written. Remove before submission.
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+
+\title{TwinCheck Vision: Do Image-Aware Fact-Checkers Judge the Photo's Truth or Its Look?\\
+\large MAAI901 Deep Learning for Visual Data}
+\author{Rathi \and Youssef \and Himasri \and Feba\\
+University of Wollongong in Dubai}
+\date{November 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\todo{150--200 words, written last: AI-looking photos can flip fact-check verdicts;
+image twins (VAE / SDXL round trip, same content); CLIP probe seen vs unseen generators;
+CNN vs ViT; ALR fused vs decoupled; main numbers from results/F3 and results/F5.}
+\end{abstract}
+
+% ---------------------------------------------------------------------
+\section{Introduction}
+\label{sec:intro}
+\todo{Motivation: image--caption misinformation in UAE news and messaging apps.}
+\todo{Problem: systems may call a true post fake because the photo looks AI-generated
+\citep{falsdo2026}; authenticity and truthfulness are different questions.}
+\todo{Approach: image twins that change only the image's generative fingerprint.}
+\todo{Contributions (with "to our knowledge"): image-twin audit, decoupled design, CNN vs ViT vs CLIP probe.}
+
+% ---------------------------------------------------------------------
+\section{Related Work}
+\label{sec:related}
+\todo{Out-of-context image--caption verification: VERITE (cite), CCN \citep{abdelnabi2022ccn}.}
+\todo{AI-generated image detection: UnivFD CLIP probe (cite), GenImage benchmark (cite),
+format/JPEG bias in GenImage (cite after checking).}
+\todo{Unifying authenticity and truth: FakeWorld \citep{fakeworld2026} (not our claim).}
+\todo{Shortcut learning in fact checking \citep{papadopoulos2025similarity}.}
+
+% ---------------------------------------------------------------------
+\section{Problem Definition and Research Questions}
+\label{sec:problem}
+\todo{Inputs (image, caption), outputs (verdict, authenticity), the decoupling rule:
+the verdict never sees the authenticity score.}
+\todo{RQ1 detection across generators; RQ2 CNN vs ViT vs CLIP probe; RQ3 authenticity leakage (ALR).}
+
+% ---------------------------------------------------------------------
+\section{Data}
+\label{sec:data}
+\todo{VERITE: 1,001 image--caption records, split by image 701/149/151 (notes/F1.md).}
+\todo{GenImage subset: real, SD v1.4, BigGAN (5,000 train / 1,000 val each); Midjourney
+test images unavailable, so leave-one-generator-out (notes/F1.md, notes/F3.md).
+Note the PNG-vs-JPEG format difference between fakes and reals.}
+\todo{M4FC Arabic image claims (603 images).}
+\todo{Image-twin pipeline: VAE round trip, SDXL img2img strength 0.15, SigLIP cosine
+$\ge$ 0.92, face screening, JPEG 85 (features/vision/F2_completion_report.md; counts from
+results/F2/README.md). Figure: original vs twin examples.}
+\todo{Augmentation for CNN/ViT training: crop, flip, JPEG 60--95, blur (results/F5).}
+
+% ---------------------------------------------------------------------
+\section{Methods}
+\label{sec:methods}
+\todo{SigLIP 2 image and caption embeddings; image--caption match features.}
+\todo{CLIP ViT-L/14 logistic probe (UnivFD-style); C by 5-fold CV (src/vision/probe.py).}
+\todo{ResNet-50 and ViT-B/16 (last 4 blocks unfrozen) detectors (results/F5).}
+\todo{Leakage models: decoupled (match features only) vs fused (image + caption + match +
+authenticity) vs fused without authenticity (src/vision/leakage.py).}
+
+% ---------------------------------------------------------------------
+\section{Experimental Setup}
+\label{sec:setup}
+\todo{Splits, metrics (accuracy, AUROC, macro-F1, ALR with bootstrap 95\% CI), seeds
+42/43/44, hardware and run times, W\&B project twincheck.}
+
+% ---------------------------------------------------------------------
+\section{Results: AI-Image Detection}
+\label{sec:detection}
+\todo{Table: probe seen / unseen-BigGAN / unseen-SD (results/F3/probe_metrics.csv).}
+\todo{JPEG-85 control rows (results/F3/probe_metrics.csv, seen\_on\_jpeg85).}
+\todo{CNN vs ViT vs CLIP probe table (results/F5/cnn\_vit.csv).}
+\todo{Twins: p\_ai of originals vs twins (results/F3/twin\_authenticity.csv).}
+
+% ---------------------------------------------------------------------
+\section{Results: Authenticity Leakage}
+\label{sec:leakage}
+\todo{Table: ALR with 95\% CI and the JPEG re-save noise floor for decoupled, fused,
+fused without authenticity, VAE and SDXL twins (results/F3/alr.csv,
+results/F3/alr\_bootstrap.json). Report test macro-F1 of each model next to it.}
+\todo{Interpretation, honestly: what the noise floor and the near-chance VERITE scores mean.}
+
+% ---------------------------------------------------------------------
+\section{Robustness, Explanations and Deployment}
+\label{sec:robustness}
+\todo{JPEG 50/70 and 20\% crop (results/F5).}
+\todo{Grad-CAM, 8 examples (reports/figures).}
+\todo{ONNX export and ms per image (results/F5).}
+
+% ---------------------------------------------------------------------
+\section{Error Analysis}
+\label{sec:errors}
+\todo{8 vision failure cases with Grad-CAM, grouped by cause (F6).}
+
+% ---------------------------------------------------------------------
+\section{Ethics and Limitations}
+\label{sec:ethics}
+\todo{News photos not redistributed; face screening limits (Haar); GenImage licence
+CC-BY-NC-SA; no "edited" class in training data; detector false positives on real news photos.}
+
+% ---------------------------------------------------------------------
+\section{Conclusion}
+\label{sec:conclusion}
+\todo{Three to five sentences: findings and future work.}
+
+% ---------------------------------------------------------------------
+\section*{Team Contributions}
+\todo{From notes/contributions.md: one or two sentences per member, with task IDs.}
+
+\section*{Code and Data Availability}
+\todo{GitHub repository link (tag v1.0) and W\&B project.}
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}
