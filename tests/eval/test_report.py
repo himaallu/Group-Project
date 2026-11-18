@@ -92,3 +92,13 @@ def test_compare_same_file_has_zero_diff():
     assert {"macro_f1", "esr", "unrelated_rate", "paraphrase_consistency"} <= set(res)
     for r in res.values():
         assert r["diff"] == 0 and r["p_value"] == 1.0
+
+
+def test_error_case_groups():
+    """error_cases.group_of assigns failures to the right groups."""
+    from src.eval.error_cases import group_of
+    assert group_of("multifc_1", "supported", "contradicted", None, None) == ["supported_as_contradicted"]
+    assert group_of("multifc_1_B", "contradicted", "supported", None, "supported") == ["missed_swap"]
+    assert group_of("multifc_1_B", "contradicted", "contradicted", None, "supported") == ["fixed_by_twin_loss"]
+    assert group_of("multifc_1_P", "supported", "contradicted", "supported", None) == ["paraphrase_flip"]
+    assert group_of("multifc_1", "supported", "supported", None, None) == []
