@@ -1,0 +1,5 @@
+model,dataset,n_seeds,n_orig,n_P,n_A,n_M,n_B,n_C,n_V,macro_f1,macro_f1_sd,auroc,auroc_sd,ece,ece_sd,esr,esr_sd,unrelated_rate,unrelated_rate_sd,paraphrase_consistency,paraphrase_consistency_sd,crosslingual_consistency,crosslingual_consistency_sd,alr,alr_sd
+claim_only,averitec,1,429,0,0,0,0,0,0,0.3333156666035712,,0.5213182204430519,,0.159756421761463,,,,,,,,,,,
+claim_only,multifc,1,2106,0,0,0,0,0,0,0.480508977740836,,0.7189964087268615,,0.11255817884247818,,,,,,,,,,,
+similarity,averitec,3,429,0,0,0,0,0,0,0.28088207973777946,0.007183977893480074,0.45386769747297406,0.0050798261154043406,0.1630312647821339,0.008314897096864176,,,,,,,,,,
+similarity,multifc,3,2106,0,0,0,0,0,0,0.38549540526376985,0.005042394845712836,0.6089407985479762,0.002354917533578469,0.06361346442120745,0.0027417441099003323,,,,,,,,,,
