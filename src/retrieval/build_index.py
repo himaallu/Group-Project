@@ -89,6 +89,7 @@ class OfflineIndex:
     """
 
     def __init__(self, snippets: list[dict], embeddings: np.ndarray, encode, rerank):
+        """Build the BM25 index and the FAISS inner-product index over ``snippets``."""
         from rank_bm25 import BM25Okapi
         import faiss
 
@@ -141,6 +142,7 @@ def bge_encoder(batch_size: int = 64):
         model.half()
 
     def encode(texts: list[str]) -> np.ndarray:
+        """Unit-length BGE-M3 embeddings, one row per text."""
         return model.encode(texts, batch_size=batch_size, normalize_embeddings=True,
                             convert_to_numpy=True, show_progress_bar=len(texts) > 1000)
     return encode

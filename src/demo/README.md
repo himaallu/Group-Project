@@ -6,3 +6,5 @@
 | `examples.py` | Rathi (R6) | six made-up UAE examples (2 per verdict, 2 Arabic, 1 mixed), shown as "Illustrative example" |
 
 Run: `python -m src.retrieval.build_index download && python -m src.demo.app`. Tests: `tests/demo/`.
+
+Verdict: the trained head `models/verdict_twin_s42` by default; `TWINCHECK_VERDICT=none` uses the simple rule (max entail vs max contradict), which gets 5 of 6 examples right against 2 of 6 for the head (`results/R6/README.md`).

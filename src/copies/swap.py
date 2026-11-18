@@ -140,6 +140,7 @@ def apply_swap(text: str, pairs: list[tuple[str, str, bool]]) -> str:
     """Apply the replacements of ``swap_pairs`` to one snippet (whole words only)."""
     for old, new, surname_only in pairs:
         def replace(match, new=new, surname_only=surname_only):
+            """The new value, unless a surname match belongs to another person."""
             if surname_only and other_persons_name(match.string, match.start()):
                 return match.group(0)        # someone else's surname: keep it
             return new

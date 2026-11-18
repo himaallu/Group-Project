@@ -323,6 +323,7 @@ def reliability_figure(curves: dict[str, tuple[list, list]], path: Path) -> None
 def build_all(results: Path, tables: Path, figures: Path, gold_paths: list[str]) -> None:
     """Make every table and figure whose source exists (see the module docstring)."""
     def skip(what: str) -> None:
+        """Say that an output was skipped because its source is missing."""
         print(f"  skip   {what} (source not in results/ yet)")
 
     counts = results / "R1" / "counts.csv"
