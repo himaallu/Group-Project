@@ -1,0 +1,272 @@
+{
+  "version": "v2",
+  "base_model": "joeddav/xlm-roberta-large-xnli",
+  "seed": 42,
+  "n_train_pairs": 18525,
+  "lr": 1e-05,
+  "batch_size": 16,
+  "max_len": 256,
+  "epochs": 2,
+  "warmup": 0.1,
+  "precision": "fp32 (tf32)",
+  "skipped_batches": 0,
+  "train_minutes": 0.0,
+  "gpu": "NVIDIA L4",
+  "zero_shot": {
+    "gold_ar": {
+      "n": 150,
+      "macro_f1": 0.5023,
+      "accuracy": 0.5667,
+      "per_class": {
+        "entail": {
+          "precision": 0.4655,
+          "recall": 0.75,
+          "f1": 0.5745,
+          "support": 36
+        },
+        "contradict": {
+          "precision": 0.2414,
+          "recall": 0.3182,
+          "f1": 0.2745,
+          "support": 22
+        },
+        "neutral": {
+          "precision": 0.8095,
+          "recall": 0.5543,
+          "f1": 0.6581,
+          "support": 92
+        }
+      },
+      "confusion (rows = gold)": {
+        "entail": {
+          "entail": 27,
+          "contradict": 2,
+          "neutral": 7
+        },
+        "contradict": {
+          "entail": 10,
+          "contradict": 7,
+          "neutral": 5
+        },
+        "neutral": {
+          "entail": 21,
+          "contradict": 20,
+          "neutral": 51
+        }
+      }
+    },
+    "gold_en": {
+      "n": 150,
+      "macro_f1": 0.3823,
+      "accuracy": 0.54,
+      "per_class": {
+        "entail": {
+          "precision": 0.1636,
+          "recall": 0.9,
+          "f1": 0.2769,
+          "support": 10
+        },
+        "contradict": {
+          "precision": 0.1304,
+          "recall": 0.375,
+          "f1": 0.1935,
+          "support": 8
+        },
+        "neutral": {
+          "precision": 0.9583,
+          "recall": 0.5227,
+          "f1": 0.6765,
+          "support": 132
+        }
+      },
+      "confusion (rows = gold)": {
+        "entail": {
+          "entail": 9,
+          "contradict": 0,
+          "neutral": 1
+        },
+        "contradict": {
+          "entail": 3,
+          "contradict": 3,
+          "neutral": 2
+        },
+        "neutral": {
+          "entail": 43,
+          "contradict": 20,
+          "neutral": 69
+        }
+      }
+    },
+    "val_weak": {
+      "n": 1500,
+      "macro_f1": 0.6286,
+      "accuracy": 0.638,
+      "per_class": {
+        "entail": {
+          "precision": 0.8099,
+          "recall": 0.622,
+          "f1": 0.7036,
+          "support": 500
+        },
+        "contradict": {
+          "precision": 0.7674,
+          "recall": 0.396,
+          "f1": 0.5224,
+          "support": 500
+        },
+        "neutral": {
+          "precision": 0.5221,
+          "recall": 0.896,
+          "f1": 0.6598,
+          "support": 500
+        }
+      },
+      "confusion (rows = gold)": {
+        "entail": {
+          "entail": 311,
+          "contradict": 23,
+          "neutral": 166
+        },
+        "contradict": {
+          "entail": 58,
+          "contradict": 198,
+          "neutral": 244
+        },
+        "neutral": {
+          "entail": 15,
+          "contradict": 37,
+          "neutral": 448
+        }
+      }
+    }
+  },
+  "fine_tuned": {
+    "gold_ar": {
+      "n": 150,
+      "macro_f1": 0.1778,
+      "accuracy": 0.2133,
+      "per_class": {
+        "entail": {
+          "precision": 0.2857,
+          "recall": 0.0556,
+          "f1": 0.093,
+          "support": 36
+        },
+        "contradict": {
+          "precision": 0.163,
+          "recall": 1.0,
+          "f1": 0.2803,
+          "support": 22
+        },
+        "neutral": {
+          "precision": 1.0,
+          "recall": 0.087,
+          "f1": 0.16,
+          "support": 92
+        }
+      },
+      "confusion (rows = gold)": {
+        "entail": {
+          "entail": 2,
+          "contradict": 34,
+          "neutral": 0
+        },
+        "contradict": {
+          "entail": 0,
+          "contradict": 22,
+          "neutral": 0
+        },
+        "neutral": {
+          "entail": 5,
+          "contradict": 79,
+          "neutral": 8
+        }
+      }
+    },
+    "gold_en": {
+      "n": 150,
+      "macro_f1": 0.1205,
+      "accuracy": 0.1,
+      "per_class": {
+        "entail": {
+          "precision": 0.0865,
+          "recall": 0.9,
+          "f1": 0.1579,
+          "support": 10
+        },
+        "contradict": {
+          "precision": 0.1111,
+          "recall": 0.625,
+          "f1": 0.1887,
+          "support": 8
+        },
+        "neutral": {
+          "precision": 1.0,
+          "recall": 0.0076,
+          "f1": 0.015,
+          "support": 132
+        }
+      },
+      "confusion (rows = gold)": {
+        "entail": {
+          "entail": 9,
+          "contradict": 1,
+          "neutral": 0
+        },
+        "contradict": {
+          "entail": 3,
+          "contradict": 5,
+          "neutral": 0
+        },
+        "neutral": {
+          "entail": 92,
+          "contradict": 39,
+          "neutral": 1
+        }
+      }
+    },
+    "val_weak": {
+      "n": 1500,
+      "macro_f1": 0.6408,
+      "accuracy": 0.6433,
+      "per_class": {
+        "entail": {
+          "precision": 0.5409,
+          "recall": 0.872,
+          "f1": 0.6677,
+          "support": 500
+        },
+        "contradict": {
+          "precision": 0.6432,
+          "recall": 0.566,
+          "f1": 0.6021,
+          "support": 500
+        },
+        "neutral": {
+          "precision": 0.9685,
+          "recall": 0.492,
+          "f1": 0.6525,
+          "support": 500
+        }
+      },
+      "confusion (rows = gold)": {
+        "entail": {
+          "entail": 436,
+          "contradict": 64,
+          "neutral": 0
+        },
+        "contradict": {
+          "entail": 209,
+          "contradict": 283,
+          "neutral": 8
+        },
+        "neutral": {
+          "entail": 161,
+          "contradict": 93,
+          "neutral": 246
+        }
+      }
+    }
+  },
+  "wandb_url": "https://forge.coreweave.com/wandb/rathiabeth-uowd/twincheck/runs/kb4qblvy"
+}
