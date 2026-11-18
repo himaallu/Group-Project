@@ -6,7 +6,8 @@ Run: python -m pytest tests/nli/test_r4.py -q
 
 from collections import Counter
 
-from src.nli.build_pairs import build, labelled_pairs, random_pairs, swap_pairs
+from src.nli.build_pairs import (build, build_arabic, filter_by_model, labelled_pairs,
+                                  own_snippet_pairs, random_pairs, swap_pairs)
 from src.nli.train import class_report
 
 
@@ -85,3 +86,57 @@ def test_class_report():
     assert rep["confusion (rows = gold)"]["entail"]["neutral"] == 1
     # a class absent from gold and predictions is left out of the macro average
     assert class_report(["neutral", "contradict"], ["neutral", "contradict"])["macro_f1"] == 1.0
+
+
+def fake_scorer(claims: list[str], snippets: list[str]) -> list[dict]:
+    """Toy zero-shot model: snippet 0 entails, 1 is neutral, 2 contradicts, others unsure."""
+    def probs(snippet: str) -> dict:
+        if "snippet 0 " in snippet:
+            return {"p_entail": 0.8, "p_contradict": 0.1, "p_neutral": 0.1}
+        if "snippet 1 " in snippet:
+            return {"p_entail": 0.1, "p_contradict": 0.1, "p_neutral": 0.8}
+        if "snippet 2 " in snippet:
+            return {"p_entail": 0.1, "p_contradict": 0.7, "p_neutral": 0.2}
+        return {"p_entail": 0.2, "p_contradict": 0.45, "p_neutral": 0.35}   # top < 0.5
+    return [probs(s) for s in snippets]
+
+
+def test_filter_keeps_only_agreeing_confident_pairs():
+    own = own_snippet_pairs(RECORDS[:2], seed=42)
+    assert len(own) == 6 and all(p["label"] == "neutral" for p in own)
+    kept = filter_by_model(labelled_pairs(RECORDS, RELEVANCE, 42) + own, fake_scorer)
+    # entail only from supported claims' snippet 0; contradicted claims only use their
+    # relevant snippets 0/1, which the model does not call contradict; hard neutrals = snippet 1
+    assert {(p["label"], p["snippet_idx"]) for p in kept} == {("entail", 0), ("neutral", 1)}
+    assert all(p["claim_id"] in ("multifc_000000", "multifc_000001")
+               for p in kept if p["label"] == "neutral")
+
+
+def test_build_v2_has_hard_neutrals_and_keeps_swaps():
+    twins = [swap_twin(r) for r in RECORDS[:2]]
+    pairs = build(RECORDS, RELEVANCE, twins, n_per_class=4, seed=42, scorer=fake_scorer)
+    assert Counter(p["label"] for p in pairs) == {"entail": 4, "contradict": 4, "neutral": 4}
+    assert all(p["origin"] == "en_swap_B" for p in pairs if p["label"] == "contradict")
+    origins = {p["origin"] for p in pairs if p["label"] == "neutral"}
+    assert origins <= {"en_own_neutral", "en_random"}
+    assert pairs == build(RECORDS, RELEVANCE, twins, n_per_class=4, seed=42, scorer=fake_scorer)
+
+
+def test_build_arabic_filters_and_balances():
+    recs = [dict(r, id=r["id"].replace("multifc", "xfact_ar")) for r in RECORDS]
+    # every snippet once with each label: the filter keeps snippet 0 as entail and
+    # snippet 2 as contradict; the Y2 neutral rows are kept as they are
+    ar_pairs = [dict(p, id=f"{p['id']}_{lab}", label=lab, origin="xfact_weak")
+                for p in own_snippet_pairs(recs, 42, per_claim=3, language="ar")
+                for lab in ("entail", "contradict", "neutral")]
+    out = build_arabic(ar_pairs, recs, fake_scorer, seed=42)
+    c = Counter(p["label"] for p in out)
+    assert c == {"entail": 10, "contradict": 10, "neutral": 10}
+    assert all(p["snippet_idx"] == 0 for p in out if p["label"] == "entail")
+    assert all(p["snippet_idx"] == 2 for p in out if p["label"] == "contradict")
+    assert all(p["language"] == "ar" for p in out)
+
+
+def test_filter_needs_min_prob():
+    rec = dict(RECORDS[0], evidence=[{"text": "snippet 5 of claim 0", "url": "", "domain": ""}])
+    assert filter_by_model(own_snippet_pairs([rec], 42), fake_scorer) == []   # top 0.45

@@ -22,7 +22,7 @@ Inputs
     --train data/nli/train.jsonl   --val data/nli/val_weak.jsonl   --gold data/nli/gold_val.jsonl
 
 Outputs
-    --out       models/nli_v1/   (model + tokenizer; uploaded to the HF Hub by the notebook)
+    --out       models/nli_v2/   (model + tokenizer; uploaded to the HF Hub by the notebook)
     --metrics   results/R4/gold_eval.json
     --ckpt-dir  /content/ckpt_nli/  (resume checkpoint; not in git)
 
@@ -180,8 +180,8 @@ def train(args: argparse.Namespace) -> dict:
     if args.wandb:
         import wandb
         short = args.model.split("/")[-1]
-        run = wandb.init(project="twincheck", name=f"R4-nli-{short}-seed{args.seed}",
-                         config=vars(args), tags=["R4", "nli"])
+        run = wandb.init(project="twincheck", name=f"R4-nli-{args.version}-{short}-seed{args.seed}",
+                         config=vars(args), tags=["R4", "nli", args.version])
 
     before = evaluate(model, tokenizer, gold, val, args.max_len, device, dtype, mixed)
     print("zero-shot:", json.dumps({k: v["macro_f1"] for k, v in before.items()}))
@@ -266,7 +266,7 @@ def train(args: argparse.Namespace) -> dict:
     model.save_pretrained(args.out, safe_serialization=True)   # fp32: safe for DeBERTa
     tokenizer.save_pretrained(args.out)
 
-    metrics = {"base_model": args.model, "seed": args.seed, "n_train_pairs": len(train_pairs),
+    metrics = {"version": args.version, "base_model": args.model, "seed": args.seed, "n_train_pairs": len(train_pairs),
                "lr": args.lr, "batch_size": args.batch_size, "max_len": args.max_len,
                "epochs": args.epochs, "warmup": args.warmup,
                "precision": args.precision if mixed else "fp32 (tf32)",
@@ -295,7 +295,8 @@ def main() -> None:
     ap.add_argument("--n-train", type=int, help="first N train pairs only (10-row check)")
     ap.add_argument("--n-val", type=int, default=1500)
     ap.add_argument("--model", default=DEFAULT_MODEL)
-    ap.add_argument("--out", default="models/nli_v1")
+    ap.add_argument("--version", default="v2", help="pairs version, used in the W&B run name")
+    ap.add_argument("--out", default="models/nli_v2")
     ap.add_argument("--metrics", default="results/R4/gold_eval.json")
     ap.add_argument("--ckpt-dir", default="/content/ckpt_nli")
     ap.add_argument("--ckpt-minutes", type=float, default=20)
