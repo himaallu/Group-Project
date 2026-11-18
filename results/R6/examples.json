@@ -3,7 +3,7 @@
     "extract_claims (Y3)": "real",
     "get_evidence (R5)": "real",
     "score_nli (R4)": "real",
-    "verdict (H3)": "stub",
+    "verdict (H3)": "real",
     "calibrate (H4)": "real",
     "explain (R5)": "real"
   },
@@ -15,9 +15,9 @@
       "claims": [
         {
           "claim": "Dubai Metro's Red Line reopened on Monday after maintenance work.",
-          "label": "unverified",
-          "confidence": 0.664,
-          "explanation": "The RTA stated the Red Line resumed full service on Monday after maintenance was completed [1]. Passengers returned to the Red Line on Monday morning with trains running on the normal timetable again [2]."
+          "label": "contradicted",
+          "confidence": 0.808,
+          "explanation": "The claim is contradicted because the RTA confirmed the Red Line resumed full service on Monday after maintenance, which supports the claim rather than contradicting it [1]. Additionally, passengers returned to the Red Line on Monday morning with normal train operations, further supporting the claim [2]."
         }
       ]
     },
@@ -28,9 +28,9 @@
       "claims": [
         {
           "claim": "افتتحت هيئة الطرق والمواصلات في دبي محطة مترو جديدة على الخط الأحمر.",
-          "label": "supported",
-          "confidence": 0.905,
-          "explanation": "هيئة الطرق والمواصلات في دبي أعلنت افتتاح محطة جديدة على الخط الأحمر [1]. المحطة بدأت تستقبل الركاب صباح اليوم [2]."
+          "label": "contradicted",
+          "confidence": 0.467,
+          "explanation": "افتتحت هيئة الطرق والمواصلات في دبي محطة مترو جديدة على الخط الأحمر [1]. لكن لا توجد معلومات تؤكد أن الافتتاح حدث بالفعل [2]."
         }
       ]
     },
@@ -42,8 +42,8 @@
         {
           "claim": "All schools in Abu Dhabi will close for a month because of heavy rain.",
           "label": "contradicted",
-          "confidence": 0.988,
-          "explanation": "The claim is contradicted because schools in Abu Dhabi will only switch to remote learning for one day due to rain, not a full month [1]. Classes are expected to resume normally by Wednesday [2]."
+          "confidence": 0.745,
+          "explanation": "Abu Dhabi's education authority confirmed schools will only switch to remote learning for one day due to rain, not for a month [1]. Classes are expected to return to normal by Wednesday, contradicting the claim of a one-month closure [2]."
         }
       ]
     },
@@ -55,8 +55,8 @@
         {
           "claim": "metro dubai أوقف all lines today بسبب heavy flooding in the city",
           "label": "contradicted",
-          "confidence": 0.999,
-          "explanation": "الCLAIM خاطئ لأن المترو يعمل بشكل طبيعي اليوم وفقًا للتأكيد من RTA [1]."
+          "confidence": 0.829,
+          "explanation": "The RTA confirmed that the Red Line and the Green Line are operating normally today despite the rain [1]. Dubai Metro services ran on schedule on Tuesday, the RTA said [2]."
         }
       ]
     },
@@ -67,9 +67,9 @@
       "claims": [
         {
           "claim": "A new species of falcon was discovered in the Hajar Mountains last week.",
-          "label": "unverified",
-          "confidence": 0.999,
-          "explanation": "The evidence mentions that the Hajar Mountains are a popular hiking destination, but this does not confirm or deny the discovery of a new falcon species [1]. The mention of falconry as a traditional sport in the UAE does not provide information about a new species discovery [2]."
+          "label": "supported",
+          "confidence": 0.491,
+          "explanation": "The discovery of a new falcon species in the Hajar Mountains is supported by the fact that the area is known for its biodiversity and has been the subject of recent scientific studies."
         }
       ]
     },
@@ -80,9 +80,9 @@
       "claims": [
         {
           "claim": "ستطلق الإمارات رحلة مأهولة إلى المريخ العام المقبل.",
-          "label": "unverified",
-          "confidence": 0.995,
-          "explanation": "البيانات لا تؤكد أو تنفي Claim، لأنها تتحدث عن زيارة سياح إلى دبي [1] وافتتاح متحف في الشارقة [2]."
+          "label": "contradicted",
+          "confidence": 0.531,
+          "explanation": "لا توجد معلومات تشير إلى أن الإمارات ستقود رحلة مأهولة إلى المريخ العام المقبل. [1]"
         }
       ]
     }
