@@ -1,0 +1,118 @@
+{
+  "task": "F2 - Vision features and image twins",
+  "last_updated_utc": "2026-11-18T07:48:06.864823+00:00",
+  "embedding_audit": {
+    "VERITE": {
+      "siglip2_images": 663,
+      "siglip2_captions": 1001,
+      "clip_vit_l14_images": 663
+    },
+    "GenImage": {
+      "siglip2_images": 18000,
+      "clip_vit_l14_images": 18000,
+      "float16_siglip2_file": "features/vision/genimage/genimage_siglip2_image_projected_embeddings_float16.npy",
+      "float16_clip_file": "features/vision/genimage/genimage_clip_vit_l14_image_projected_embeddings_float16.npy"
+    },
+    "M4FC": {
+      "siglip2_images": 603,
+      "clip_vit_l14_images": 603,
+      "siglip2_arabic_claim_embeddings": 770
+    },
+    "jpeg85_final": {
+      "image_count": 1200,
+      "siglip2_shape": [
+        1200,
+        1152
+      ],
+      "clip_vit_l14_shape": [
+        1200,
+        768
+      ],
+      "siglip2_embeddings": "features/vision/jpeg85_final/siglip2/jpeg85_siglip2_embeddings.npy",
+      "clip_embeddings": "features/vision/jpeg85_final/clip_vit_l14/jpeg85_clip_vit_l14_embeddings.npy",
+      "all_embeddings_finite_and_normalized": true
+    },
+    "all_checked_image_embeddings_passed": true
+  },
+  "vae_twins": {
+    "VERITE": {
+      "generated": 338,
+      "accepted_before_final_face_screen": 311,
+      "final_retained_pairs": 311
+    },
+    "M4FC": {
+      "generated": 156,
+      "accepted_before_final_face_screen": 142,
+      "final_retained_pairs": 141,
+      "additional_face_exclusion": "m4fc_000478"
+    },
+    "total_generated": 494,
+    "final_retained_pairs": 452,
+    "jsonl": "data/copies/vision/vae.jsonl",
+    "jsonl_records": 452
+  },
+  "sdxl_twins": {
+    "strength": 0.15,
+    "seed": 42,
+    "sources_approved": 249,
+    "generated": 249,
+    "similarity_accepted_before_manual_face_review": 157,
+    "similarity_rejected": 92,
+    "manually_excluded_for_faces": 9,
+    "final_retained_pairs": 148,
+    "visual_pairs_manually_inspected": 30,
+    "final_manifest": "data/copies/vision/sdxl_face_filtered_accepted_manifest.csv",
+    "jsonl": "data/copies/vision/sdxl.jsonl",
+    "jsonl_records": 148,
+    "sources_csv": "data/copies/vision/sources.csv",
+    "sources_csv_records": 249,
+    "verite_training_sources_included": 0
+  },
+  "jpeg85_final": {
+    "conversion": "Originals and twins re-saved from decoded RGB pixels as JPEG quality 85",
+    "pairs_before_additional_automatic_face_screen": 601,
+    "pairs_excluded_after_screen": 1,
+    "excluded_pair_id": "m4fc_000478",
+    "final_retained_pairs": 600,
+    "final_files": 1200,
+    "dataset_pair_counts": {
+      "VERITE_VAE": 311,
+      "M4FC_VAE": 141,
+      "SDXL": 148
+    },
+    "excluded_manifest": "data/copies/vision/jpeg85_final/jpeg85_excluded_manifest.csv",
+    "final_manifest": "data/copies/vision/jpeg85_final/jpeg85_final_manifest.csv",
+    "quality_85_verified_by_conversion_process": true
+  },
+  "face_screening": {
+    "method": "OpenCV Haar frontal-face cascade",
+    "twins_screened": 601,
+    "detections_over_10_percent": 4,
+    "confirmed_face_exclusions": 1,
+    "confirmed_exclusion_id": "m4fc_000478",
+    "false_positive_detections": 3,
+    "manual_review_scope": "The four automatic detections were visually reviewed; SDXL also had a separate manual review of 30 pairs and nine face exclusions.",
+    "limitation": "Haar frontal-face detection is not a comprehensive detector for all faces or poses."
+  },
+  "pr_deliverables": {
+    "vae_jsonl_records": 452,
+    "sdxl_jsonl_records": 148,
+    "sources_csv_records": 249,
+    "actual_twin_image_files_to_commit": 0
+  },
+  "limitations_and_pending_items": [
+    "No GenImage captions were found in the inspected metadata; GenImage caption embeddings were not generated.",
+    "GenImage Midjourney test images were unavailable in the inspected Drive dataset; embeddings for those images are not claimed as completed.",
+    "M4FC text embeddings represent Arabic claims, not image captions.",
+    "SDXL manual visual inspection covered 30 pairs, not every generated pair.",
+    "The automatic Haar face detector is limited and does not establish exhaustive face removal."
+  ],
+  "status": "PARTIALLY COMPLETE: the final JPEG85 image-twin pairs, embeddings, and PR metadata files are generated and validated. GenImage caption and unavailable Midjourney test-image limitations remain documented.",
+  "final_twin_count_summary": {
+    "VERITE_VAE": 311,
+    "M4FC_VAE": 141,
+    "SDXL": 148,
+    "total_retained_pairs_across_methods": 600,
+    "note": "The total counts outputs across methods; the same source may have both a VAE twin and an SDXL twin."
+  }
+}
