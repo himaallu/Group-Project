@@ -1,0 +1,49 @@
+{
+    "dataset": "VERITE",
+    "total_records": 1001,
+    "unique_images": 663,
+    "extracted_images": 664,
+    "valid_images": 664,
+    "invalid_images": 0,
+    "unreferenced_images": [
+        "false_179.jpeg"
+    ],
+    "missing_image_records": 0,
+    "split_method": "Stratified group-based split by image_id",
+    "random_state": 42,
+    "split_ratio": {
+        "training": 0.7,
+        "validation": 0.15,
+        "testing": 0.15
+    },
+    "splits": {
+        "training": {
+            "records": 701,
+            "unique_images": 464,
+            "labels": {
+                "true": 237,
+                "miscaptioned": 237,
+                "out-of-context": 227
+            }
+        },
+        "validation": {
+            "records": 149,
+            "unique_images": 99,
+            "labels": {
+                "true": 50,
+                "miscaptioned": 50,
+                "out-of-context": 49
+            }
+        },
+        "testing": {
+            "records": 151,
+            "unique_images": 100,
+            "labels": {
+                "true": 51,
+                "miscaptioned": 51,
+                "out-of-context": 49
+            }
+        }
+    },
+    "image_leakage_detected": false
+}

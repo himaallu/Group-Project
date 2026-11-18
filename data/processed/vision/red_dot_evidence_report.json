@@ -1,0 +1,14 @@
+{
+    "dataset": "VERITE",
+    "source": "RED-DOT repository",
+    "total_evidence_json_files": 1352,
+    "non_empty_files": 1104,
+    "empty_files": 248,
+    "invalid_files": 0,
+    "filename_categories": {
+        "true": 676,
+        "false": 676
+    },
+    "evidence_availability": "External search-result JSON files available",
+    "relevance_verified": false
+}

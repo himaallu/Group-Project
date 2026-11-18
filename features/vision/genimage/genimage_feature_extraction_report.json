@@ -1,0 +1,21 @@
+{
+  "dataset": "GenImage train and validation",
+  "total_images": 18000,
+  "batches": 563,
+  "batch_size": 32,
+  "previous_batches_reused": 279,
+  "new_batches_processed": 284,
+  "siglip_model": "google/siglip2-so400m-patch14-384",
+  "clip_model": "openai/clip-vit-large-patch14",
+  "siglip_embedding_shape": [
+    18000,
+    1152
+  ],
+  "clip_embedding_shape": [
+    18000,
+    768
+  ],
+  "all_embeddings_finite": true,
+  "l2_normalized": true,
+  "status": "completed"
+}

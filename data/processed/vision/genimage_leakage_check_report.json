@@ -1,0 +1,16 @@
+{
+    "train_validation_records": 18000,
+    "midjourney_test_records": 11998,
+    "genimage_test_records": 11998,
+    "duplicate_hashes_in_train_validation": 0,
+    "duplicate_rows_in_train_validation": 0,
+    "train_validation_hash_overlap": 0,
+    "all_image_overlap_with_midjourney": 0,
+    "real_image_overlap_with_midjourney": 0,
+    "train_real_overlap_with_midjourney": 0,
+    "validation_real_overlap_with_midjourney": 0,
+    "train_unique_hashes": 15000,
+    "validation_unique_hashes": 3000,
+    "midjourney_unique_hashes": 11998,
+    "leakage_detected": false
+}

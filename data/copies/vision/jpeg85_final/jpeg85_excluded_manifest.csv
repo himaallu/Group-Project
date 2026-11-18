@@ -1,0 +1,3 @@
+dataset,image_id,role,source_path,output_path,format,quality_setting,width,height,valid,dimensions_preserved,manual_exclusion
+M4FC_VAE,m4fc_000478,original,data/processed/vision/m4fc_images/m4fc_000478.jpg,data/copies/vision/jpeg85_final/M4FC_VAE/original/m4fc_000478.jpg,JPEG,85,500,566,True,True,True
+M4FC_VAE,m4fc_000478,twin,data/copies/vision/m4fc/vae_twins_corrected/m4fc_000478_V.jpg,data/copies/vision/jpeg85_final/M4FC_VAE/twin/m4fc_000478_V.jpg,JPEG,85,496,560,True,True,True
