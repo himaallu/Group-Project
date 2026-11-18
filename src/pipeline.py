@@ -13,8 +13,9 @@ What it does
         step              real module (owner)                 stand-in until then
         extract_claims    src/claims/extract.py (Youssef Y3)  split into sentences
         get_evidence      src/retrieval/index.py (Rathi R5)   evidence passed in, else none
-        score_nli         models/nli_v1 (Rathi R4)            word-overlap scores
-        verdict           src/verdict/model.py (Himasri H3)   rule on max entail/contradict
+        score_nli         src/nli/score.py (Rathi R4;         word-overlap scores
+                          zero-shot mDeBERTa by default)
+        verdict           src/verdict/infer.py (Himasri H3)   rule on max entail/contradict
         calibrate         models/verdict_calib.json (H4)      no change if file missing
         explain           src/explain/generate.py (Rathi R5)  quote the best snippet
 
@@ -46,6 +47,7 @@ from __future__ import annotations
 import argparse
 import importlib
 import json
+import os
 import re
 from pathlib import Path
 
@@ -167,16 +169,26 @@ def score_nli(claim: str, snippets: list[dict]) -> list[dict]:
 # Step 4: verdict + Step 5: calibration
 # --------------------------------------------------------------------------
 
+def _verdict_head():
+    """``src.verdict.infer.predict_one`` if it imports and its model folder exists, else None."""
+    real = _optional("src.verdict.infer", "predict_one")
+    if real is None:
+        return None
+    model_dir = Path(os.environ.get("TWINCHECK_VERDICT", "models/verdict_twin_s42"))
+    return real if (model_dir / "config.json").exists() else None
+
+
 def verdict_probs(claim: str, snippets: list[dict], nli: list[dict]) -> np.ndarray:
     """Probabilities over LABELS (supported, contradicted, unverified).
 
-    Uses ``src.verdict.model.predict_one(claim, snippets, nli) -> array(3)``
-    (Himasri H3) when it exists. TODO(H3): until then a simple rule: support =
-    max p_entail, contradict = max p_contradict, unverified = what is left.
-    No snippets -> certainly unverified.
+    Uses the trained verdict head, ``src.verdict.infer.predict_one`` (H3/H4: the
+    twin-loss model ``models/verdict_twin_s42``, which also scores relevance with the
+    reranker and claim entities with spaCy). If torch or the model folder is missing,
+    a simple rule: support = max p_entail, contradict = max p_contradict,
+    unverified = what is left. No snippets -> certainly unverified.
     """
-    real = _optional("src.verdict.model", "predict_one")
-    if real is not None:
+    real = _verdict_head()
+    if real is not None and nli:
         return np.asarray(real(claim, snippets, nli), dtype=float)
     if not nli:
         return np.array([0.0, 0.0, 1.0])
@@ -267,7 +279,7 @@ def component_status() -> dict[str, str]:
         "extract_claims (Y3)": _optional("src.claims.extract", "extract_claims"),
         "get_evidence (R5)": _optional("src.retrieval.index", "search"),
         "score_nli (R4)": _optional("src.nli.score", "score_pairs"),
-        "verdict (H3)": _optional("src.verdict.model", "predict_one"),
+        "verdict (H3)": _verdict_head(),
         "calibrate (H4)": CALIB_PATH if CALIB_PATH.exists() else None,
         "explain (R5)": _optional("src.explain.generate", "generate"),
     }

@@ -22,7 +22,7 @@ Inputs
     --train data/nli/train.jsonl   --val data/nli/val_weak.jsonl   --gold data/nli/gold_val.jsonl
 
 Outputs
-    --out       models/nli_v1/   (model + tokenizer; uploaded to the HF Hub by the notebook)
+    --out       models/nli_v2/   (model + tokenizer; uploaded to the HF Hub by the notebook)
     --metrics   results/R4/gold_eval.json
     --ckpt-dir  /content/ckpt_nli/  (resume checkpoint; not in git)
 
@@ -129,7 +129,18 @@ def evaluate(model, tokenizer, gold: list[dict], val: list[dict], max_len: int,
     return result
 
 
-def save_checkpoint(path: Path, model, optimizer, scheduler, scaler, step: int) -> None:
+def run_key(args: argparse.Namespace, n_train: int) -> str:
+    """What identifies a training run; a checkpoint is only resumed if its key matches.
+
+    Without this, a leftover checkpoint from another run (e.g. v1 XLM-R in the same
+    Colab session) was resumed past its end, so the v2 run trained for 0 steps.
+    """
+    return "|".join(str(v) for v in (args.model, args.version, args.train, n_train, args.seed,
+                                     args.epochs, args.batch_size, args.lr))
+
+
+def save_checkpoint(path: Path, model, optimizer, scheduler, scaler, step: int,
+                    key: str = "") -> None:
     """Save everything needed to resume training at ``step`` (atomic write)."""
     import torch
 
@@ -137,7 +148,7 @@ def save_checkpoint(path: Path, model, optimizer, scheduler, scaler, step: int) 
     tmp = path / "state.pt.tmp"
     torch.save({"model": model.state_dict(), "optimizer": optimizer.state_dict(),
                 "scheduler": scheduler.state_dict(), "scaler": scaler.state_dict(),
-                "step": step}, tmp)
+                "step": step, "key": key}, tmp)
     os.replace(tmp, path / "state.pt")
     print(f"  checkpoint at step {step} -> {path}")
 
@@ -180,8 +191,8 @@ def train(args: argparse.Namespace) -> dict:
     if args.wandb:
         import wandb
         short = args.model.split("/")[-1]
-        run = wandb.init(project="twincheck", name=f"R4-nli-{short}-seed{args.seed}",
-                         config=vars(args), tags=["R4", "nli"])
+        run = wandb.init(project="twincheck", name=f"R4-nli-{args.version}-{short}-seed{args.seed}",
+                         config=vars(args), tags=["R4", "nli", args.version])
 
     before = evaluate(model, tokenizer, gold, val, args.max_len, device, dtype, mixed)
     print("zero-shot:", json.dumps({k: v["macro_f1"] for k, v in before.items()}))
@@ -196,8 +207,12 @@ def train(args: argparse.Namespace) -> dict:
     loss_fn = torch.nn.CrossEntropyLoss()
 
     step, ckpt = 0, Path(args.ckpt_dir) / "state.pt"
-    if ckpt.exists():
-        state = torch.load(ckpt, map_location=device)
+    key = run_key(args, len(train_pairs))
+    state = torch.load(ckpt, map_location=device) if ckpt.exists() else None
+    if state is not None and state.get("key") != key:
+        print(f"ignoring checkpoint in {args.ckpt_dir}: it belongs to another run")
+        state = None
+    if state is not None:
         model.load_state_dict(state["model"])
         optimizer.load_state_dict(state["optimizer"])
         scheduler.load_state_dict(state["scheduler"])
@@ -255,10 +270,13 @@ def train(args: argparse.Namespace) -> dict:
                     run.log({"train/loss": loss.item(), "lr": scheduler.get_last_lr()[0]},
                             step=step)
             if time.time() - last_ckpt > args.ckpt_minutes * 60:
-                save_checkpoint(Path(args.ckpt_dir), model, optimizer, scheduler, scaler, step)
+                save_checkpoint(Path(args.ckpt_dir), model, optimizer, scheduler, scaler, step,
+                                key)
                 last_ckpt = time.time()
 
     train_minutes = (time.time() - start) / 60
+    if ckpt.exists():
+        ckpt.unlink()          # run finished: a later run must not resume from it
     after = evaluate(model, tokenizer, gold, val, args.max_len, device, dtype, mixed)
     print("fine-tuned:", json.dumps({k: v["macro_f1"] for k, v in after.items()}))
 
@@ -266,7 +284,7 @@ def train(args: argparse.Namespace) -> dict:
     model.save_pretrained(args.out, safe_serialization=True)   # fp32: safe for DeBERTa
     tokenizer.save_pretrained(args.out)
 
-    metrics = {"base_model": args.model, "seed": args.seed, "n_train_pairs": len(train_pairs),
+    metrics = {"version": args.version, "base_model": args.model, "seed": args.seed, "n_train_pairs": len(train_pairs),
                "lr": args.lr, "batch_size": args.batch_size, "max_len": args.max_len,
                "epochs": args.epochs, "warmup": args.warmup,
                "precision": args.precision if mixed else "fp32 (tf32)",
@@ -295,7 +313,8 @@ def main() -> None:
     ap.add_argument("--n-train", type=int, help="first N train pairs only (10-row check)")
     ap.add_argument("--n-val", type=int, default=1500)
     ap.add_argument("--model", default=DEFAULT_MODEL)
-    ap.add_argument("--out", default="models/nli_v1")
+    ap.add_argument("--version", default="v2", help="pairs version, used in the W&B run name")
+    ap.add_argument("--out", default="models/nli_v2")
     ap.add_argument("--metrics", default="results/R4/gold_eval.json")
     ap.add_argument("--ckpt-dir", default="/content/ckpt_nli")
     ap.add_argument("--ckpt-minutes", type=float, default=20)

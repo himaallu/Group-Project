@@ -26,6 +26,7 @@ How to run
 from __future__ import annotations
 
 import argparse
+import json
 import re
 from pathlib import Path
 
@@ -141,6 +142,20 @@ def to_latex(by_model: pd.DataFrame, columns: list[tuple[str, str]], caption: st
     return "\n".join(lines)
 
 
+def is_verdict_preds(path: Path) -> bool:
+    """True if the file's first record looks like a verdict prediction (§5 format).
+
+    Other tasks also write ``preds_*.jsonl`` (e.g. Youssef's claim-extraction
+    ``results/Y3/preds_qwen.jsonl`` with ``pred_claims``); those are skipped.
+    """
+    with open(path, encoding="utf-8") as f:
+        for line in f:
+            if line.strip():
+                rec = json.loads(line)
+                return "pred_label" in rec and "probs" in rec
+    return False
+
+
 def build_report(results_dir: Path, gold_paths: list[Path], out_dir: Path) -> pd.DataFrame:
     """Evaluate every predictions file and write all tables.
 
@@ -162,6 +177,10 @@ def build_report(results_dir: Path, gold_paths: list[Path], out_dir: Path) -> pd
         gold_records += load_jsonl(gold_path)
 
     pred_paths = sorted(results_dir.glob("*/preds_*.jsonl"))
+    skipped = [p for p in pred_paths if not is_verdict_preds(p)]
+    pred_paths = [p for p in pred_paths if p not in skipped]
+    for p in skipped:
+        print(f"skipping {p}: not a verdict predictions file")
     if not pred_paths:
         raise FileNotFoundError(f"no {results_dir}/*/preds_*.jsonl files found")
 
