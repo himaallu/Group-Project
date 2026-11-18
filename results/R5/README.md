@@ -1,0 +1,7 @@
+# R5 · Cited explanations + offline index (Rathi)
+
+- **What ran:** `src/explain/generate.py` (Qwen3-8B 4-bit, claim + verdict + top-3 reranked snippets → 1–2 sentences citing [1]–[3], in the claim's language) on 250 test claims (200 EN, 50 AR, seed 42); `src/explain/faithfulness.py` (NLI: cited snippet vs each sentence); `src/retrieval/build_index.py` (BM25 + BGE-M3 FAISS over every cleaned snippet, top 20 each → fine-tuned reranker → best 5) with recall@5 on 250 claims.
+- **Settings:** verdict explained = gold label (verdict head not plugged in yet); NLI = zero-shot mDeBERTa-v3 XNLI, a sentence counts as faithful if p_entail > 0.5 for one of its cited snippets; reranker `RathiAbeth/twincheck-reranker-v1`; 163,244 unique snippets from 24,945 claims (MultiFC, AVeriTeC, X-FACT AR). No training, so no W&B run.
+- **Retrieval recall@5:** EN hybrid 0.945 (BM25 0.91, dense 0.87); AR hybrid 0.92 (BM25 0.86, dense 0.80).
+- **Explanations:** faithfulness 0.32 (EN 0.29, AR 0.48), citation accuracy 0.31 (EN 0.28, AR 0.45), notes fully faithful 21%. Main cause: 144 of 369 sentences say what is missing or does not match ("no mention of…", "not…"), which NLI cannot entail from a snippet, and 66% of the sampled claims are contradicted.
+- **Files:** `results/R5/{notes,notes_scored,notes_good,notes_bad}.jsonl`, `explain_eval.json`, `retrieval_eval.json`; index on the HF Hub `datasets/RathiAbeth/twincheck-index-v1` (`models/index_v1/README.md` says how to download).
