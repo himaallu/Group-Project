@@ -1,0 +1,17 @@
+{
+  "encoder": "BAAI/bge-m3",
+  "n_records": 24945,
+  "n_snippets": 163244,
+  "files": [
+    "data/processed/en/multifc_train.jsonl",
+    "data/processed/en/multifc_val.jsonl",
+    "data/processed/en/multifc_test.jsonl",
+    "data/processed/en/averitec_train.jsonl",
+    "data/processed/en/averitec_val.jsonl",
+    "data/processed/en/averitec_test.jsonl",
+    "data/processed/ar/xfact_ar_train.jsonl",
+    "data/processed/ar/xfact_ar_val.jsonl",
+    "data/processed/ar/xfact_ar_test.jsonl"
+  ],
+  "embed_minutes": 4.8
+}

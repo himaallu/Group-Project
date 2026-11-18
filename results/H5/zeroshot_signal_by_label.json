@@ -1,0 +1,24 @@
+{
+  "what": "zero-shot mDeBERTa NLI on MultiFC val: per claim, the highest snippet probability, averaged by gold verdict",
+  "n_claims": 2104,
+  "by_label": {
+    "contradicted": {
+      "n": 1317,
+      "mean_max_entail": 0.579,
+      "mean_max_contradict": 0.6513,
+      "share_with_entail_gt_0.9": 0.3402
+    },
+    "supported": {
+      "n": 713,
+      "mean_max_entail": 0.5937,
+      "mean_max_contradict": 0.602,
+      "share_with_entail_gt_0.9": 0.3913
+    },
+    "unverified": {
+      "n": 74,
+      "mean_max_entail": 0.6119,
+      "mean_max_contradict": 0.593,
+      "share_with_entail_gt_0.9": 0.3784
+    }
+  }
+}
