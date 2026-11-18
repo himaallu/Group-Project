@@ -93,20 +93,30 @@ The final JPEG85 embeddings were extracted after conversion and screening.
 
 ## 5. PR metadata deliverables
 
-The following metadata files are prepared:
+The twin files are in the shared record format (CLAUDE.md §4). Each line is
+the source record from `data/processed/vision/verite.jsonl` or
+`data/processed/ar/m4fc_ar_test.jsonl` (same claim, label, evidence, language
+and split) with `id = <source id>_V` and `image_path` = the twin image.
+`method`, `similarity` and `orig_image_path` are extra fields. A twin image
+gets one record per claim that uses the original photo. For example, a
+VERITE true photo has a true caption and a miscaptioned one.
 
-| File | Records |
-|---|---:|
-| `data/copies/vision/vae.jsonl` | 452 |
-| `data/copies/vision/sdxl.jsonl` | 148 |
-| `data/copies/vision/sources.csv` | 249 |
+| File | Twin images | Records |
+|---|---:|---:|
+| `data/copies/vision/vae.jsonl` | 452 | 903 (VERITE 622, M4FC 281) |
+| `data/copies/vision/sdxl.jsonl` | 148 | 295 (VERITE 106, M4FC 189) |
+| `data/copies/vision/sources.csv` | 249 approved SDXL sources (148 with a kept twin) | — |
 
-The source list contains only the approved SDXL sources. Actual twin image
-files are not included in the intended public GitHub deliverables.
+All three pass `python -m src.eval.loaders --check`. Built by
+`python -m src.vision.make_twin_records` from the F2 notebook manifests in
+`data/copies/vision/manifests/`. `data/processed/vision/verite.jsonl` is built by
+`python -m src.vision.load_verite` (ids `verite_000000`…, labels true →
+supported, miscaptioned / out-of-context → contradicted, F1 split by image:
+701 / 149 / 151 records). Paths are repo-relative. The image files themselves
+are not in git (the repo is public and these are news photos).
 
-IDs use the `<source_id>_V` suffix. IDs can occur in both JSONL files when
-the same source has both a VAE twin and an SDXL twin; uniqueness is checked
-within each file.
+IDs can occur in both JSONL files when the same source has both a VAE twin
+and an SDXL twin; uniqueness is checked within each file.
 
 ## 6. Remaining limitations
 
