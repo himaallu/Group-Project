@@ -82,8 +82,9 @@ def build_evidence(row):
         if not text:
             continue
         url = row.get(f"link_{i}", "").strip()
-        url = None if url in ("", "NO_LINK") else url
-        evidence.append({"text": text, "url": url, "domain": domain_of(url)})
+        url = "" if url == "NO_LINK" else url
+        # empty strings (not None) for missing links, as clean.py expects strings
+        evidence.append({"text": text, "url": url, "domain": domain_of(url) or ""})
     return evidence
 
 
