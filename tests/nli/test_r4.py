@@ -140,3 +140,15 @@ def test_build_arabic_filters_and_balances():
 def test_filter_needs_min_prob():
     rec = dict(RECORDS[0], evidence=[{"text": "snippet 5 of claim 0", "url": "", "domain": ""}])
     assert filter_by_model(own_snippet_pairs([rec], 42), fake_scorer) == []   # top 0.45
+
+
+def test_run_key_differs_between_runs():
+    import argparse
+
+    from src.nli.train import run_key
+    base = dict(model="joeddav/xlm-roberta-large-xnli", version="v1", train="data/nli/train.jsonl",
+                seed=42, epochs=2, batch_size=16, lr=1e-5)
+    v1 = run_key(argparse.Namespace(**base), 32658)
+    assert v1 == run_key(argparse.Namespace(**base), 32658)
+    assert v1 != run_key(argparse.Namespace(**dict(base, version="v2")), 18525)
+    assert v1 != run_key(argparse.Namespace(**base), 18525)    # same names, new data
