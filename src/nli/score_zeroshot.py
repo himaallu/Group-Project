@@ -116,7 +116,9 @@ def score_pairs(premises: list[str], hypotheses: list[str], tok, model, device: 
         for start in range(0, len(order), batch_size):
             batch = order[start:start + batch_size]
             enc = tok([premises[i] for i in batch], [hypotheses[i] for i in batch],
-                      truncation="only_first", max_length=max_len,  # cut the snippet, keep the claim
+                      # cut the longer side token by token: normally the snippet; a few
+                      # claims are longer than max_len on their own, then the claim is cut too
+                      truncation="longest_first", max_length=max_len,
                       padding=True, return_tensors="pt").to(device)
             p = torch.softmax(model(**enc).logits.float(), dim=-1).cpu().numpy()
             for i, row in zip(batch, p):

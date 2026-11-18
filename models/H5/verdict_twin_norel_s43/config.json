@@ -1,0 +1,55 @@
+{
+  "features": [
+    "w_entail",
+    "w_contradict",
+    "w_neutral",
+    "max_entail",
+    "max_contradict",
+    "share_relevant",
+    "match_place",
+    "match_date",
+    "match_person",
+    "n_snippets"
+  ],
+  "mean": [
+    0.24698283053197084,
+    0.2595168452274732,
+    0.49350032401626504,
+    0.5988891722676111,
+    0.6246437654780734,
+    1.0,
+    0.9702412044535271,
+    0.9404038305534121,
+    0.9825984985316024,
+    0.7314833501513622
+  ],
+  "sd": [
+    0.22623108841357045,
+    0.2177751222871736,
+    0.2544756071253754,
+    0.37560997168333565,
+    0.35011339441483674,
+    1.0,
+    0.16235759862789417,
+    0.23076372826682737,
+    0.12662870996237816,
+    0.1966661700012652
+  ],
+  "name": "twin_norel",
+  "seed": 43,
+  "lambda_inv": 1.0,
+  "lambda_sens": 0.5,
+  "no_relevance": true,
+  "drop_entity": false,
+  "nli_files": [
+    "features/nli_zeroshot/multifc_train.parquet",
+    "features/nli_zeroshot/multifc_val.parquet",
+    "features/nli_zeroshot/multifc_test.parquet",
+    "features/nli_zeroshot/copies_en/train.parquet",
+    "features/nli_zeroshot/copies_en/test.parquet"
+  ],
+  "lr": 0.001,
+  "batch_groups": 64,
+  "best_epoch": 13,
+  "val_macro_f1": 0.2936315872569411
+}

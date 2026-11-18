@@ -1,0 +1,24 @@
+{
+  "chosen": {
+    "name": "inv1_sens0.5",
+    "lambda_inv": 1.0,
+    "lambda_sens": 0.5,
+    "val_macro_f1": 0.35730180443286436,
+    "val_paraphrase_consistency": 0.9263157894736842,
+    "val_esr": 0.9239766081871345,
+    "val_unrelated_rate": 1.0,
+    "val_twin_score": 0.9500974658869396,
+    "best_epoch": 2
+  },
+  "base_val_macro_f1": 0.3670768229827623,
+  "f1_floor": 0.3570768229827623,
+  "eligible": [
+    "inv0_sens0",
+    "inv0_sens0.5",
+    "inv0.5_sens0",
+    "inv0.5_sens0.5",
+    "inv1_sens0",
+    "inv1_sens0.5",
+    "inv2_sens0"
+  ]
+}
