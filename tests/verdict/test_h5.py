@@ -79,3 +79,12 @@ def test_nli_files_accepts_flat_twin_layout(tmp_path):
         (tmp_path / f"{name}.parquet").write_bytes(b"")
     files = run_h5.nli_files(tmp_path)
     assert files["train"][-2:] == [str(tmp_path / "train.parquet"), str(tmp_path / "test.parquet")]
+
+
+def test_e5_probs_to_logits_round_trip():
+    """log-probabilities are valid logits: softmax gives the probabilities back."""
+    import numpy as np
+    from src.eval.run_e5_ar import probs_to_logits
+    from src.verdict.calibrate import softmax
+    rows = [{"probs": {"supported": 0.2, "contradicted": 0.7, "unverified": 0.1}}]
+    assert np.allclose(softmax(probs_to_logits(rows)), [[0.2, 0.7, 0.1]], atol=1e-6)
