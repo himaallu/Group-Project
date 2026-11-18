@@ -10,10 +10,12 @@ What it does
         results/R1/counts.csv                   -> tab_data_counts
         results/R2/reranker_eval.json           -> tab_reranker
         results/R3/make_twins_report.json       -> tab_twins, fig_twin_counts
-        results/R4/gold_eval*.json              -> tab_nli, fig_nli_gold
-        results/R5/{explain,retrieval}_eval.json-> tab_explain, tab_retrieval
-        reports/tables/metrics_by_model.csv     -> fig_twin_metrics (from src/eval/report.py)
-        results/*/preds_*_s42.jsonl (+ gold)    -> fig_reliability (calibration curves)
+        results/R4/{v1_,}gold_eval*.json        -> tab_nli, fig_nli_gold (v1, v2, XLM-R)
+        results/R5/{explain,retrieval}_eval.json-> tab_explain, tab_retrieval, fig_retrieval
+        results/H5/summary.csv                  -> tab_main, tab_averitec, fig_main
+        results/H4/bootstrap_twin_vs_notwin.json-> tab_bootstrap
+        results/H4/preds_*_s42.jsonl (+ gold)   -> fig_reliability (calibration curves)
+        results/Y3/f1_{split,qwen}.json         -> tab_claims
         results/Y5/arabic_E7.csv                -> tab_arabic_E7
         results/F4/audit_E0.csv                 -> tab_audit_E0
 
@@ -52,7 +54,7 @@ def latex_escape(value) -> str:
     for char, repl in (("\\", r"\textbackslash{}"), ("&", r"\&"), ("%", r"\%"), ("_", r"\_"),
                        ("#", r"\#"), ("$", r"\$"), ("{", r"\{"), ("}", r"\}")):
         text = text.replace(char, repl)
-    return text
+    return text.replace("±", r"$\pm$").replace(">=", r"$\geq$")
 
 
 def to_latex(df: pd.DataFrame, caption: str, label: str) -> str:
@@ -113,16 +115,88 @@ def reranker_table(ev: dict) -> pd.DataFrame:
                                            ("fine-tuned", "val_fine_tuned"))])
 
 
-def nli_table(evals: dict[str, dict]) -> pd.DataFrame:
-    """R4 macro-F1 for each model, zero-shot and fine-tuned, per evaluation set."""
-    rows = []
-    for model, ev in evals.items():
-        for when in ("zero_shot", "fine_tuned"):
-            row = {"model": model, "setting": when.replace("_", "-")}
-            for key, res in ev[when].items():
-                row[f"{key} macro-F1"] = res["macro_f1"]
+def nli_table(evals: list[tuple[str, str, dict]]) -> pd.DataFrame:
+    """R4 gold macro-F1: zero-shot once per base model, then each fine-tuned version.
+
+    ``evals`` holds (base model, version, gold_eval dict). Only the hand-labelled gold
+    sets are shown: the weak validation sets differ between versions.
+    """
+    rows, seen = [], set()
+    for model, version, ev in evals:
+        for when, setting in (("zero_shot", "zero-shot"), ("fine_tuned", f"fine-tuned {version}")):
+            if when == "zero_shot" and model in seen:
+                continue
+            seen.add(model)
+            row = {"model": model, "setting": setting}
+            for key in ("gold_en", "gold_ar"):
+                if key in ev[when]:
+                    row[f"{key} macro-F1"] = ev[when][key]["macro_f1"]
             rows.append(row)
     return pd.DataFrame(rows)
+
+
+# H5 summary.csv model names -> report names (fixed order = fixed colours)
+MAIN_MODELS = {"notwin": "no twin loss", "twin": "twin loss",
+               "twin_norel": "twin loss, no reranker", "twin_noent": "twin loss, no entity match"}
+MAIN_METRICS = {"macro_f1": "macro-F1", "esr": "ESR", "unrelated_rate": "unrelated",
+                "paraphrase_consistency": "paraphrase cons.", "ece": "ECE"}
+
+
+def pct(value: float) -> str:
+    """A rate as a percentage with one decimal, rounded half up (0.3625 -> '36.3')."""
+    from decimal import ROUND_HALF_UP, Decimal
+    return str(Decimal(str(round(100 * value, 6))).quantize(Decimal("0.1"), ROUND_HALF_UP))
+
+
+def pm(mean, sd) -> str:
+    """'mean ± sd' in %, one decimal; a dash if missing."""
+    if mean is None or pd.isna(mean):
+        return "–"
+    return f"{pct(mean)} ± {pct(sd)}"
+
+
+def main_table(summary: pd.DataFrame, prefix: str = "") -> pd.DataFrame:
+    """Verdict-head variants (H5) as 'mean ± sd' over seeds, in %.
+
+    ECE is shown before and after temperature scaling; ablations have no calibrated
+    run, so their "ECE (cal.)" is a dash. Twin metrics are dropped for datasets
+    without twins (AVeriTeC).
+    """
+    by = summary.set_index("model")
+    rows = []
+    for key, name in MAIN_MODELS.items():
+        if prefix + key not in by.index:
+            continue
+        r, row = by.loc[prefix + key], {"model": name}
+        for m, label in MAIN_METRICS.items():
+            row[label] = pm(r.get(f"{m}_mean"), r.get(f"{m}_std"))
+        cal = by.loc[prefix + key + "_cal"] if prefix + key + "_cal" in by.index else {}
+        row["ECE (cal.)"] = pm(cal.get("ece_mean") if len(cal) else None,
+                               cal.get("ece_std") if len(cal) else None)
+        rows.append(row)
+    df = pd.DataFrame(rows)
+    return df[[c for c in df.columns if c == "model" or (df[c] != "–").any()]]
+
+
+def bootstrap_table(boot: dict) -> pd.DataFrame:
+    """Twin vs no-twin paired bootstrap per seed: difference, 95% CI and p, in points."""
+    rows = []
+    for pair, metrics in boot.items():
+        seed = pair.rsplit("_s", 1)[-1]          # "preds_twin_s42 vs preds_notwin_s42" -> "42"
+        for m, label in MAIN_METRICS.items():
+            if m in metrics:
+                b = metrics[m]
+                rows.append({"seed": seed, "metric": label, "diff": round(100 * b["diff"], 1),
+                             "95% CI": f"[{100 * b['ci_low']:.1f}, {100 * b['ci_high']:.1f}]",
+                             "p": b["p_value"]})
+    return pd.DataFrame(rows)
+
+
+def claims_table(f1: dict[str, dict]) -> pd.DataFrame:
+    """Y3 claim-extraction F1 per language for each extractor."""
+    return pd.DataFrame([{"extractor": name, **{f"{lang} F1": ev[lang]["f1"]
+                                                for lang in ("en", "ar", "mixed", "all") if lang in ev}}
+                         for name, ev in f1.items()])
 
 
 def explain_table(ev: dict) -> pd.DataFrame:
@@ -184,17 +258,23 @@ def grouped_bars(groups: list[str], series: dict[str, list[float]], ylabel: str,
     ax.set_title(title, fontsize=10, loc="left")
     style_axes(ax)
     if n >= 2:
-        ax.legend(frameon=False, fontsize=8, labelcolor=TEXT, ncol=min(n, 4),
+        ax.legend(frameon=False, fontsize=8, labelcolor=TEXT, ncol=min(n, 3),
                   loc="upper left", bbox_to_anchor=(0, -0.12))
     fig.tight_layout()
     path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(path, dpi=300, facecolor=SURFACE)
+    # bbox_inches="tight" keeps a wide legend inside the image
+    fig.savefig(path, dpi=300, facecolor=SURFACE, bbox_inches="tight")
     plt.close(fig)
     print(f"  figure {path.name}")
 
 
-def reliability_points(df: pd.DataFrame, n_bins: int = 15) -> tuple[list, list]:
-    """(mean confidence, accuracy) per non-empty bin for originals in a joined table."""
+def reliability_points(df: pd.DataFrame, n_bins: int = 15, min_count: int = 20) -> tuple[list, list]:
+    """(mean confidence, accuracy) per bin with at least ``min_count`` original claims.
+
+    Bins with only a few claims are left out of the plot: their accuracy is noise
+    (e.g. 0 of 3 correct) and hides the shape of the curve. ECE itself (metrics.py)
+    still uses every bin.
+    """
     from src.eval.metrics import LABELS, originals
 
     orig = originals(df)
@@ -205,7 +285,7 @@ def reliability_points(df: pd.DataFrame, n_bins: int = 15) -> tuple[list, list]:
     for b in range(n_bins):
         lo, hi = b / n_bins, (b + 1) / n_bins
         mask = (conf > lo) & (conf <= hi) if b else (conf >= lo) & (conf <= hi)
-        if mask.any():
+        if mask.sum() >= min_count:
             xs.append(float(conf[mask].mean()))
             ys.append(float(correct[mask].mean()))
     return xs, ys
@@ -226,11 +306,12 @@ def reliability_figure(curves: dict[str, tuple[list, list]], path: Path) -> None
     ax.set_ylim(0, 1)
     ax.set_xlabel("confidence", color=TEXT)
     ax.set_ylabel("accuracy")
-    ax.set_title("Calibration on original test claims (seed 42)", fontsize=10, loc="left")
+    ax.set_title("Calibration on original test claims\n(seed 42; bins with ≥ 20 claims)",
+                 fontsize=9, loc="left")
     style_axes(ax)
     ax.legend(frameon=False, fontsize=8, labelcolor=TEXT)
     fig.tight_layout()
-    fig.savefig(path, dpi=300, facecolor=SURFACE)
+    fig.savefig(path, dpi=300, facecolor=SURFACE, bbox_inches="tight")
     plt.close(fig)
     print(f"  figure {path.name}")
 
@@ -270,9 +351,11 @@ def build_all(results: Path, tables: Path, figures: Path, gold_paths: list[str])
     else:
         skip("tab_twins / fig_twin_counts")
 
-    nli = {name: e for name, e in (("mDeBERTa-v3", read_json(results / "R4" / "gold_eval.json")),
-                                   ("XLM-R-large", read_json(results / "R4" / "gold_eval_xlmr.json")))
-           if e}
+    nli = [(model, version, ev) for model, version, name in (
+               ("mDeBERTa-v3", "v1", "v1_gold_eval.json"),
+               ("mDeBERTa-v3", "v2", "gold_eval.json"),
+               ("XLM-R-large", "v1", "v1_gold_eval_xlmr.json"))
+           if (ev := read_json(results / "R4" / name))]
     if nli:
         df = nli_table(nli)
         write_table(df, "tab_nli", "NLI macro-F1, zero-shot vs fine-tuned (gold = hand-labelled pairs).",
@@ -289,7 +372,7 @@ def build_all(results: Path, tables: Path, figures: Path, gold_paths: list[str])
     expl = read_json(results / "R5" / "explain_eval.json")
     if expl:
         write_table(explain_table(expl), "tab_explain",
-                    "Cited notes: faithfulness and citation accuracy (fine-tuned NLI judge).", tables)
+                    "Cited notes: faithfulness and citation accuracy (zero-shot NLI judge).", tables)
     else:
         skip("tab_explain")
     retr = read_json(results / "R5" / "retrieval_eval.json")
@@ -301,26 +384,49 @@ def build_all(results: Path, tables: Path, figures: Path, gold_paths: list[str])
     else:
         skip("tab_retrieval")
 
-    by_model = tables / "metrics_by_model.csv"
-    if by_model.exists():
-        df = pd.read_csv(by_model)
-        metrics = [("esr_mean", "ESR"), ("unrelated_rate_mean", "Unrelated"),
-                   ("paraphrase_consistency_mean", "Paraphrase"), ("crosslingual_A_mean", "Cross-ling.")]
-        metrics = [(c, n) for c, n in metrics if c in df.columns and df[c].notna().any()]
-        series = {f"{r['task']}/{r['model']}": [r[c] for c, _ in metrics] for _, r in df.iterrows()}
-        grouped_bars([n for _, n in metrics], dict(list(series.items())[:6]), "rate",
-                     "Twin metrics per model", figures / "fig_twin_metrics.png")
+    summary_path = results / "H5" / "summary.csv"
+    if summary_path.exists():
+        summary = pd.read_csv(summary_path)
+        write_table(main_table(summary), "tab_main",
+                    "Verdict head on MultiFC test and its twins (%, mean ± sd, seeds 42/43/44).", tables)
+        write_table(main_table(summary, prefix="avt_"), "tab_averitec",
+                    "Verdict head on AVeriTeC test (%, mean ± sd, seeds 42/43/44).", tables)
+        by = summary.set_index("model")
+        metrics = ["macro_f1", "esr", "unrelated_rate", "paraphrase_consistency"]
+        series = {name: [by.loc[key, f"{m}_mean"] for m in metrics]
+                  for key, name in MAIN_MODELS.items() if key in by.index}
+        grouped_bars([MAIN_METRICS[m] for m in metrics], series, "rate (mean of 3 seeds)",
+                     "Verdict head on MultiFC test: twin loss and ablations", figures / "fig_main.png")
     else:
-        skip("fig_twin_metrics (run src.eval.report first)")
+        skip("tab_main / tab_averitec / fig_main")
 
-    pred_files = sorted(results.glob("*/preds_*_s42.jsonl"))
+    boot = read_json(results / "H4" / "bootstrap_twin_vs_notwin.json")
+    if boot:
+        write_table(bootstrap_table(boot), "tab_bootstrap",
+                    "Twin loss minus no twin loss, paired bootstrap (1,000 resamples), in points.", tables)
+    else:
+        skip("tab_bootstrap")
+
+    f1 = {name: ev for name, file in (("rule-based split", "f1_split.json"),
+                                      ("Qwen3-8B few-shot", "f1_qwen.json"))
+          if (ev := read_json(results / "Y3" / file))}
+    if f1:
+        write_table(claims_table(f1), "tab_claims",
+                    "Claim extraction on 200 held-out messages (match: BGE-M3 cosine >= 0.8).", tables)
+    else:
+        skip("tab_claims")
+
+    # calibration curves of the H4 seed-42 heads, before and after temperature scaling
+    pred_files = {name: results / "H4" / f"preds_{key}_s42.jsonl"
+                  for key, name in (("notwin", "no twin loss"), ("notwin_cal", "no twin loss, cal."),
+                                    ("twin", "twin loss"), ("twin_cal", "twin loss, cal."))}
+    pred_files = {name: path for name, path in pred_files.items() if path.exists()}
     if pred_files and all(Path(p).exists() for p in gold_paths):
         from src.eval.loaders import join_gold, load_jsonl, load_preds
         gold = [r for p in gold_paths for r in load_jsonl(p)]
         curves = {}
-        for path in pred_files[:6]:
+        for name, path in pred_files.items():
             df, _ = join_gold(load_preds(path), gold)
-            name = f"{path.parent.name}/{path.stem.removeprefix('preds_').removesuffix('_s42')}"
             curves[name] = reliability_points(df)
         reliability_figure(curves, figures / "fig_reliability.png")
     else:

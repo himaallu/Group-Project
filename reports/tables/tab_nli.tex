@@ -1,0 +1,16 @@
+\begin{table}[t]
+\centering
+\caption{NLI macro-F1, zero-shot vs fine-tuned (gold = hand-labelled pairs).}
+\label{tab:tab_nli}
+\begin{tabular}{lrrr}
+\toprule
+model & setting & gold\_en macro-F1 & gold\_ar macro-F1 \\
+\midrule
+mDeBERTa-v3 & zero-shot & 0.371 & 0.443 \\
+mDeBERTa-v3 & fine-tuned v1 & 0.124 & 0.162 \\
+mDeBERTa-v3 & fine-tuned v2 & 0.334 & 0.473 \\
+XLM-R-large & zero-shot & 0.382 & 0.502 \\
+XLM-R-large & fine-tuned v1 & 0.124 & 0.173 \\
+\bottomrule
+\end{tabular}
+\end{table}

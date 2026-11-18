@@ -1,0 +1,5 @@
+model,macro-F1,ECE,ECE (cal.)
+no twin loss,38.0 ± 2.9,9.8 ± 2.3,5.0 ± 1.8
+twin loss,38.3 ± 2.0,11.1 ± 0.8,9.0 ± 1.7
+"twin loss, no reranker",31.3 ± 2.6,9.9 ± 2.1,–
+"twin loss, no entity match",35.6 ± 4.5,9.7 ± 0.3,–
