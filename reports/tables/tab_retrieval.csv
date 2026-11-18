@@ -1,0 +1,3 @@
+language,claims,BM25,dense,hybrid + reranker
+en,200,0.91,0.87,0.945
+ar,50,0.86,0.8,0.92
