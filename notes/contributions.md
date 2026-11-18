@@ -18,3 +18,4 @@ contribution statement.
 | R5 | Rathi | 2026-11-18 | branch `rathi/R5-explain-index`: offline index (163k snippets, recall@5 EN 0.945 / AR 0.92), 250 cited notes, faithfulness 0.32 / citation accuracy 0.31; index on HF `datasets/RathiAbeth/twincheck-index-v1` |
 | R6 | Rathi | 2026-11-18 | branch `rathi/R6-demo` (fb01911): Gradio demo on `check()`, 6 examples; trained verdict head 2/6 as expected vs rule 5/6 (`results/R6/`); Qwen3-8B shared by extractor + explainer to fit a T4 |
 | R7 | Rathi | 2026-11-18 | branch `rathi/R7-cleanup`: `run_all.sh` stages for R1–R6, Y2–Y3, H3–H5 (default run: 136 tests pass, tables rebuilt incl. AVeriTeC + X-FACT AR); README with pipeline, Hub models, reproduce, demo, provisional results |
+| R8 | Rathi | 2026-11-18 | branch `rathi/R8-figures`: `src/eval/figures.py` → 12 tables + 5 figures in `reports/` from `results/`; T1 sheet (60 notes, 100 rating rows) in `results/T1/`; fresh-clone `run_all.sh` passes (142 tests) |
