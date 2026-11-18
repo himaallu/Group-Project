@@ -14,3 +14,5 @@ contribution statement.
 | R1 | Rathi | 2026-11-17 | PR #2 + #7: `src/data/` loaders + `clean.py`, `data/label_map.csv`, `data/processed/en/` (MultiFC 21,057 + AVeriTeC 2,990 claims) |
 | R2 | Rathi | 2026-11-17 | branch `rathi/R2-reranker`: reranker AUROC 0.980 → 0.998, `features/relevance_en.parquet`, `features/entities_en.jsonl`; W&B https://forge.coreweave.com/wandb/rathiabeth-uowd/twincheck/runs/aihv3ag6 |
 | R3 | Rathi | 2026-11-17 | branch `rathi/R3-twins` (dc1bd8b): `data/copies/en/` test 955 twins (174 P, 281 B, 500 C), train 5,705 (986 P, 1,719 B, 3,000 C); checks 0/1 failures |
+| R4 | Rathi | 2026-11-18 | branch `rathi/R4-nli`: NLI v1 (gold EN 0.37 → 0.12, AR 0.44 → 0.16: label shortcut, reported as finding; zero-shot kept as default), XLM-R comparison, v2 pair builder; W&B https://forge.coreweave.com/wandb/rathiabeth-uowd/twincheck/runs/gepd51e6 |
+| R5 | Rathi | 2026-11-18 | branch `rathi/R5-explain-index`: offline index (163k snippets, recall@5 EN 0.945 / AR 0.92), 250 cited notes, faithfulness 0.32 / citation accuracy 0.31; index on HF `datasets/RathiAbeth/twincheck-index-v1` |
