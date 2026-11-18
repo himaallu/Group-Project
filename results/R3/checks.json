@@ -1,0 +1,29 @@
+{
+  "data/copies/en/test.jsonl": {
+    "n_twins": 955,
+    "per_type": {
+      "P": 174,
+      "C": 500,
+      "B": 281
+    },
+    "n_failed": 0,
+    "failures": []
+  },
+  "data/copies/en/train.jsonl": {
+    "n_twins": 5705,
+    "per_type": {
+      "B": 1719,
+      "C": 3000,
+      "P": 986
+    },
+    "n_failed": 1,
+    "failures": [
+      {
+        "id": "multifc_030465_C",
+        "problems": [
+          "_C donor relevance >= 0.1"
+        ]
+      }
+    ]
+  }
+}
