@@ -1,0 +1,48 @@
+{
+  "version": "v2",
+  "filter_model": "MoritzLaurer/mDeBERTa-v3-base-xnli-multilingual-nli-2mil7",
+  "min_prob": 0.5,
+  "train": {
+    "n_pairs": 18525,
+    "per_label": {
+      "entail": 6175,
+      "contradict": 6175,
+      "neutral": 6175
+    },
+    "per_language": {
+      "en": 17880,
+      "ar": 645
+    },
+    "per_origin": {
+      "en_supported": 5960,
+      "en_swap_B": 3226,
+      "en_random": 3055,
+      "en_own_neutral": 2905,
+      "en_contradicted": 2734,
+      "multifc_translated": 206,
+      "xfact_weak": 367,
+      "ar_own_neutral": 72
+    }
+  },
+  "val_weak": {
+    "n_pairs": 1500,
+    "per_label": {
+      "contradict": 500,
+      "neutral": 500,
+      "entail": 500
+    },
+    "per_language": {
+      "en": 1500
+    },
+    "per_origin": {
+      "en_contradicted": 500,
+      "en_own_neutral": 265,
+      "en_random": 235,
+      "en_supported": 500
+    }
+  },
+  "arabic_file": "data/nli/ar_train.jsonl",
+  "seed": 42,
+  "relevance_min": 0.3,
+  "per_claim": 2
+}
