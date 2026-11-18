@@ -37,6 +37,7 @@ import json
 import os
 import random
 import re
+import sys
 from pathlib import Path
 
 MODEL = "Qwen/Qwen3-8B"
@@ -135,9 +136,19 @@ def template_note(label: str, snippets: list, lang: str) -> str:
 
 
 def _load():
-    """Load Qwen3-8B once (4-bit on GPU)."""
+    """Load Qwen3-8B once (4-bit on GPU).
+
+    If the claim extractor (Y3) has already loaded the same model in this process,
+    reuse its copy: two 4-bit Qwen3-8B copies plus the other pipeline models do not
+    fit on a 15 GB T4.
+    """
     global _model
     if _model is None:
+        extract = sys.modules.get("src.claims.extract")
+        if extract is not None and getattr(extract, "MODEL", None) == MODEL \
+                and getattr(extract, "_model", None) is not None:
+            _model = extract._model
+            return _model
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 

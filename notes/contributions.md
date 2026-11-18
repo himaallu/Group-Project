@@ -16,3 +16,4 @@ contribution statement.
 | R3 | Rathi | 2026-11-17 | branch `rathi/R3-twins` (dc1bd8b): `data/copies/en/` test 955 twins (174 P, 281 B, 500 C), train 5,705 (986 P, 1,719 B, 3,000 C); checks 0/1 failures |
 | R4 | Rathi | 2026-11-18 | branch `rathi/R4-nli`: NLI v1 (gold EN 0.37 → 0.12, AR 0.44 → 0.16: label shortcut) and v2 (filter + hard neutrals: EN 0.33, AR 0.47, tie with zero-shot, which stays default); `features/nli_v2/`; W&B https://forge.coreweave.com/wandb/rathiabeth-uowd/twincheck/runs/hmtd5olh |
 | R5 | Rathi | 2026-11-18 | branch `rathi/R5-explain-index`: offline index (163k snippets, recall@5 EN 0.945 / AR 0.92), 250 cited notes, faithfulness 0.32 / citation accuracy 0.31; index on HF `datasets/RathiAbeth/twincheck-index-v1` |
+| R6 | Rathi | 2026-11-18 | branch `rathi/R6-demo` (fb01911): Gradio demo on `check()`, 6 examples; trained verdict head 2/6 as expected vs rule 5/6 (`results/R6/`); Qwen3-8B shared by extractor + explainer to fit a T4 |
