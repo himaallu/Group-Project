@@ -1,0 +1,26 @@
+{
+  "base_model": "BAAI/bge-reranker-v2-m3",
+  "seed": 42,
+  "n_train_pairs": 20000,
+  "lr": 2e-05,
+  "batch_size": 16,
+  "max_len": 256,
+  "epochs": 1,
+  "train_minutes": 2.6,
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "val_zero_shot": {
+    "n_pairs": 2000,
+    "accuracy": 0.719,
+    "auroc": 0.979972,
+    "mean_relevance_pos": 0.436084899811638,
+    "mean_relevance_neg": 7.156987474991183e-05
+  },
+  "val_fine_tuned": {
+    "n_pairs": 2000,
+    "accuracy": 0.9795,
+    "auroc": 0.9979355,
+    "mean_relevance_pos": 0.9744193983048899,
+    "mean_relevance_neg": 0.02040655630576657
+  },
+  "wandb_url": "https://forge.coreweave.com/wandb/rathiabeth-uowd/twincheck/runs/aihv3ag6"
+}
