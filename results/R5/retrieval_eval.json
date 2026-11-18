@@ -1,0 +1,18 @@
+{
+  "index_dir": "models/index_v1",
+  "n_snippets": 163244,
+  "k": 5,
+  "candidates_per_method": 20,
+  "en": {
+    "n_claims": 200,
+    "recall@5_bm25": 0.91,
+    "recall@5_dense": 0.87,
+    "recall@5_hybrid": 0.945
+  },
+  "ar": {
+    "n_claims": 50,
+    "recall@5_bm25": 0.86,
+    "recall@5_dense": 0.8,
+    "recall@5_hybrid": 0.92
+  }
+}
