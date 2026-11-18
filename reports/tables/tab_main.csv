@@ -1,0 +1,5 @@
+model,macro-F1,ESR,unrelated,paraphrase cons.,ECE,ECE (cal.)
+no twin loss,36.3 ± 0.5,52.2 ± 3.0,42.4 ± 24.4,91.2 ± 1.7,5.4 ± 0.1,5.1 ± 0.4
+twin loss,35.2 ± 0.7,89.7 ± 0.9,100.0 ± 0.0,91.4 ± 2.5,8.2 ± 1.1,7.0 ± 0.3
+"twin loss, no reranker",30.1 ± 1.4,68.7 ± 0.6,81.0 ± 3.8,87.4 ± 0.6,3.7 ± 0.8,–
+"twin loss, no entity match",33.8 ± 1.3,86.8 ± 3.9,100.0 ± 0.0,90.6 ± 0.9,8.4 ± 1.3,–

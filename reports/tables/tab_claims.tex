@@ -1,0 +1,13 @@
+\begin{table}[t]
+\centering
+\caption{Claim extraction on 200 held-out messages (match: BGE-M3 cosine $\geq$ 0.8).}
+\label{tab:tab_claims}
+\begin{tabular}{lrrrr}
+\toprule
+extractor & en F1 & ar F1 & mixed F1 & all F1 \\
+\midrule
+rule-based split & 0.772 & 0.751 & 0.845 & 0.786 \\
+Qwen3-8B few-shot & 0.989 & 0.966 & 1.000 & 0.984 \\
+\bottomrule
+\end{tabular}
+\end{table}

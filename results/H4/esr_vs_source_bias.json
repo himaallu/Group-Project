@@ -1,0 +1,14 @@
+{
+  "what": "_B sources (supported, test) vs their _B twins, mean over seeds 42/43/44",
+  "n_pairs": 281,
+  "notwin": {
+    "orig_pred_contradicted": 0.3986,
+    "B_pred_contradicted": 0.5219,
+    "flipped_to_contradicted": 0.1839
+  },
+  "twin": {
+    "orig_pred_contradicted": 0.6109,
+    "B_pred_contradicted": 0.8968,
+    "flipped_to_contradicted": 0.3049
+  }
+}

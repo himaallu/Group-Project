@@ -1,0 +1,90 @@
+{
+  "components": {
+    "extract_claims (Y3)": "real",
+    "get_evidence (R5)": "real",
+    "score_nli (R4)": "real",
+    "verdict (H3)": "stub",
+    "calibrate (H4)": "real",
+    "explain (R5)": "real"
+  },
+  "examples": [
+    {
+      "title": "Metro line reopens (EN)",
+      "lang": "en",
+      "expected": "supported",
+      "claims": [
+        {
+          "claim": "Dubai Metro's Red Line reopened on Monday after maintenance work.",
+          "label": "unverified",
+          "confidence": 0.664,
+          "explanation": "The RTA stated the Red Line resumed full service on Monday after maintenance was completed [1]. Passengers returned to the Red Line on Monday morning with trains running on the normal timetable again [2]."
+        }
+      ]
+    },
+    {
+      "title": "New metro station (AR)",
+      "lang": "ar",
+      "expected": "supported",
+      "claims": [
+        {
+          "claim": "افتتحت هيئة الطرق والمواصلات في دبي محطة مترو جديدة على الخط الأحمر.",
+          "label": "supported",
+          "confidence": 0.905,
+          "explanation": "هيئة الطرق والمواصلات في دبي أعلنت افتتاح محطة جديدة على الخط الأحمر [1]. المحطة بدأت تستقبل الركاب صباح اليوم [2]."
+        }
+      ]
+    },
+    {
+      "title": "Schools closed for a month (EN)",
+      "lang": "en",
+      "expected": "contradicted",
+      "claims": [
+        {
+          "claim": "All schools in Abu Dhabi will close for a month because of heavy rain.",
+          "label": "contradicted",
+          "confidence": 0.988,
+          "explanation": "The claim is contradicted because schools in Abu Dhabi will only switch to remote learning for one day due to rain, not a full month [1]. Classes are expected to resume normally by Wednesday [2]."
+        }
+      ]
+    },
+    {
+      "title": "Metro stopped by floods (mixed)",
+      "lang": "mixed",
+      "expected": "contradicted",
+      "claims": [
+        {
+          "claim": "metro dubai أوقف all lines today بسبب heavy flooding in the city",
+          "label": "contradicted",
+          "confidence": 0.999,
+          "explanation": "الCLAIM خاطئ لأن المترو يعمل بشكل طبيعي اليوم وفقًا للتأكيد من RTA [1]."
+        }
+      ]
+    },
+    {
+      "title": "New falcon species (EN)",
+      "lang": "en",
+      "expected": "unverified",
+      "claims": [
+        {
+          "claim": "A new species of falcon was discovered in the Hajar Mountains last week.",
+          "label": "unverified",
+          "confidence": 0.999,
+          "explanation": "The evidence mentions that the Hajar Mountains are a popular hiking destination, but this does not confirm or deny the discovery of a new falcon species [1]. The mention of falconry as a traditional sport in the UAE does not provide information about a new species discovery [2]."
+        }
+      ]
+    },
+    {
+      "title": "Crewed Mars trip (AR)",
+      "lang": "ar",
+      "expected": "unverified",
+      "claims": [
+        {
+          "claim": "ستطلق الإمارات رحلة مأهولة إلى المريخ العام المقبل.",
+          "label": "unverified",
+          "confidence": 0.995,
+          "explanation": "البيانات لا تؤكد أو تنفي Claim، لأنها تتحدث عن زيارة سياح إلى دبي [1] وافتتاح متحف في الشارقة [2]."
+        }
+      ]
+    }
+  ]
+}

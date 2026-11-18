@@ -1,0 +1,7 @@
+# R6 · Demo (Rathi)
+
+- **What ran:** `src/demo/app.py` (Gradio): message → claims (Y3 Qwen3-8B) → offline evidence (R5 index + reranker) → zero-shot NLI → verdict + calibration (H3/H4) → cited note (R5), on 6 illustrative UAE examples (2 Supported, 2 Contradicted, 2 Unverified; 2 Arabic, 1 mixed) with `python -m src.demo.app --run-examples`; live app with `--share` on a Colab T4.
+- **Settings:** NLI = zero-shot mDeBERTa-v3 XNLI; verdict head = `models/verdict_twin_s42` (λ_inv 1, λ_sens 0.5) with `models/verdict_calib.json` (T 0.89, τ 0); Qwen3-8B 4-bit shared by the extractor and the explainer (two copies did not fit a 15 GB T4). No training, so no W&B run.
+- **Trained verdict head:** 2 of 6 examples as expected (both Contradicted); clear supporting evidence came out Contradicted (0.81, 0.47) and unrelated evidence came out Supported / Contradicted (0.49, 0.53). Matches its weak validation macro-F1 (0.357, H4).
+- **Rule stand-in** (max p_entail vs max p_contradict, same NLI + calibration): 5 of 6 as expected; only miss "Metro line reopens" → Unverified (0.66). Notes cite the right snippets in both runs; one mixed note contains "الCLAIM".
+- **Files:** `results/R6/examples.json` (trained head), `examples_rule.json` (rule stand-in); app `src/demo/app.py`, examples `src/demo/examples.py`, notebook `notebooks/R6_demo_colab.ipynb`. Set `TWINCHECK_VERDICT=none` to run the demo with the rule.
