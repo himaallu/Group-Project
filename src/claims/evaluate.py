@@ -1,7 +1,8 @@
 """Evaluate claim extraction against the gold examples (task Y3, part 2).
 
 What it does
-    Runs src.claims.extract on every gold example except the 6 few-shot ones,
+    Runs src.claims.extract on the 200 held-out gold examples (claims_0101-0300;
+    0001-0100 hold the 6 few-shot examples and the LoRA training data),
     then computes claim-extraction precision / recall / F1 per language (en, ar,
     mixed) and overall with src.eval.metrics.claim_extraction_f1. Two claims match
     when their BGE-M3 cosine similarity is >= 0.8 (CLAUDE.md section 5).
@@ -51,6 +52,8 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--gold", default=None)
     ap.add_argument("--backend", choices=["qwen", "split"], default="qwen")
+    ap.add_argument("--eval_from", default="claims_0101",
+                    help="score only ids >= this (claims_0001-0100 hold the few-shot examples and LoRA training data)")
     ap.add_argument("--limit", type=int, default=None)
     ap.add_argument("--batch", type=int, default=4)
     ap.add_argument("--no_wandb", action="store_true")
@@ -58,7 +61,8 @@ def main() -> None:
 
     os.environ["TWINCHECK_EXTRACTOR"] = args.backend
     gold_path = args.gold or next(p for p in extract.GOLD_FILES if os.path.exists(p))
-    rows = [r for r in read_jsonl(gold_path) if r["id"] not in extract.FEWSHOT_IDS][: args.limit]
+    rows = [r for r in read_jsonl(gold_path)
+            if r["id"] not in extract.FEWSHOT_IDS and r["id"] >= args.eval_from][: args.limit]
 
     preds = []
     for i in range(0, len(rows), args.batch):

@@ -65,3 +65,30 @@ def test_smoke_test_runs_on_fixture(tmp_path):
     metrics = run([FIXTURES / "fake_gold.jsonl"], tmp_path)
     assert metrics["n_orig"] == 10 and metrics["n_B"] == 5
     assert (tmp_path / "preds_random.jsonl").exists()
+
+
+def test_report_skips_non_verdict_pred_files(tmp_path):
+    """Other tasks' preds_*.jsonl (e.g. claim extraction) must not break the report."""
+    import json
+    from pathlib import Path
+    from src.eval.report import build_report
+    fixtures = Path("tests/fixtures")
+    (tmp_path / "H5").mkdir()
+    (tmp_path / "H5" / "preds_ours.jsonl").write_text((fixtures / "fake_preds.jsonl").read_text())
+    (tmp_path / "Y3").mkdir()
+    (tmp_path / "Y3" / "preds_qwen.jsonl").write_text(
+        json.dumps({"id": "claims_0101", "language": "en", "pred_claims": ["x"]}) + "\n")
+    table = build_report(tmp_path, [fixtures / "fake_gold.jsonl"], tmp_path / "out")
+    assert list(table["model"]) == ["ours"]
+
+
+def test_compare_same_file_has_zero_diff():
+    """compare.py: a model compared with itself has diff 0 and p = 1 for every metric."""
+    from src.eval.compare import compare
+    from src.eval.loaders import load_jsonl
+    gold = load_jsonl("tests/fixtures/fake_gold.jsonl")
+    res = compare("tests/fixtures/fake_preds.jsonl", "tests/fixtures/fake_preds.jsonl", gold,
+                  n_resamples=50)
+    assert {"macro_f1", "esr", "unrelated_rate", "paraphrase_consistency"} <= set(res)
+    for r in res.values():
+        assert r["diff"] == 0 and r["p_value"] == 1.0
