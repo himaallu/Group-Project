@@ -20,7 +20,8 @@ What it does (CLAUDE.md §9 H5, §5)
     (``--nli-dir features/nli_v1 --tag _r4``) sits next to the zero-shot run.
 
 Inputs
-    --nli-dir with multifc_{train,val,test}.parquet, copies_en/{train,test}.parquet,
+    --nli-dir with multifc_{train,val,test}.parquet, twin scores copies_en/{train,test}.parquet
+              (or {train,test}.parquet),
               averitec_test.parquet (same columns as score_zeroshot.py writes)
     data/processed/en/{multifc_*,averitec_test}.jsonl, data/copies/en/{train,test}.jsonl,
     features/relevance_en.parquet, features/relevance_copies_en.parquet,
@@ -74,7 +75,11 @@ def variants(lambda_inv: float, lambda_sens: float) -> dict[str, list[str]]:
 def nli_files(nli_dir: Path) -> dict[str, list[str]]:
     """NLI parquet paths for training (MultiFC + twins) and for AVeriTeC test."""
     train = [nli_dir / f"multifc_{s}.parquet" for s in ("train", "val", "test")]
-    train += [nli_dir / "copies_en" / f"{s}.parquet" for s in ("train", "test")]
+    # Twin scores: copies_en/{train,test}.parquet (score_zeroshot with --out-dir), or
+    # {train,test}.parquet next to the others (Rathi's src/nli/score.py names by file stem).
+    for s in ("train", "test"):
+        nested = nli_dir / "copies_en" / f"{s}.parquet"
+        train.append(nested if nested.exists() else nli_dir / f"{s}.parquet")
     files = {"train": [str(p) for p in train], "averitec": [str(nli_dir / "averitec_test.parquet")]}
     missing = [p for group in files.values() for p in group if not Path(p).exists()]
     if missing:
