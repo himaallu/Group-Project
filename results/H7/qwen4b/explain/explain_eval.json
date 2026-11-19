@@ -1,0 +1,29 @@
+{
+  "nli_model": "MoritzLaurer/mDeBERTa-v3-base-xnli-multilingual-nli-2mil7",
+  "entail_min": 0.5,
+  "verdict_explained": "gold label",
+  "all": {
+    "n_notes": 250,
+    "n_sentences": 423,
+    "n_citations": 424,
+    "faithfulness": 0.35224586288416077,
+    "citation_accuracy": 0.3632075471698113,
+    "share_notes_fully_faithful": 0.18
+  },
+  "en": {
+    "n_notes": 200,
+    "n_sentences": 357,
+    "n_citations": 358,
+    "faithfulness": 0.35294117647058826,
+    "citation_accuracy": 0.36312849162011174,
+    "share_notes_fully_faithful": 0.16
+  },
+  "ar": {
+    "n_notes": 50,
+    "n_sentences": 66,
+    "n_citations": 66,
+    "faithfulness": 0.3484848484848485,
+    "citation_accuracy": 0.36363636363636365,
+    "share_notes_fully_faithful": 0.26
+  }
+}
