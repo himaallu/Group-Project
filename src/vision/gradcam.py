@@ -3,8 +3,8 @@
 What it does
     For the ``seen`` ResNet-50 and ViT-B/16 checkpoints, computes Grad-CAM for the
     AI logit on 8 validation images (3 real, 3 SD v1.4, 2 BigGAN; sampled with seed 42).
-    ResNet-50: activations of the last bottleneck block (7x7). ViT-B/16: patch tokens of
-    the last encoder layer reshaped to 14x14 (the CLS token is dropped). Heatmaps are
+    ResNet-50: activations of the last bottleneck block (7x7). ViT-B/16: patch tokens at the
+    input LayerNorm of the last encoder block, reshaped to 14x14 (the CLS token is dropped). Heatmaps are
     upsampled to 224x224 and drawn over the input crop.
 
 Inputs

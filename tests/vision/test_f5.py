@@ -5,7 +5,7 @@ Run: python -m pytest tests/vision/test_f5.py -q
 import torch
 from PIL import Image
 
-from src.vision.detectors import build_model, corrupt
+from src.vision.detectors import build_model, corrupt, target_layer
 from src.vision.evaluate_detectors import CKPT_NAME
 
 
@@ -32,3 +32,13 @@ def test_checkpoint_names():
     match = CKPT_NAME.match("vit_b16_unseen_biggan_s42")
     assert (match["arch"], match["setting"], match["seed"]) == ("vit_b16", "unseen_biggan", "42")
     assert CKPT_NAME.match("resnet50_seen_s43")["setting"] == "seen"
+
+
+def test_vit_gradcam_layer_gets_patch_gradients():
+    vit = build_model("vit_b16", pretrained=False).eval()
+    store = {}
+    hook = target_layer(vit, "vit_b16").register_full_backward_hook(
+        lambda m, gi, go: store.__setitem__("grad", go[0]))
+    vit(torch.randn(1, 3, 224, 224)).sum().backward()
+    hook.remove()
+    assert store["grad"][:, 1:].abs().max() > 0

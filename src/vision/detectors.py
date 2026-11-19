@@ -158,5 +158,9 @@ def build_model(arch: str, pretrained: bool = True) -> nn.Module:
 
 
 def target_layer(model: nn.Module, arch: str) -> nn.Module:
-    """Layer whose activations Grad-CAM uses (last conv block / last encoder block)."""
-    return model.layer4[-1] if arch == "resnet50" else model.encoder.layers[-1]
+    """Layer whose activations Grad-CAM uses (last conv block / input LayerNorm of the last encoder block).
+
+    The output of the last ViT block reaches the head only through the CLS token, so its
+    patch tokens get zero gradient; ``ln_1`` of that block still sees all tokens.
+    """
+    return model.layer4[-1] if arch == "resnet50" else model.encoder.layers[-1].ln_1
