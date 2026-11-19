@@ -110,3 +110,19 @@ def test_nli_selection_f1_ci_bounds():
     y = ["entail", "neutral", "contradict"] * 10
     f1, lo, hi = f1_ci(y, y, n=50)
     assert f1 == 1.0 and lo == 1.0 and hi == 1.0
+
+
+def test_swap_model_replaces_model_and_passes_args(tmp_path, monkeypatch):
+    """swap_model sets the module's MODEL and calls main() with the remaining args."""
+    import sys
+    pkg = tmp_path / "fakepkg"
+    pkg.mkdir()
+    (pkg / "__init__.py").write_text("")
+    (pkg / "judge.py").write_text(
+        "import sys\nMODEL = 'Qwen/Qwen3-8B'\nSEEN = {}\n"
+        "def main():\n    SEEN['model'] = MODEL\n    SEEN['argv'] = sys.argv[1:]\n")
+    monkeypatch.syspath_prepend(str(tmp_path))
+    from src.eval.swap_model import run
+    run("fakepkg.judge", "Qwen/Qwen3-4B", ["--out", "x.jsonl"])
+    judge = sys.modules["fakepkg.judge"]
+    assert judge.SEEN == {"model": "Qwen/Qwen3-4B", "argv": ["--out", "x.jsonl"]}
