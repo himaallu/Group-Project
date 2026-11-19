@@ -1,16 +1,25 @@
 {
-    "train_validation_records": 18000,
-    "midjourney_test_records": 11998,
-    "genimage_test_records": 11998,
-    "duplicate_hashes_in_train_validation": 0,
-    "duplicate_rows_in_train_validation": 0,
+    "train_records": 9000,
+    "train_unique_hashes": 9000,
+    "train_counts": {
+        "BigGAN": 5000,
+        "real": 4000
+    },
+    "validation_records": 2000,
+    "validation_unique_hashes": 2000,
+    "validation_counts": {
+        "BigGAN": 1000,
+        "real": 1000
+    },
+    "test_records": 2000,
+    "test_unique_hashes": 2000,
+    "test_counts": {
+        "Stable Diffusion v1.4": 1000,
+        "real": 1000
+    },
     "train_validation_hash_overlap": 0,
-    "all_image_overlap_with_midjourney": 0,
-    "real_image_overlap_with_midjourney": 0,
-    "train_real_overlap_with_midjourney": 0,
-    "validation_real_overlap_with_midjourney": 0,
-    "train_unique_hashes": 15000,
-    "validation_unique_hashes": 3000,
-    "midjourney_unique_hashes": 11998,
+    "train_test_hash_overlap": 0,
+    "validation_test_hash_overlap": 0,
+    "test_ai_generator_seen_in_training": false,
     "leakage_detected": false
 }
