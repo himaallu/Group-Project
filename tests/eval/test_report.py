@@ -102,3 +102,11 @@ def test_error_case_groups():
     assert group_of("multifc_1_B", "contradicted", "contradicted", None, "supported") == ["fixed_by_twin_loss"]
     assert group_of("multifc_1_P", "supported", "contradicted", "supported", None) == ["paraphrase_flip"]
     assert group_of("multifc_1", "supported", "supported", None, None) == []
+
+
+def test_nli_selection_f1_ci_bounds():
+    """nli_selection.f1_ci: perfect predictions give F1 = 1 with a degenerate interval."""
+    from src.eval.nli_selection import f1_ci
+    y = ["entail", "neutral", "contradict"] * 10
+    f1, lo, hi = f1_ci(y, y, n=50)
+    assert f1 == 1.0 and lo == 1.0 and hi == 1.0
