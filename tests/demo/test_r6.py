@@ -31,7 +31,7 @@ def test_card_escapes_html_and_shows_confidence():
               "evidence": [{"text": "Trains <ran>", "url": "https://a.ae", "domain": "a.ae"}]}
     card = claim_card(result)
     assert "&lt;b&gt;x&lt;/b&gt;" in card and "Contradicted" in card and "73%" in card
-    assert 'href="https://a.ae"' in card and 'dir="auto"' in card
+    assert 'href="https://a.ae"' in card and 'dir="ltr"' in card
     assert "No check-worthy claim" in format_results([])
     assert ILLUSTRATIVE in format_results([result], ILLUSTRATIVE)
 

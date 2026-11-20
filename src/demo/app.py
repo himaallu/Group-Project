@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import argparse
 import html
+import re
 
 from src.demo.examples import EXAMPLES
 
@@ -44,26 +45,90 @@ def parse_evidence(text: str) -> list[str] | None:
     return lines or None
 
 
+FIRST_LETTER = re.compile(r"[A-Za-z\u0600-\u06FF]")   # first Latin or Arabic letter
+CITATION = re.compile(r"\[(\d+)\]")
+
+
+def text_dir(text: str) -> str:
+    """'rtl' if the first letter of the text is Arabic, else 'ltr'.
+
+    This is the "first strong character" rule that the browser uses for dir="auto",
+    made explicit so the alignment can follow it too: a mixed message that starts
+    in Arabic reads right-to-left, an English note that quotes an Arabic name does not.
+    """
+    m = FIRST_LETTER.search(text or "")
+    return "rtl" if m and not m.group(0).isascii() else "ltr"
+
+
+def dir_attrs(text: str) -> str:
+    """HTML attributes that set direction and alignment for ``text``."""
+    d = text_dir(text)
+    return f'dir="{d}" style="text-align:{"right" if d == "rtl" else "left"}"'
+
+
+def link_citations(note: str, evidence: list[dict]) -> str:
+    """Escape the note and turn each [k] into a link to snippet k's source.
+
+    A citation without a URL (e.g. pasted evidence) stays as bold [k]; a number
+    outside the evidence list is left as plain text.
+    """
+    def repl(m: re.Match) -> str:
+        k = int(m.group(1))
+        if not 1 <= k <= len(evidence):
+            return m.group(0)
+        url = evidence[k - 1].get("url")
+        if url:
+            return (f'<a href="{html.escape(url)}" target="_blank" '
+                    f'title="{html.escape(evidence[k - 1].get("domain") or url)}"><b>[{k}]</b></a>')
+        return f"<b>[{k}]</b>"
+    return CITATION.sub(repl, html.escape(note))
+
+
+def confidence_bar(pct: int, colour: str) -> str:
+    """A thin bar for the confidence, with the number as text for screen readers."""
+    return (f'<div role="progressbar" aria-valuenow="{pct}" aria-valuemin="0" '
+            f'aria-valuemax="100" aria-label="confidence {pct}%" '
+            f'style="background:#eaeef2;border-radius:4px;height:8px">'
+            f'<div style="background:{colour};width:{pct}%;height:8px;border-radius:4px">'
+            f'</div></div>')
+
+
 def claim_card(result: dict) -> str:
-    """HTML card for one claim's result from ``check``."""
+    """HTML card for one claim's result from ``check``.
+
+    Shows the claim, the verdict badge, a confidence bar, the note with clickable
+    citations, and the numbered evidence with source links. Arabic text is shown
+    right-to-left (claim, note and each snippet separately, since mixed messages
+    can have an Arabic claim with English evidence).
+    """
     label, colour = VERDICT_STYLE.get(result["label"], (result["label"], "#57606a"))
     pct = round(100 * float(result["confidence"]))
+    shown = result.get("evidence", [])[:3]
     items = []
-    for i, ev in enumerate(result.get("evidence", [])[:3], start=1):
+    for i, ev in enumerate(shown, start=1):
         text = html.escape(ev["text"][:300])
         source = (f' <a href="{html.escape(ev["url"])}" target="_blank">'
                   f'{html.escape(ev.get("domain") or "source")}</a>' if ev.get("url") else "")
-        items.append(f'<li dir="auto"><b>[{i}]</b> {text}{source}</li>')
+        items.append(f'<li {dir_attrs(ev["text"])}><b>[{i}]</b> {text}{source}</li>')
     evidence = "".join(items) or "<li>No evidence found.</li>"
     return (
         '<div style="border:1px solid #d0d7de;border-radius:8px;padding:12px;margin:8px 0">'
-        f'<div dir="auto" style="font-weight:600">{html.escape(result["claim"])}</div>'
+        f'<div {dir_attrs(result["claim"])}><b>{html.escape(result["claim"])}</b></div>'
         f'<div style="margin:6px 0"><span style="background:{colour};color:#fff;'
         f'padding:2px 8px;border-radius:12px">{label}</span> confidence {pct}%</div>'
-        f'<div style="background:#eaeef2;border-radius:4px;height:8px">'
-        f'<div style="background:{colour};width:{pct}%;height:8px;border-radius:4px"></div></div>'
-        f'<p dir="auto">{html.escape(result["explanation"])}</p>'
+        f'{confidence_bar(pct, colour)}'
+        f'<p {dir_attrs(result["explanation"])}>'
+        f'{link_citations(result["explanation"], shown)}</p>'
         f'<ol style="list-style:none;padding-left:0;font-size:0.9em">{evidence}</ol></div>')
+
+
+def verdict_method() -> str:
+    """Which verdict step is running, in words for the page footer."""
+    from src.pipeline import component_status
+
+    if component_status()["verdict (H3)"] == "real":
+        return "trained verdict head (H4, twin loss)"
+    return "evidence rule (strongest entail vs strongest contradict snippet)"
 
 
 def format_results(results: list[dict], note: str = "") -> str:
@@ -113,7 +178,8 @@ def build_app():
                                                  ex["lang"], ILLUSTRATIVE)),
                         None, [message, evidence, lang, output])
         status = ", ".join(f"{k}: {v}" for k, v in component_status().items())
-        gr.Markdown(f"<small>Components: {html.escape(status)}</small>")
+        gr.Markdown(f"<small>Verdict by: {html.escape(verdict_method())}. "
+                    f"Components: {html.escape(status)}</small>")
     return app
 
 
@@ -136,7 +202,7 @@ def run_examples(path: str) -> list[dict]:
                      "claims": [{"claim": r["claim"], "label": r["label"],
                                  "confidence": round(float(r["confidence"]), 3),
                                  "explanation": r["explanation"]} for r in results]})
-    report = {"components": component_status(),
+    report = {"components": component_status(), "verdict_method": verdict_method(),
               "examples": rows}
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     Path(path).write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
