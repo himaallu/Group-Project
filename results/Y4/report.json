@@ -1,0 +1,27 @@
+{
+  "sources": 200,
+  "twins": 642,
+  "by_type": {
+    "M": 192,
+    "C_A": 158,
+    "A": 147,
+    "B_A": 145
+  },
+  "by_label": {
+    "supported": 339,
+    "unverified": 158,
+    "contradicted": 145
+  },
+  "dropped_twins": {
+    "A": 53,
+    "M": 8,
+    "B_A": 55,
+    "C_A": 42
+  },
+  "failed_texts": 164,
+  "distinct_texts": 3670,
+  "glossary_names": 3044,
+  "minutes": 158.4,
+  "model": "Qwen/Qwen3-8B 4-bit",
+  "seed": 42
+}
