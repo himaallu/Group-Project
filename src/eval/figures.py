@@ -520,8 +520,14 @@ def build_all(results: Path, tables: Path, figures: Path, gold_paths: list[str])
 
     arabic = results / "Y5" / "arabic_E7.csv"
     if arabic.exists():
-        write_table(pd.read_csv(arabic), "tab_arabic_E7", "Arabic and mixed-language results (E7).",
-                    tables)
+        e7 = pd.read_csv(arabic)
+        e7 = e7[e7["dataset"] == "twins"]
+        cols = {"macro_f1_mean": "Macro-F1", "esr_mean": "ESR", "unrelated_mean": "Unrelated",
+                "crossling_mean": "Cross-lingual"}
+        e7 = e7[["system", "language"] + list(cols)].rename(columns=cols)
+        e7[list(cols.values())] = (e7[list(cols.values())] * 100).round(1)
+        write_table(e7, "tab_arabic_E7",
+                    "Arabic and mixed-language twins (E7), % mean over seeds 42/43/44.", tables)
     else:
         skip("tab_arabic_E7")
 

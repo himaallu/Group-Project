@@ -154,7 +154,16 @@ Stable Diffusion v1.4, seed 42 (`reports/tables/tab_detectors.csv`, F3/F5).
   the threshold learned on BigGAN. On VERITE, adding the authenticity score to the verdict
   model changes no pair verdicts (ALR 7.8% on 51 test pairs for both, `tab_leakage.csv`).
   ONNX: 15.5 ms (ResNet-50) / 85.7 ms (ViT-B/16) per image on CPU (`tab_onnx.csv`).
-- Arabic experiments (Y5, `tab_arabic_E7`) are added when `results/Y5/arabic_E7.csv` is pushed.
+**Arabic and mixed language (E7, Y5).** 192 MultiFC test sources with Arabic twins (`_A` Arabic claim + evidence, `_M` Arabic claim + English evidence, `_B_A` / `_C_A` Arabic swap / unrelated), same models, no Arabic verdict training, mean over seeds 42/43/44, in % (`reports/tables/tab_arabic_E7.csv`).
+
+| Model | Lang | Macro-F1 | ESR | Unrelated | Cross-lingual |
+|---|---|---|---|---|---|
+| verdict head + twin loss | EN / AR | 64.3 / 55.9 | 89.1 / 96.8 | 100 / 100 | AR 63.0, mixed 77.3 |
+| + twin loss, no entity match | EN / AR | 60.5 / 59.7 | 87.2 / 80.5 | 100 / 100 | AR 73.9, mixed 79.5 |
+| verdict head, no twin loss | EN / AR | 35.6 / 39.0 | 51.7 / 39.5 | 23.1 / 24.7 | AR 62.4, mixed 78.6 |
+| zero-shot NLI | EN / AR | 54.1 / 49.4 | 60.4 / 52.4 | 54.7 / 45.6 | AR 64.6, mixed 72.4 |
+
+Without entity features the head is as good in Arabic as in English. With them, Arabic records get a neutral entity value (spaCy is English-only) and the head calls about 97% of supported Arabic twins contradicted (supported recall 1.8%), so its high Arabic ESR is bias (`results/Y5/diagnostics.csv`). About 85% of Arabic errors are also English errors; most of the rest are translation errors (`results/Y6/`). Real Arabic claims (X-FACT AR test, 135): all systems near chance (macro-F1 19 to 33).
 
 ## Team
 

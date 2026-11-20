@@ -22,7 +22,7 @@ Language groups: **en** = English original + `_B` + `_C` (576 records); **ar** =
 | zero-shot NLI rule | en | 0.541 | 60.4 | 54.7 | |
 | zero-shot NLI rule | ar | 0.494 | 52.4 | 45.6 | 64.6 |
 | similarity + LightGBM | en | 0.290 | 57.8 | 2.1 | |
-| similarity + LightGBM | ar | 0.235 | 74.3 | 0.6 | 49.4 |
+| similarity + LightGBM | ar | 0.235 | 74.2 | 0.6 | 49.4 |
 
 Cross-lingual = % of `_A` / `_M` twins with the same verdict as the English original.
 
