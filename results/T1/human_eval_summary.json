@@ -1,8 +1,6 @@
 {
-  "n_ratings": 80,
-  "blank_rows": {
-    "sheet_youssef.csv": 20
-  },
+  "n_ratings": 100,
+  "blank_rows": {},
   "agreement_en": {
     "raters": [
       "himasri",
@@ -41,6 +39,14 @@
       "supported_partly": 0.5,
       "supported_no": 0.15,
       "readability_mean": 3.9
+    },
+    "youssef/ar": {
+      "n": 20,
+      "verdict_correct": 0.1,
+      "supported_yes": 0.25,
+      "supported_partly": 0.5,
+      "supported_no": 0.25,
+      "readability_mean": 3.7
     }
   }
 }
