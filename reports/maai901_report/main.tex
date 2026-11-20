@@ -70,8 +70,8 @@ the verdict never sees the authenticity score.}
 \section{Data}
 \label{sec:data}
 \todo{VERITE: 1,001 image--caption records, split by image 701/149/151 (notes/F1.md).}
-\todo{GenImage subset: real, SD v1.4, BigGAN (5,000 train / 1,000 val each); Midjourney
-test images unavailable, so leave-one-generator-out (notes/F1.md, notes/F3.md).
+\todo{GenImage subset (notes/F1.md): train 4,000 real + 5,000 BigGAN, validation 1,000 real +
+1,000 BigGAN, test 1,000 real + 1,000 Stable Diffusion v1.4 (unseen generator).
 Note the PNG-vs-JPEG format difference between fakes and reals.}
 \todo{M4FC Arabic image claims (603 images).}
 \todo{Image-twin pipeline: VAE round trip, SDXL img2img strength 0.15, SigLIP cosine
@@ -83,32 +83,35 @@ results/F2/README.md). Figure: original vs twin examples.}
 \section{Methods}
 \label{sec:methods}
 \todo{SigLIP 2 image and caption embeddings; image--caption match features.}
-\todo{CLIP ViT-L/14 logistic probe (UnivFD-style); C by 5-fold CV (src/vision/probe.py).}
+\todo{CLIP ViT-L/14 logistic regression and linear SVM probes on the F2 embeddings (UnivFD-style;
+notebooks/Feba\_F3\_authenticity\_leakage.ipynb).}
 \todo{ResNet-50 and ViT-B/16 (last 4 blocks unfrozen) detectors (results/F5).}
-\todo{Leakage models: decoupled (match features only) vs fused (image + caption + match +
-authenticity) vs fused without authenticity (src/vision/leakage.py).}
+\todo{Leakage models on VERITE: decoupled (image--caption similarity) vs fused (similarity,
+authenticity score and their product), logistic regression (results/F3/README.md).}
 
 % ---------------------------------------------------------------------
 \section{Experimental Setup}
 \label{sec:setup}
-\todo{Splits, metrics (accuracy, AUROC, macro-F1, ALR with bootstrap 95\% CI), seeds
+\todo{Splits, metrics (accuracy, AUROC, macro-F1, ALR), seeds
 42/43/44, hardware and run times, W\&B project twincheck.}
 
 % ---------------------------------------------------------------------
 \section{Results: AI-Image Detection}
 \label{sec:detection}
-\todo{Table: probe seen / unseen-BigGAN / unseen-SD (results/F3/probe_metrics.csv).}
-\todo{JPEG-85 control rows (results/F3/probe_metrics.csv, seen\_on\_jpeg85).}
+\todo{Table: probes on the unseen Stable Diffusion v1.4 test split, accuracy, precision, recall,
+F1, AUROC (results/F3/F3\_FINAL\_SUMMARY.csv).}
 \todo{CNN vs ViT vs CLIP probe table (results/F5/cnn\_vit.csv).}
-\todo{Twins: p\_ai of originals vs twins (results/F3/twin\_authenticity.csv).}
+\todo{Twins: authenticity scores of VERITE originals vs VAE twins
+(results/F3/F3\_VERITE\_authenticity\_probe\_original\_twin\_scores.csv).}
 
 % ---------------------------------------------------------------------
 \section{Results: Authenticity Leakage}
 \label{sec:leakage}
-\todo{Table: ALR with 95\% CI and the JPEG re-save noise floor for decoupled, fused,
-fused without authenticity, VAE and SDXL twins (results/F3/alr.csv,
-results/F3/alr\_bootstrap.json). Report test macro-F1 of each model next to it.}
-\todo{Interpretation, honestly: what the noise floor and the near-chance VERITE scores mean.}
+\todo{Table: pair accuracy and ALR for decoupled vs fused on VERITE validation and test
+(results/F3/F3\_corrected\_pair\_ALR\_summary.csv), with caption-level metrics
+(results/F3/F3\_corrected\_caption\_metrics.csv).}
+\todo{Interpretation, honestly: what the small VERITE test set (51 pairs) and the near-chance
+scores mean.}
 
 % ---------------------------------------------------------------------
 \section{Robustness, Explanations and Deployment}
