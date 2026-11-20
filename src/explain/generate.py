@@ -57,9 +57,13 @@ SYSTEM_PROMPT = (
     "evidence is about and that it does not confirm or deny the claim. "
     "Output only the note."
 )
+ARABIC_HINT = " In Arabic, call the claim \"الادعاء\" and do not use English words for it."
 CITATION_RE = re.compile(r"\[(\d+)\]")
 SENTENCE_END_RE = re.compile(r"(?<=[.!?؟])\s+")
 LEADING_CITATIONS_RE = re.compile(r"^((?:\[\d+\]\s*)+)")
+# English "claim" left inside an Arabic note (R6 demo: "الCLAIM خاطئ", "لا تنفي Claim").
+ENGLISH_CLAIM_RE = re.compile(r"(?:ال)?(?<![A-Za-z])claims?(?![A-Za-z])", flags=re.I)
+ARABIC_CHAR_RE = re.compile(r"[\u0600-\u06FF]")   # Arabic Unicode block
 _model = None
 
 
@@ -90,6 +94,8 @@ def build_messages(claim: str, label: str, snippets: list, lang: str) -> list[di
     out_lang = note_language(lang)
     system = SYSTEM_PROMPT.format(n_sent="1 or 2 short sentences",
                                   language="Modern Standard Arabic" if out_lang == "ar" else "English")
+    if out_lang == "ar":
+        system += ARABIC_HINT
     evidence = "\n".join(f"[{i + 1}] {snippet_text(s)}" for i, s in enumerate(snippets))
     user = (f"Claim: {claim}\nVerdict: {LABEL_WORDS[out_lang][label]}\n"
             f"Evidence:\n{evidence}\n\nNote:")
@@ -114,9 +120,23 @@ def split_sentences(note: str) -> list[str]:
     return sentences
 
 
+def fix_arabic_claim_word(text: str) -> str:
+    """Replace an English "claim" left in an Arabic note with "الادعاء".
+
+    "الCLAIM خاطئ" -> "الادعاء خاطئ". English notes are not touched: the caller
+    only uses this when the note contains Arabic letters.
+    """
+    return ENGLISH_CLAIM_RE.sub("الادعاء", text)
+
+
 def clean_note(text: str, n_snippets: int) -> str:
-    """Remove thinking tags, citations outside [1]..[n], extra sentences and spaces."""
+    """Remove thinking tags, citations outside [1]..[n], extra sentences and spaces.
+
+    In an Arabic note an English "claim" is also replaced with "الادعاء".
+    """
     text = re.sub(r"<think>.*?</think>", "", text, flags=re.S).strip()
+    if ARABIC_CHAR_RE.search(text):
+        text = fix_arabic_claim_word(text)
     text = re.sub(r"^(note|الملاحظة)\s*:\s*", "", text, flags=re.I)
     text = CITATION_RE.sub(lambda m: m.group(0) if 1 <= int(m.group(1)) <= n_snippets else "",
                            text)
