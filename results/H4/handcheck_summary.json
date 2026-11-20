@@ -1,0 +1,19 @@
+{
+  "kappa": 0.5714285714285715,
+  "n_overlap": 30,
+  "agreement": 0.8333333333333334,
+  "disagreements": [
+    "multifc_001345_B",
+    "multifc_011031_B",
+    "multifc_019789_B",
+    "multifc_028466_B",
+    "multifc_028752_B"
+  ],
+  "valid_rate": {
+    "all": 0.7333333333333333,
+    "B": 0.225,
+    "C": 1.0,
+    "P": 0.975
+  },
+  "n_rated": 120
+}

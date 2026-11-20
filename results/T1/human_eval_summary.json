@@ -1,0 +1,46 @@
+{
+  "n_ratings": 80,
+  "blank_rows": {
+    "sheet_youssef.csv": 20
+  },
+  "agreement_en": {
+    "raters": [
+      "himasri",
+      "feba"
+    ],
+    "n_shared": 40,
+    "verdict_correct": {
+      "kappa": 0.494,
+      "weighted": null,
+      "agreement": 0.75
+    },
+    "sentences_supported": {
+      "kappa": 0.349,
+      "weighted": null,
+      "agreement": 0.575
+    },
+    "readability": {
+      "kappa": 0.477,
+      "weighted": "quadratic",
+      "agreement": 0.55
+    }
+  },
+  "averages": {
+    "feba/en": {
+      "n": 40,
+      "verdict_correct": 0.475,
+      "supported_yes": 0.55,
+      "supported_partly": 0.25,
+      "supported_no": 0.2,
+      "readability_mean": 4.08
+    },
+    "himasri/en": {
+      "n": 40,
+      "verdict_correct": 0.375,
+      "supported_yes": 0.35,
+      "supported_partly": 0.5,
+      "supported_no": 0.15,
+      "readability_mean": 3.9
+    }
+  }
+}

@@ -7,3 +7,4 @@
 5. **Files:** `results/H7/{verdict_head_selection.csv, nli_selection.csv, bootstrap_head_selection.json, preds_*}`; scripts `src/eval/{model_selection,nli_selection}.py`. Other choices already measured elsewhere: retrieval hybrid vs BM25 / dense (`results/R5/`), reranker fine-tuning (`results/R2/`), extractor Qwen vs rule (`results/Y3/`), CLIP probe (`results/F3/`), baselines (`results/F4/audit_E0.csv`).
 
 **Qwen3-4B (4-bit) vs Qwen3-8B** in the team's LLM roles: `results/H7/qwen4b/README.md` (claim extraction equal, explanations slightly more faithful, LLM judge much better: MultiFC macro-F1 0.391 vs 0.233, AVeriTeC 0.613 vs 0.494).
+**Qwen3-4B as the verdict model** (QLoRA): fine-tuned on originals it is the most accurate model (MultiFC macro-F1 0.500) but fails the twin tests (ESR 0.31, unrelated 0.15); trained with twins it reaches ESR 0.67 / unrelated 0.99 at macro-F1 0.44; the twin-loss MLP still has the best ESR (0.89). Details: `results/H7/qwen4b/README.md`.

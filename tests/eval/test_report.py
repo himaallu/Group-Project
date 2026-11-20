@@ -126,3 +126,17 @@ def test_swap_model_replaces_model_and_passes_args(tmp_path, monkeypatch):
     run("fakepkg.judge", "Qwen/Qwen3-4B", ["--out", "x.jsonl"])
     judge = sys.modules["fakepkg.judge"]
     assert judge.SEEN == {"model": "Qwen/Qwen3-4B", "argv": ["--out", "x.jsonl"]}
+
+
+def test_t1_summary_agreement_and_averages():
+    """t1_summary: identical ratings give kappa 1 and the right averages."""
+    from src.eval.t1_summary import agreement, averages
+    rows = []
+    for rater in ("himasri", "feba"):
+        for i, (v, s, r) in enumerate([("yes", "yes", "5"), ("no", "partly", "3"), ("no", "no", "2")]):
+            rows.append({"note_id": f"n{i}", "rater": rater, "language": "en",
+                         "verdict_correct": v, "sentences_supported": s, "readability": r})
+    a = agreement(rows, "himasri", "feba")
+    assert a["n_shared"] == 3 and a["verdict_correct"]["kappa"] == 1.0 and a["readability"]["agreement"] == 1.0
+    avg = averages(rows)["feba/en"]
+    assert avg["verdict_correct"] == round(1 / 3, 3) and avg["readability_mean"] == round(10 / 3, 2)
