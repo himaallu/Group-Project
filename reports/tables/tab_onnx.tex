@@ -1,0 +1,13 @@
+\begin{table}[t]
+\centering
+\caption{ONNX export of the detectors: size, agreement and latency (batch 1, 224x224).}
+\label{tab:tab_onnx}
+\begin{tabular}{lrrrrr}
+\toprule
+model & ONNX MB & max diff vs PyTorch & CPU ms (ONNX Runtime) & GPU ms (PyTorch) & GPU \\
+\midrule
+ResNet-50 (last 4 blocks) & 94.0 & 6.0e-07 & 15.51 & 6.66 & NVIDIA L4 \\
+ViT-B/16 (last 4 blocks) & 343.6 & 2.4e-06 & 85.73 & 7.10 & NVIDIA L4 \\
+\bottomrule
+\end{tabular}
+\end{table}

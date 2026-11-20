@@ -1,0 +1,19 @@
+\begin{table}[t]
+\centering
+\caption{Detectors on the unseen-generator test under JPEG and cropping.}
+\label{tab:tab_robustness}
+\begin{tabular}{lrrrr}
+\toprule
+model & corruption & accuracy & AUROC & recall \\
+\midrule
+ResNet-50 (last 4 blocks) & clean & 0.505 & 0.713 & 0.012 \\
+ResNet-50 (last 4 blocks) & jpeg50 & 0.512 & 0.716 & 0.027 \\
+ResNet-50 (last 4 blocks) & jpeg70 & 0.511 & 0.721 & 0.026 \\
+ResNet-50 (last 4 blocks) & crop20 & 0.506 & 0.662 & 0.014 \\
+ViT-B/16 (last 4 blocks) & clean & 0.538 & 0.885 & 0.080 \\
+ViT-B/16 (last 4 blocks) & jpeg50 & 0.547 & 0.888 & 0.102 \\
+ViT-B/16 (last 4 blocks) & jpeg70 & 0.545 & 0.892 & 0.095 \\
+ViT-B/16 (last 4 blocks) & crop20 & 0.534 & 0.871 & 0.075 \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -2,9 +2,9 @@
 
 _Owner: Rathi (R9). For each model and dataset: checkpoint, hyperparameters, training
 time, GPU, data sizes and twin counts. Every number here is copied from a file in
-`results/` (named next to it). Status at the results freeze (Wed 18 Nov 2026, 23:00);
-Arabic experiments (Y4/Y5), baselines (F4) and the vision side (F1–F5) are added when
-their results are pushed._
+`results/` (named next to it). Status at the results freeze (Wed 18 Nov 2026, 23:00),
+updated for `v1.0` (Fri 20 Nov) with the baselines (F4) and the vision side (F1–F5);
+Arabic twins and experiments (Y4/Y5) are added when their results are pushed._
 
 ## 1. Environment
 
@@ -140,5 +140,12 @@ Copied from each owner's `results/<task-id>/README.md` (details there).
 | Verdict head | Himasri (H3) | MLP 10 → 64 → 3 (dropout 0.2) on zero-shot NLI + relevance + entity features; class-weighted CE; Adam lr 1e-3, batch 64 groups, ≤ 30 epochs, patience 5; CPU | v0 test macro-F1 0.363 ± 0.005, AUROC 0.611 ± 0.003 |
 | Twin loss + calibration | Himasri (H4) | grid λ_inv ∈ {0, 0.5, 1, 2} × λ_sens ∈ {0, 0.5, 1}, chosen λ_inv = 1, λ_sens = 0.5; temperature scaling (T 0.80–0.89, τ = 0) | ESR 52.2 → 89.7, unrelated 42.4 → 100.0, macro-F1 36.3 → 35.2 (%, 3 seeds); bootstrap p < 0.001 for ESR and unrelated |
 | Ablations, AVeriTeC, Arabic | Himasri (H5) | 4 variants × seeds 42/43/44; paired bootstrap 1,000 resamples | no reranker: macro-F1 30.1, ESR 68.7; AVeriTeC macro-F1 38.3 (twin) vs 38.0; X-FACT AR near chance (AUROC 0.51–0.54) |
+| Vision data | Feba (F1) | VERITE split by image ID; GenImage train/val = real + BigGAN, test = real + Stable Diffusion v1.4 (unseen generator); seed 42; MD5 overlap check | VERITE 1,001 records / 663 images (701 / 149 / 151); GenImage 9,000 / 2,000 / 2,000; no overlap |
+| Vision features + image twins | Feba (F2) | SigLIP 2 (so400m) and CLIP ViT-L/14 embeddings; `_V` twins by SD VAE round trip + SDXL img2img (strength 0.15), kept if SigLIP cosine ≥ 0.92, Haar face screen, JPEG 85 | final set 600 originals + 600 twins; embeddings VERITE 663, M4FC 603, GenImage 18,000 |
+| Authenticity probe + leakage | Feba (F3) | logistic regression / linear SVM (C = 1) on frozen CLIP features; VERITE decoupled (SigLIP similarity) vs fused (+ authenticity) logistic regression, 323 twin pairs | unseen-generator AUROC 0.860 / 0.903, recall 0.024 / 0.014; VERITE test ALR 7.8% (4/51) for both models |
+| Baselines audit (E0) | Feba (F4) | claim-only TF-IDF + LR (C = 10); 12 similarity features + LightGBM (seeds 42/43/44); zero-shot NLI rule (t = 0.05 on val); Qwen3-8B 4-bit LLM judge (Colab L4) | MultiFC macro-F1 0.481 / 0.385 / 0.346 / 0.233; ESR 0.445 / 0.592 / 0.623 / 0.100 |
+| CNN vs ViT detectors | Feba (F5) | ResNet-50 and ViT-B/16, ImageNet weights, last 4 blocks + head trained; 3 epochs, AdamW lr 1e-4, wd 0.05, cosine, batch 64, AMP; augmentation crop / flip / JPEG 60–95 / blur; seed 42; NVIDIA L4; not logged to W&B | val accuracy 0.991 / 0.997; unseen test accuracy 0.505 / 0.538, AUROC 0.713 / 0.885; ONNX CPU 15.51 / 85.73 ms per image |
+
+Not yet in results/: Arabic twins (Y4) and Arabic experiments E7 (Y5).
 
 All tables and figures in `reports/` are rebuilt from these files by `python -m src.eval.figures` (R8).

@@ -1,0 +1,5 @@
+split,model,pairs,original acc.,twin acc.,changed,ALR
+validation,decoupled,49,53.1,49.0,6,12.2
+validation,fused,49,53.1,49.0,6,12.2
+test,decoupled,51,60.8,60.8,4,7.8
+test,fused,51,60.8,60.8,4,7.8
