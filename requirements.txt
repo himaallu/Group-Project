@@ -1,6 +1,7 @@
 # TwinCheck — Python 3.11
 # Core ML
 torch>=2.3
+torchvision>=0.18
 transformers>=4.46
 sentence-transformers>=3.2
 datasets>=3.0
@@ -9,6 +10,7 @@ sentencepiece>=0.2
 protobuf>=4.25
 diffusers>=0.31
 open_clip_torch>=2.26
+onnx>=1.16
 onnxruntime>=1.19
 
 # NLP / retrieval
@@ -22,6 +24,7 @@ pandas>=2.2
 pyarrow>=16.0
 scikit-learn>=1.5
 lightgbm>=4.5
+matplotlib>=3.8
 
 # Tracking, demo, tests
 wandb>=0.18

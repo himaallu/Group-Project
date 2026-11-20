@@ -1,0 +1,9 @@
+image_id,generator,class_name,p_ai
+ef3242d36eeb7da42ff73cad9a1ac9ba,real,real,0.0018044541
+044e81d502c80da87e830fdc4ecee3b1,real,real,0.0020966618
+fb32b93dee421c8cc04e45d9f49322ae,real,real,0.00024129699
+4822174c0b2224ad1baf5470643b64ec,Stable Diffusion v1.4,fake,0.99911433
+ff5bb4c1c2065884c9f28f2a634db58c,Stable Diffusion v1.4,fake,0.9998847
+32f5bcf97091c3c48b49b1ac57c0e57a,Stable Diffusion v1.4,fake,0.99993634
+55e3d0f5b8a8b0959e3e1f3dd871403b,BigGAN,fake,0.9984565
+7a70ed10aa59ad87a59217d665cbe57b,BigGAN,fake,0.9999018
