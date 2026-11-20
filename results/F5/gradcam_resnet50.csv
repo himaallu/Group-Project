@@ -1,0 +1,9 @@
+image_id,split,generator,class_name,p_ai
+data/processed/vision/genimage/train/real/aed0a4d6fdd6c2a3da68725c13cf503e.JPEG,test,real,real,0.0073198606
+data/processed/vision/genimage/train/real/c2a129636881bc0a1c153637dd125ac1.JPEG,test,real,real,0.0007940007
+data/processed/vision/genimage/train/real/53565d7b41f77fc903aae42998c65361.JPEG,test,real,real,0.0008629247
+data/processed/vision/genimage/validation/fake/Stable_Diffusion_v1_4/86e21f60c79b8e00fd159c47205d82f6.png,test,Stable Diffusion v1.4,fake,0.04486011
+data/processed/vision/genimage/validation/fake/Stable_Diffusion_v1_4/bd800c70c28256d2a0edafe2913d89de.png,test,Stable Diffusion v1.4,fake,0.055272132
+data/processed/vision/genimage/validation/fake/Stable_Diffusion_v1_4/be5fe3906f1bf20964032873b88fbd0d.png,test,Stable Diffusion v1.4,fake,0.00011119228
+data/processed/vision/genimage/validation/fake/BigGAN/7ea473af4f78b1329cc37cefc80e6e50.png,validation,BigGAN,fake,0.9822703
+data/processed/vision/genimage/validation/fake/BigGAN/bd9da11f823eedaa9d731f8a42aa3022.png,validation,BigGAN,fake,0.9974485

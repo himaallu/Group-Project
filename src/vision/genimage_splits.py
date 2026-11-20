@@ -13,7 +13,8 @@ COLUMNS = ["image_path", "md5", "label", "generator", "class_name", "split", "so
 
 
 def load_pool():
-    frames = [pd.read_csv(VISION / f"genimage_{name}_manifest.csv") for name in ["train", "validation", "test"]]
+    paths = [VISION / f"genimage_{name}_manifest.csv" for name in ["train", "validation", "test"]]
+    frames = [pd.read_csv(path) for path in paths if path.exists()]
     pool = pd.concat(frames, ignore_index=True)
     pool = pool[pool["generator"].isin(GENERATORS)].copy()
     if "source_split" not in pool.columns:

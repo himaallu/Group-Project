@@ -1,6 +1,0 @@
-setting,train,test,C,n,accuracy,auroc,acc_BigGAN,acc_Stable Diffusion v1.4,acc_real
-seen,real+Stable Diffusion v1.4+BigGAN,real+Stable Diffusion v1.4+BigGAN,10.0,3000,0.988,0.9994665,0.998,0.974,0.992
-unseen_biggan,real+Stable Diffusion v1.4,real+BigGAN,10.0,2000,0.8605,0.9812240000000001,0.736,,0.985
-unseen_sd,real+BigGAN,real+Stable Diffusion v1.4,10.0,2000,0.5075,0.869548,,0.015,1.0
-seen_on_jpeg85,real+Stable Diffusion v1.4+BigGAN,real+Stable Diffusion v1.4+BigGAN,10.0,900,0.9833333333333333,0.9994944444444445,0.9966666666666667,0.97,0.9833333333333333
-seen_on_unchanged,real+Stable Diffusion v1.4+BigGAN,real+Stable Diffusion v1.4+BigGAN,10.0,900,0.9855555555555555,0.9993444444444445,0.9966666666666667,0.9766666666666667,0.9833333333333333

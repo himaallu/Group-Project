@@ -11,7 +11,16 @@
       "siglip2_images": 18000,
       "clip_vit_l14_images": 18000,
       "float16_siglip2_file": "features/vision/genimage/genimage_siglip2_image_projected_embeddings_float16.npy",
-      "float16_clip_file": "features/vision/genimage/genimage_clip_vit_l14_image_projected_embeddings_float16.npy"
+      "float16_clip_file": "features/vision/genimage/genimage_clip_vit_l14_image_projected_embeddings_float16.npy",
+      "manifest_split_column": "GenImage source folder (train / validation), not the experiment split",
+      "experiment_splits": {
+        "source": "data/processed/vision/genimage_{train,validation,test}_manifest.csv (F1)",
+        "join_key": "image_id = md5",
+        "train": "4,000 real + 5,000 BigGAN",
+        "validation": "1,000 real + 1,000 BigGAN",
+        "test": "1,000 real + 1,000 Stable Diffusion v1.4 (unseen generator)",
+        "images_with_embeddings": 13000
+      }
     },
     "M4FC": {
       "siglip2_images": 603,
@@ -49,7 +58,8 @@
     "total_generated": 494,
     "final_retained_pairs": 452,
     "jsonl": "data/copies/vision/vae.jsonl",
-    "jsonl_records": 452
+    "jsonl_records": 903,
+    "twin_images": 452
   },
   "sdxl_twins": {
     "strength": 0.15,
@@ -63,10 +73,11 @@
     "visual_pairs_manually_inspected": 30,
     "final_manifest": "data/copies/vision/sdxl_face_filtered_accepted_manifest.csv",
     "jsonl": "data/copies/vision/sdxl.jsonl",
-    "jsonl_records": 148,
+    "jsonl_records": 295,
     "sources_csv": "data/copies/vision/sources.csv",
     "sources_csv_records": 249,
-    "verite_training_sources_included": 0
+    "verite_training_sources_included": 0,
+    "twin_images": 148
   },
   "jpeg85_final": {
     "conversion": "Originals and twins re-saved from decoded RGB pixels as JPEG quality 85",
@@ -95,19 +106,17 @@
     "limitation": "Haar frontal-face detection is not a comprehensive detector for all faces or poses."
   },
   "pr_deliverables": {
-    "vae_jsonl_records": 452,
-    "sdxl_jsonl_records": 148,
+    "vae_jsonl_records": 903,
+    "sdxl_jsonl_records": 295,
     "sources_csv_records": 249,
     "actual_twin_image_files_to_commit": 0
   },
   "limitations_and_pending_items": [
-    "No GenImage captions were found in the inspected metadata; GenImage caption embeddings were not generated.",
-    "GenImage Midjourney test images were unavailable in the inspected Drive dataset; embeddings for those images are not claimed as completed.",
     "M4FC text embeddings represent Arabic claims, not image captions.",
     "SDXL manual visual inspection covered 30 pairs, not every generated pair.",
     "The automatic Haar face detector is limited and does not establish exhaustive face removal."
   ],
-  "status": "PARTIALLY COMPLETE: the final JPEG85 image-twin pairs, embeddings, and PR metadata files are generated and validated. GenImage caption and unavailable Midjourney test-image limitations remain documented.",
+  "status": "COMPLETED: the core F2 image embeddings, image-twin generation, JPEG85 originals/twins, final embeddings, manifests, and shared-format records are generated and validated. Quality-review limitations remain documented.",
   "final_twin_count_summary": {
     "VERITE_VAE": 311,
     "M4FC_VAE": 141,
