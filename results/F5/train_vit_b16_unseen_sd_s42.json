@@ -1,0 +1,20 @@
+{
+  "seed": 42,
+  "arch": "vit_b16",
+  "setting": "unseen_sd",
+  "epochs": 3,
+  "lr": 0.0001,
+  "batch": 64,
+  "unfrozen": "last 4 blocks + head",
+  "augmentation": "rrc0.6, hflip, jpeg60-95, blur p0.3",
+  "n_train": 10000,
+  "n_test": 2000,
+  "epoch": 2,
+  "train_loss": 0.003794630647357553,
+  "n": 2000,
+  "accuracy": 0.534,
+  "auroc": 0.8809795,
+  "acc_Stable Diffusion v1.4": 0.069,
+  "acc_real": 0.999,
+  "wandb": "https://wandb.ai/febaannjoshy-university-of-wollongong-in-dubai/twincheck/runs/sx5cizor"
+}
