@@ -1,0 +1,7 @@
+system,language,supported_recall,paired_esr,paired_n,errors_inherited,errors_n
+twin,en,0.203,0.764,75.0,,
+twin,ar,0.018,0.629,6.333,0.85,308.0
+notwin,en,0.373,0.327,116.333,,
+notwin,ar,0.594,0.164,89.667,0.853,396.333
+twin_noent,en,0.141,0.585,47.333,,
+twin_noent,ar,0.156,0.405,33.0,0.857,323.0
