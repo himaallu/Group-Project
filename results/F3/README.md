@@ -5,7 +5,7 @@
    - `src/eval/baselines/{claim_only,similarity}.py` on the MultiFC and AVeriTeC test originals.
 2. **Settings:**
    - GenImage splits from F1: train 4,000 real + 5,000 BigGAN, validation 1,000 real + 1,000 BigGAN, test 1,000 real + 1,000 Stable Diffusion v1.4. Stable Diffusion is never seen in training or validation, so the test measures transfer to an unseen generator.
-   - Probe: logistic regression and linear SVM (C = 1) on the 768-d CLIP embeddings, seed 42. The decision threshold is chosen on validation (best F1).
+   - Probe: logistic regression and linear SVM (C = 1) on the 768-d CLIP embeddings, seed 42. The probe table uses each model's default decision rule (probability 0.5 for LR, margin 0 for SVM). For the VERITE authenticity predictions, the LR threshold is chosen on validation (best F1, 0.79).
    - VERITE: true and miscaptioned captions of the same photo (out-of-context excluded). 323 photos with an accepted VAE twin (SigLIP cosine ≥ 0.92): train 223, validation 49, test 51.
    - Decoupled model: SigLIP 2 image–caption similarity only. Fused model: similarity, authenticity score and their product. Both are logistic regression with standard scaling, trained on original training photos only; twins are only evaluated.
    - A pair is correct when the model gives the true caption a higher probability than the miscaptioned one. ALR is the share of pairs whose verdict changes between the original and the twin.
@@ -20,7 +20,7 @@
    | Logistic regression | 0.860 | 0.510 | 0.857 | 0.024 | 0.047 |
    | Linear SVM | 0.903 | 0.507 | 1.000 | 0.014 | 0.028 |
 
-   The probe ranks Stable Diffusion images above real ones, but at the validation threshold it flags almost none of them, so it does not transfer well to the unseen generator. On VERITE, mean authenticity score goes from 0.025 (original) to 0.031 (twin), and 0/323 binary predictions change (`F3_VERITE_authenticity_probe_original_twin_scores.csv`).
+   The probe ranks Stable Diffusion images above real ones, but at the default decision rule it flags almost none of them (the validation-selected threshold flags even fewer: recall 0.001), so it does not transfer well to the unseen generator. On VERITE, mean authenticity score goes from 0.025 (original) to 0.031 (twin), and 0/323 binary predictions change (`F3_VERITE_authenticity_probe_original_twin_scores.csv`).
 
    VERITE pair verdicts (`F3_corrected_pair_ALR_summary.csv`; all-pairs row from `F3_decoupled_similarity_baseline_summary.json`):
 
@@ -43,6 +43,6 @@
 **Limitations:**
 - VERITE is small (51 test pairs), so a single changed verdict moves ALR by about 2 points.
 - The VERITE set includes 12 twins that F2 later removed in its face screen (8 train, 2 validation, 2 test). F2 keeps 311 VERITE twins; these results use 323.
-- Probe recall on the unseen generator is very low at the chosen threshold, and only one unseen generator (Stable Diffusion v1.4) is tested.
+- Probe recall on the unseen generator is very low, and only one unseen generator (Stable Diffusion v1.4) is tested.
 - The fusion features are simple (three numbers per caption).
 - ALR measures verdict stability, not correctness.
