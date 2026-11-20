@@ -1,17 +1,13 @@
-"""Tests for the F5 detector helpers (no image files or pretrained weights needed).
-
-Run: python -m pytest tests/vision/test_f5.py -q
-"""
 import torch
 from PIL import Image
 
-from src.vision.detectors import build_model, corrupt, target_layer
+from src.vision.detectors import build_model, corrupt, manifest_rows, target_layer
 from src.vision.evaluate_detectors import CKPT_NAME
 
 
 def test_corruptions_keep_an_rgb_image():
     image = Image.new("RGB", (100, 50), (120, 30, 200))
-    assert corrupt(image, "crop20").size == (80, 40)        # 10% off each side
+    assert corrupt(image, "crop20").size == (80, 40)
     assert corrupt(image, "jpeg50").mode == "RGB"
     assert corrupt(image, "clean") is image
 
@@ -29,9 +25,20 @@ def test_only_last_four_blocks_are_trainable():
 
 
 def test_checkpoint_names():
-    match = CKPT_NAME.match("vit_b16_unseen_biggan_s42")
-    assert (match["arch"], match["setting"], match["seed"]) == ("vit_b16", "unseen_biggan", "42")
-    assert CKPT_NAME.match("resnet50_seen_s43")["setting"] == "seen"
+    match = CKPT_NAME.match("vit_b16_s42")
+    assert (match["arch"], match["seed"]) == ("vit_b16", "42")
+    assert CKPT_NAME.match("resnet50_s43")["seed"] == "43"
+    assert CKPT_NAME.match("resnet50_seen_s42") is None
+
+
+def test_f1_splits():
+    counts = {s: manifest_rows(s)["generator"].value_counts().to_dict() for s in ("train", "validation", "test")}
+    assert counts == {"train": {"BigGAN": 5000, "real": 4000},
+                      "validation": {"BigGAN": 1000, "real": 1000},
+                      "test": {"Stable Diffusion v1.4": 1000, "real": 1000}}
+    rows = [manifest_rows(s) for s in ("train", "validation", "test")]
+    assert all(r["image_path"].str.startswith("data/processed/vision/genimage/").all() for r in rows)
+    assert len(set().union(*(set(r["image_id"]) for r in rows))) == 13000
 
 
 def test_vit_gradcam_layer_gets_patch_gradients():

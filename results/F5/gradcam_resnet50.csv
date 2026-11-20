@@ -1,9 +1,9 @@
-image_id,generator,class_name,p_ai
-ef3242d36eeb7da42ff73cad9a1ac9ba,real,real,0.0015161516
-044e81d502c80da87e830fdc4ecee3b1,real,real,0.018427212
-fb32b93dee421c8cc04e45d9f49322ae,real,real,0.00083918957
-4822174c0b2224ad1baf5470643b64ec,Stable Diffusion v1.4,fake,0.992242
-ff5bb4c1c2065884c9f28f2a634db58c,Stable Diffusion v1.4,fake,0.99992955
-32f5bcf97091c3c48b49b1ac57c0e57a,Stable Diffusion v1.4,fake,0.99988735
-55e3d0f5b8a8b0959e3e1f3dd871403b,BigGAN,fake,0.9985411
-7a70ed10aa59ad87a59217d665cbe57b,BigGAN,fake,0.9974368
+image_id,split,generator,class_name,p_ai
+data/processed/vision/genimage/train/real/aed0a4d6fdd6c2a3da68725c13cf503e.JPEG,test,real,real,0.0073198606
+data/processed/vision/genimage/train/real/c2a129636881bc0a1c153637dd125ac1.JPEG,test,real,real,0.0007940007
+data/processed/vision/genimage/train/real/53565d7b41f77fc903aae42998c65361.JPEG,test,real,real,0.0008629247
+data/processed/vision/genimage/validation/fake/Stable_Diffusion_v1_4/86e21f60c79b8e00fd159c47205d82f6.png,test,Stable Diffusion v1.4,fake,0.04486011
+data/processed/vision/genimage/validation/fake/Stable_Diffusion_v1_4/bd800c70c28256d2a0edafe2913d89de.png,test,Stable Diffusion v1.4,fake,0.055272132
+data/processed/vision/genimage/validation/fake/Stable_Diffusion_v1_4/be5fe3906f1bf20964032873b88fbd0d.png,test,Stable Diffusion v1.4,fake,0.00011119228
+data/processed/vision/genimage/validation/fake/BigGAN/7ea473af4f78b1329cc37cefc80e6e50.png,validation,BigGAN,fake,0.9822703
+data/processed/vision/genimage/validation/fake/BigGAN/bd9da11f823eedaa9d731f8a42aa3022.png,validation,BigGAN,fake,0.9974485
