@@ -17,7 +17,10 @@ What it does
         results/H4/preds_*_s42.jsonl (+ gold)   -> fig_reliability (calibration curves)
         results/Y3/f1_{split,qwen}.json         -> tab_claims
         results/Y5/arabic_E7.csv                -> tab_arabic_E7
-        results/F4/audit_E0.csv                 -> tab_audit_E0
+        results/F4/audit_E0.csv                 -> tab_audit_E0, tab_audit_averitec
+        results/F3/F3_FINAL_SUMMARY.csv + F5/cnn_vit.csv -> tab_detectors, tab_robustness
+        results/F3/F3_corrected_pair_ALR_summary.csv     -> tab_leakage
+        results/F5/onnx_latency.csv             -> tab_onnx
 
     Colours: the first categorical slots of the shared chart palette, in fixed order
     (blue, orange, aqua, yellow), so a model keeps its colour in every figure.
@@ -213,6 +216,88 @@ def retrieval_table(ev: dict) -> pd.DataFrame:
                           "BM25": ev[lang]["recall@5_bm25"], "dense": ev[lang]["recall@5_dense"],
                           "hybrid + reranker": ev[lang]["recall@5_hybrid"]}
                          for lang in ("en", "ar") if lang in ev])
+
+
+# F4 audit_E0.csv model names -> report names (fixed order)
+BASELINES = {"claim_only": "claim-only", "similarity": "similarity + LightGBM",
+             "zeroshot_nli": "zero-shot NLI", "llm_judge": "LLM judge (Qwen3-8B)"}
+AUDIT_METRICS = {"macro_f1": "macro-F1", "auroc": "AUROC", "esr": "ESR",
+                 "unrelated_rate": "unrelated", "paraphrase_consistency": "paraphrase cons.",
+                 "ece": "ECE"}
+
+
+def audit_table(audit: pd.DataFrame, dataset: str) -> pd.DataFrame:
+    """F4 baselines on one dataset, in % ('mean ± sd' when there are several seeds).
+
+    AVeriTeC rows are named "avt_<model>" and have no twins, so their twin columns
+    are dropped.
+    """
+    rows = []
+    for key, name in BASELINES.items():
+        hit = audit[(audit["dataset"] == dataset) & audit["model"].isin([key, f"avt_{key}"])]
+        if hit.empty:
+            continue
+        r = hit.iloc[0]
+        row = {"baseline": name, "seeds": int(r["n_seeds"])}
+        for m, label in AUDIT_METRICS.items():
+            sd = r.get(f"{m}_sd")
+            row[label] = pm(r.get(m), sd) if pd.notna(sd) else (
+                "–" if pd.isna(r.get(m)) else pct(r.get(m)))
+        rows.append(row)
+    df = pd.DataFrame(rows)
+    return df[[c for c in df.columns if c in ("baseline", "seeds") or (df[c] != "–").any()]]
+
+
+DETECTORS = {"resnet50": "ResNet-50 (last 4 blocks)", "vit_b16": "ViT-B/16 (last 4 blocks)"}
+
+
+def detector_table(probe: pd.DataFrame, cnn_vit: pd.DataFrame) -> pd.DataFrame:
+    """F3 CLIP probes and F5 CNN / ViT on the unseen-generator test (real + SD v1.4), clean.
+
+    All four are trained on real + BigGAN only; the probes are linear models on frozen
+    CLIP ViT-L/14 features, the CNN / ViT fine-tune their last 4 blocks with augmentation.
+    """
+    rows = []
+    for _, r in probe[probe["Experiment"] == "GenImage Authenticity Probe"].iterrows():
+        probe_name = {"Logistic Regression": "logistic regression"}.get(r["Model"], r["Model"])
+        rows.append({"model": f"CLIP ViT-L/14 + {probe_name} (frozen)",
+                     "accuracy": r["Accuracy"], "precision": r["Precision"],
+                     "recall": r["Recall"], "F1": r["F1"], "AUROC": r["ROC_AUC"]})
+    test = cnn_vit[(cnn_vit["split"] == "test") & (cnn_vit["corruption"] == "clean")]
+    for key, name in DETECTORS.items():
+        for _, r in test[test["model"] == key].iterrows():
+            rows.append({"model": name, "accuracy": r["accuracy"], "precision": r["precision"],
+                         "recall": r["recall"], "F1": r["f1"], "AUROC": r["auroc"]})
+    return pd.DataFrame(rows)
+
+
+def robustness_table(cnn_vit: pd.DataFrame, split: str = "test") -> pd.DataFrame:
+    """F5 detectors under JPEG 50 / 70 and a 20% crop: accuracy, AUROC and recall."""
+    rows = []
+    for key, name in DETECTORS.items():
+        for _, r in cnn_vit[(cnn_vit["model"] == key) & (cnn_vit["split"] == split)].iterrows():
+            rows.append({"model": name, "corruption": r["corruption"], "accuracy": r["accuracy"],
+                         "AUROC": r["auroc"], "recall": r["recall"]})
+    return pd.DataFrame(rows)
+
+
+def leakage_table(pairs: pd.DataFrame) -> pd.DataFrame:
+    """F3 VERITE pair verdicts on originals vs VAE twins: decoupled vs fused, ALR in %."""
+    return pd.DataFrame([{"split": r["Split"], "model": r["Model"], "pairs": int(r["Pairs"]),
+                          "original acc.": pct(r["Original Accuracy"]),
+                          "twin acc.": pct(r["Twin Accuracy"]),
+                          "changed": int(r["Changed Verdicts"]), "ALR": pct(r["ALR (%)"] / 100)}
+                         for _, r in pairs.iterrows()])
+
+
+def onnx_table(lat: pd.DataFrame) -> pd.DataFrame:
+    """F5 ONNX export: file size, agreement with PyTorch and ms per image (batch 1)."""
+    return pd.DataFrame([{"model": DETECTORS.get(r["arch"], r["arch"]),
+                          "ONNX MB": f"{r['onnx_mb']:.1f}",
+                          "max diff vs PyTorch": f"{r['max_abs_diff']:.1e}",
+                          "CPU ms (ONNX Runtime)": f"{r['ort_cpu_ms_mean']:.2f}",
+                          "GPU ms (PyTorch)": f"{r['torch_gpu_ms_mean']:.2f}", "GPU": r["gpu"]}
+                         for _, r in lat.iterrows()])
 
 
 # --------------------------------------------------------------------------
@@ -433,14 +518,47 @@ def build_all(results: Path, tables: Path, figures: Path, gold_paths: list[str])
     else:
         skip("fig_reliability")
 
-    for src, name, caption in ((results / "Y5" / "arabic_E7.csv", "tab_arabic_E7",
-                                "Arabic and mixed-language results (E7)."),
-                               (results / "F4" / "audit_E0.csv", "tab_audit_E0",
-                                "Audit of baselines with the English twins (E0).")):
-        if src.exists():
-            write_table(pd.read_csv(src), name, caption, tables)
-        else:
-            skip(name)
+    arabic = results / "Y5" / "arabic_E7.csv"
+    if arabic.exists():
+        write_table(pd.read_csv(arabic), "tab_arabic_E7", "Arabic and mixed-language results (E7).",
+                    tables)
+    else:
+        skip("tab_arabic_E7")
+
+    audit_path = results / "F4" / "audit_E0.csv"
+    if audit_path.exists():
+        audit = pd.read_csv(audit_path)
+        write_table(audit_table(audit, "multifc"), "tab_audit_E0",
+                    "Baselines on MultiFC test and its English twins (E0), in %.", tables)
+        write_table(audit_table(audit, "averitec"), "tab_audit_averitec",
+                    "Baselines on AVeriTeC test, in %.", tables)
+    else:
+        skip("tab_audit_E0 / tab_audit_averitec")
+
+    # vision (MAAI901): F3 probe + leakage, F5 detectors, robustness and ONNX
+    probe, cnn_vit = results / "F3" / "F3_FINAL_SUMMARY.csv", results / "F5" / "cnn_vit.csv"
+    if probe.exists() and cnn_vit.exists():
+        cnn = pd.read_csv(cnn_vit)
+        write_table(detector_table(pd.read_csv(probe), cnn), "tab_detectors",
+                    "AI-image detectors trained on real + BigGAN, tested on real + unseen "
+                    "Stable Diffusion v1.4 (clean, seed 42).", tables)
+        write_table(robustness_table(cnn), "tab_robustness",
+                    "Detectors on the unseen-generator test under JPEG and cropping.", tables)
+    else:
+        skip("tab_detectors / tab_robustness")
+    pairs = results / "F3" / "F3_corrected_pair_ALR_summary.csv"
+    if pairs.exists():
+        write_table(leakage_table(pd.read_csv(pairs)), "tab_leakage",
+                    "VERITE pair verdicts, originals vs VAE twins: accuracy and ALR (%).", tables)
+    else:
+        skip("tab_leakage")
+    onnx = results / "F5" / "onnx_latency.csv"
+    if onnx.exists():
+        write_table(onnx_table(pd.read_csv(onnx)), "tab_onnx",
+                    "ONNX export of the detectors: size, agreement and latency (batch 1, 224x224).",
+                    tables)
+    else:
+        skip("tab_onnx")
 
 
 def main() -> None:

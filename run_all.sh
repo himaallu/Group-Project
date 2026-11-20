@@ -12,11 +12,15 @@
 #     verdict   H3 v0, H4 lambda grid + twin/notwin heads + calibration, H5 ablations, E5 Arabic
 #     explain   R5 cited notes, faithfulness, offline index + recall@5 (GPU)
 #     demo      R6 the 6 demo examples through the full pipeline (GPU)
+#     baselines F4 claim-only, similarity + LightGBM, zero-shot NLI, LLM judge (GPU) + audit E0
+#     vision    F5 ResNet-50 / ViT-B/16 detectors, robustness, Grad-CAM, ONNX (GPU; needs
+#               GENIMAGE_ROOT = folder with the F1 GenImage images, which are not in git)
 #     tables    every table and figure in reports/ from the files in results/ (CPU)
 #   A step whose script is not in the repo yet is skipped with a message, so the
 #   script works while teammates' parts are still arriving.
 #   Arabic data (Y1) needs manual raw downloads; see notes/Y1.md. Its outputs are in git.
-#   Vision (Feba, MAAI901) and baselines run from their own notebooks; add them here when merged.
+#   Vision data and features (F1-F3) run from Feba's notebooks (notebooks/Feba_F*.ipynb);
+#   their outputs are in git.
 #
 # Inputs
 #   The repo (data/, features/ and results/ are in git); internet for model downloads.
@@ -34,7 +38,7 @@ set -euo pipefail
 
 STAGES="${STAGES:-tests tables}"
 if [[ "$STAGES" == "all" ]]; then
-  STAGES="tests data features twins arabic nli verdict explain demo tables"
+  STAGES="tests data features twins arabic nli verdict explain demo baselines vision tables"
 fi
 SEEDS="${SEEDS:-42 43 44}"
 EN=data/processed/en
@@ -149,6 +153,40 @@ if wants demo; then
   # R6: the 6 ready examples through the full pipeline (GPU); `python -m src.demo.app --share` for the app.
   export TWINCHECK_NLI="${TWINCHECK_NLI:-$ZS}"
   step "R6 demo examples" src.demo.app --run-examples results/R6/examples.json
+fi
+
+if wants baselines; then
+  # F4: baselines trained on MultiFC train, tuned on val, run on MultiFC test + English twins.
+  BASE="--train $EN/multifc_train.jsonl --val $EN/multifc_val.jsonl"
+  TEST="$EN/multifc_test.jsonl data/copies/en/test.jsonl"
+  step "F4 claim-only" src.eval.baselines.claim_only $BASE --predict $TEST \
+    --out results/F4/preds_claim_only.jsonl
+  step "F4 similarity + LightGBM" src.eval.baselines.similarity $BASE --predict $TEST \
+    --out-dir results/F4
+  step "F4 zero-shot NLI" src.eval.baselines.zeroshot_nli --val-records $EN/multifc_val.jsonl \
+    --val-nli features/nli_zeroshot/multifc_val.parquet --predict $TEST \
+    --predict-nli features/nli_zeroshot/multifc_test.parquet features/nli_zeroshot/copies_en/test.parquet \
+    --out results/F4/preds_zeroshot_nli.jsonl
+  step "F4 LLM judge" src.eval.baselines.llm_judge --predict $TEST --out results/F4/preds_llm_judge.jsonl
+  # the audit also reads the AVeriTeC predictions (preds_avt_*) already in results/F4
+  step "F4 audit E0" src.eval.baselines.audit --preds results/F4/preds_*.jsonl \
+    --gold $TEST $EN/averitec_test.jsonl --out results/F4/audit_E0.csv
+fi
+
+if wants vision; then
+  if [[ -z "${GENIMAGE_ROOT:-}" ]]; then
+    echo "[run_all] skip F5 vision (set GENIMAGE_ROOT to the F1 GenImage image folder)"
+  else
+    CKPT="${VISION_CKPT:-models/vision}"
+    for arch in resnet50 vit_b16; do
+      step "F5 train $arch" src.vision.train_detector --arch "$arch" --seed 42 \
+        --root "$GENIMAGE_ROOT" --ckpt-dir "$CKPT" --resume --out results/F5 --no-wandb
+    done
+    step "F5 evaluate + robustness" src.vision.evaluate_detectors --root "$GENIMAGE_ROOT" \
+      --ckpt-dir "$CKPT" --skip-clip
+    step "F5 Grad-CAM" src.vision.gradcam --root "$GENIMAGE_ROOT" --ckpt-dir "$CKPT"
+    step "F5 ONNX" src.vision.export_onnx --ckpt-dir "$CKPT"
+  fi
 fi
 
 if wants tables; then

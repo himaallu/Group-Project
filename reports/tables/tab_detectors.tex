@@ -1,0 +1,15 @@
+\begin{table}[t]
+\centering
+\caption{AI-image detectors trained on real + BigGAN, tested on real + unseen Stable Diffusion v1.4 (clean, seed 42).}
+\label{tab:tab_detectors}
+\begin{tabular}{lrrrrr}
+\toprule
+model & accuracy & precision & recall & F1 & AUROC \\
+\midrule
+CLIP ViT-L/14 + logistic regression (frozen) & 0.510 & 0.857 & 0.024 & 0.047 & 0.860 \\
+CLIP ViT-L/14 + Linear SVM (frozen) & 0.507 & 1.000 & 0.014 & 0.028 & 0.903 \\
+ResNet-50 (last 4 blocks) & 0.505 & 0.857 & 0.012 & 0.024 & 0.713 \\
+ViT-B/16 (last 4 blocks) & 0.538 & 0.952 & 0.080 & 0.148 & 0.885 \\
+\bottomrule
+\end{tabular}
+\end{table}

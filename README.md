@@ -80,13 +80,16 @@ The code downloads them by itself:
 ## Reproduce
 
 ```bash
-bash run_all.sh                        # unit tests + tables from the files in results/ (CPU)
+bash run_all.sh                        # unit tests + every table and figure from results/ (CPU)
 STAGES="nli tables" bash run_all.sh    # chosen stages
 STAGES=all bash run_all.sh             # everything from the raw downloads (GPU, several hours)
 ```
 
-Each GPU task also has a Colab notebook in `notebooks/` (`R2_…` to `R6_…`) that runs it
-and pushes the outputs. Every training run is logged to W&B (project `twincheck`, seed 42).
+Stages: `tests data features twins arabic nli verdict explain demo baselines vision tables`.
+`vision` needs `GENIMAGE_ROOT` (the F1 GenImage images are not in git). Each GPU task also
+has a Colab notebook in `notebooks/` that runs it and pushes the outputs. Training runs are
+logged to W&B (project `twincheck`, seed 42) unless the task README says otherwise.
+Settings, checkpoints, training times and GPUs for every model: `docs/implementation.md`.
 
 ## Demo
 
@@ -96,15 +99,18 @@ python -m src.demo.app                         # http://127.0.0.1:7860 (add --sh
 ```
 
 The six ready examples are made-up UAE messages and are marked "Illustrative example"
-in the app. With the trained verdict head 2 of 6 come out as expected; with the simple
-rule (`TWINCHECK_VERDICT=none`, max entail vs max contradict) 5 of 6 do
-(`results/R6/README.md`).
+in the app. Arabic is shown right-to-left, the citations [1]–[3] in each note link to their
+sources, and the footer says which verdict step is running. With the trained verdict head
+2 of 6 come out as expected; with the simple rule (`TWINCHECK_VERDICT=none`, max entail vs
+max contradict) 5 of 6 do (`results/R6/README.md`). Colab: `notebooks/R10_demo_colab.ipynb`.
 
 ## Results
 
-MultiFC test (2,106 claims) and its English twins, zero-shot NLI features, mean ± sd over
-seeds 42/43/44, in %. From `results/H5/summary.csv`; to be re-checked at the results freeze
-(Wed 18 Nov, 23:00).
+All tables and figures are in `reports/` and are rebuilt by `python -m src.eval.figures`.
+Numbers below are copied from those files (results frozen Wed 18 Nov, 23:00).
+
+**Our verdict head.** MultiFC test (2,106 claims) and its English twins, zero-shot NLI
+features, mean ± sd over seeds 42/43/44, in % (`reports/tables/tab_main.csv`).
 
 | Model | Macro-F1 | ESR | Unrelated | Para. cons. | ECE (calibrated) |
 |---|---|---|---|---|---|
@@ -120,6 +126,35 @@ seeds 42/43/44, in %. From `results/H5/summary.csv`; to be re-checked at the res
 - AVeriTeC test: macro-F1 38.3 ± 2.0 (twin) vs 38.0 ± 2.9 (no twin loss), no significant difference.
 - Other components: claim extraction F1 98.4 (Y3); retrieval recall@5 EN 94.5 / AR 92.0 (R5);
   explanation faithfulness 32 (R5); NLI gold macro-F1 zero-shot 37.1 EN / 44.3 AR (R4).
+
+**Baselines audit (E0).** Same MultiFC test and twins, in % (`reports/tables/tab_audit_E0.csv`, F4).
+
+| Baseline | Macro-F1 | ESR | Unrelated | Para. cons. |
+|---|---|---|---|---|
+| claim-only (no evidence) | 48.1 | 44.5 | 1.2 | 84.5 |
+| similarity + LightGBM (3 seeds) | 38.5 ± 0.5 | 59.2 ± 1.1 | 1.4 ± 0.2 | 73.0 ± 2.5 |
+| zero-shot NLI | 34.6 | 62.3 | 53.6 | 87.4 |
+| LLM judge (Qwen3-8B) | 23.3 | 10.0 | 95.0 | 94.8 |
+
+- The claim-only model has the best macro-F1 while never seeing the evidence, and it almost
+  never says "unverified" when the evidence is swapped for unrelated snippets (1.2%). This
+  is the shortcut the twins are built to expose.
+
+**Vision (MAAI901).** AI-image detectors trained on real + BigGAN, tested on real + unseen
+Stable Diffusion v1.4, seed 42 (`reports/tables/tab_detectors.csv`, F3/F5).
+
+| Detector | Accuracy | Recall (AI) | AUROC |
+|---|---|---|---|
+| CLIP ViT-L/14 + logistic regression (frozen) | 0.510 | 0.024 | 0.860 |
+| CLIP ViT-L/14 + linear SVM (frozen) | 0.507 | 0.014 | 0.903 |
+| ResNet-50 (last 4 blocks) | 0.505 | 0.012 | 0.713 |
+| ViT-B/16 (last 4 blocks) | 0.538 | 0.080 | 0.885 |
+
+- All detectors rank unseen-generator images well (AUROC up to 0.90) but flag almost none at
+  the threshold learned on BigGAN. On VERITE, adding the authenticity score to the verdict
+  model changes no pair verdicts (ALR 7.8% on 51 test pairs for both, `tab_leakage.csv`).
+  ONNX: 15.5 ms (ResNet-50) / 85.7 ms (ViT-B/16) per image on CPU (`tab_onnx.csv`).
+- Arabic experiments (Y5, `tab_arabic_E7`) are added when `results/Y5/arabic_E7.csv` is pushed.
 
 ## Team
 
