@@ -1,0 +1,67 @@
+{
+  "multifc": {
+    "n_orig": 2106,
+    "macro_f1": 0.49966254119571696,
+    "auroc": 0.7897021996515776,
+    "ece": 0.09824019199253146,
+    "esr": 0.30604982206405695,
+    "unrelated_rate": 0.148,
+    "paraphrase_consistency": 0.7873563218390804,
+    "crosslingual_consistency": null,
+    "crosslingual_A": null,
+    "crosslingual_M": null,
+    "alr": null,
+    "n_P": 174,
+    "n_A": 0,
+    "n_M": 0,
+    "n_B": 281,
+    "n_C": 500,
+    "n_V": 0
+  },
+  "averitec": {
+    "n_orig": 429,
+    "macro_f1": 0.5735304695759349,
+    "auroc": 0.8120193766764684,
+    "ece": 0.06343264728437213,
+    "esr": null,
+    "unrelated_rate": null,
+    "paraphrase_consistency": null,
+    "crosslingual_consistency": null,
+    "crosslingual_A": null,
+    "crosslingual_M": null,
+    "alr": null,
+    "n_P": 0,
+    "n_A": 0,
+    "n_M": 0,
+    "n_B": 0,
+    "n_C": 0,
+    "n_V": 0
+  },
+  "settings": {
+    "variant": "orig",
+    "model": "Qwen/Qwen3-4B",
+    "no_4bit": false,
+    "n_per_class": 1500,
+    "n_twin_per_type": 600,
+    "batch_size": 4,
+    "grad_accum": 4,
+    "lr": 0.0002,
+    "max_len": 384,
+    "max_steps": null,
+    "limit_test": null,
+    "en_dir": "data/processed/en",
+    "copies_dir": "data/copies/en",
+    "relevance": [
+      "features/relevance_en.parquet",
+      "features/relevance_copies_en.parquet"
+    ],
+    "out_dir": "results/H7/qwen4b",
+    "models_dir": "models/H7"
+  },
+  "train": {
+    "steps": 281,
+    "final_loss": 0.23967705564573408,
+    "train_seconds": 3988.5
+  },
+  "n_train": 4500
+}
