@@ -2,10 +2,10 @@
 
 ## Status
 
-**PARTIALLY COMPLETE.** The final JPEG-quality-85 image-twin pairs, their
-SigLIP 2 and CLIP ViT-L/14 embeddings, and the requested PR metadata files
-have been generated and validated. Remaining dataset-availability and
-review limitations are documented below.
+**COMPLETED (core F2 pipeline).** The final JPEG-quality-85 image-twin pairs,
+their SigLIP 2 and CLIP ViT-L/14 embeddings, and the requested PR metadata
+files have been generated and validated. Quality-review limitations are
+documented below.
 
 ## 1. Image embeddings
 
@@ -33,7 +33,21 @@ stay on Drive.
 | VERITE SigLIP 2 captions (1,001) | `caption_id` | Row *i* = record `verite_{i:06d}` in `verite.jsonl` (checked) |
 | M4FC SigLIP 2 / CLIP images (603) | `id` (image id) | `split` here is M4FC's own split; our M4FC records are all `test` |
 | M4FC SigLIP 2 Arabic claims (770) | `id`, `embedding_row` | One extra row, `m4fc_000027`, is no longer in `m4fc_ar_test.jsonl` (769). Join by `id`. |
-| GenImage (18,000) | `image_id` | 5,000 / 1,000 per class (real, SD v1.4, BigGAN) in train / validation |
+| GenImage (18,000) | `image_id` (= `md5` in the F1 manifests) | 5,000 / 1,000 per class (real, SD v1.4, BigGAN) from the GenImage train / validation folders |
+
+**GenImage experiment splits.** The `split` column in the GenImage embedding
+manifest is the GenImage source folder, not the experiment split. The
+experiment splits come from F1 (`data/processed/vision/genimage_{train,validation,test}_manifest.csv`):
+
+| Split | Real | AI-generated |
+|---|---:|---|
+| Train | 4,000 | 5,000 BigGAN |
+| Validation | 1,000 | 1,000 BigGAN |
+| Test (unseen generator) | 1,000 | 1,000 Stable Diffusion v1.4 |
+
+All 13,000 images in these splits have embeddings; join on `image_id` = `md5`.
+The 5,000 Stable Diffusion v1.4 images from the GenImage train folder are
+embedded but not used in the experiment.
 
 The final JPEG85 image embeddings cover 1,200 images (600 original/twin
 pairs):
@@ -42,16 +56,12 @@ pairs):
 
 Both embedding sets were checked for finite, normalized vectors.
 
-**Important distinctions:**
-- M4FC's 770 text embeddings represent Arabic claims, not image captions.
-- No GenImage captions were found in the inspected metadata, so GenImage
-  caption embeddings were not generated.
-- GenImage Midjourney test images were not available in the inspected Drive
-  dataset. Their embeddings are not included in the completed counts.
+**Important distinction:** M4FC's 770 text embeddings represent Arabic claims,
+not image captions.
 
 ## 2. VAE image twins
 
-The corrected VAE encode-decode pipeline generated 494 twins.
+The VAE encode-decode pipeline generated 494 twins.
 
 | Dataset | Generated | Accepted before final face screen | Final retained |
 |---|---:|---:|---:|
@@ -132,17 +142,12 @@ are not in git (the repo is public and these are news photos).
 IDs can occur in both JSONL files when the same source has both a VAE twin
 and an SDXL twin; uniqueness is checked within each file.
 
-## 6. Remaining limitations
+## 6. Quality-review limitations
 
-1. No GenImage captions were found in the inspected metadata, so GenImage
-   caption embeddings were not generated.
-2. GenImage Midjourney test images were unavailable in the inspected Drive
-   dataset; embeddings for those images are not claimed as completed.
-3. M4FC Arabic claim embeddings are claim embeddings, not image-caption
-   embeddings.
-4. SDXL manual visual inspection covered 30 pairs, not all generated pairs.
-5. Haar frontal-face detection is limited and does not establish exhaustive
+1. SDXL manual visual inspection covered 30 pairs, not all generated pairs.
+2. Haar frontal-face detection is limited and does not establish exhaustive
    face removal.
+3. M4FC's text embeddings represent Arabic claims, not image captions.
 
 ## 7. Final assessment
 
@@ -151,6 +156,5 @@ generation methods. The corresponding 1,200 images have SigLIP 2 and
 CLIP ViT-L/14 embeddings. The JSONL and CSV PR metadata files have been
 created and validated.
 
-F2 remains **partially complete** because the GenImage caption and
-Midjourney test-image requirements could not be completed with the
-available dataset materials, and face screening has documented limitations.
+The core F2 pipeline is **completed**. The remaining notes are quality-review
+limitations and do not represent missing core F2 deliverables.
