@@ -1,0 +1,14 @@
+Experiment,Model,Split,Accuracy,ROC_AUC,Precision,Recall,F1,ALR_percent
+GenImage Authenticity Probe,Logistic Regression,Unseen-generator test,0.51,0.8597,0.8571,0.024,0.0467,
+GenImage Authenticity Probe,Linear SVM,Unseen-generator test,0.507,0.9031,1.0,0.014,0.0276,
+VERITE Similarity Baseline,Decoupled,All accepted pairs,0.566563,,,,,9.2879257
+VERITE Similarity Baseline,Decoupled,Validation,0.530612,,,,,12.244898
+VERITE Similarity Baseline,Decoupled,Test,0.607843,,,,,7.843137
+VERITE Corrected Model,Decoupled,Validation - Original,0.5,,,,,12.2449
+VERITE Corrected Model,Decoupled,Validation - Twin,0.5102,,,,,12.2449
+VERITE Corrected Model,Decoupled,Test - Original,0.5294,,,,,7.8431
+VERITE Corrected Model,Decoupled,Test - Twin,0.5098,,,,,7.8431
+VERITE Corrected Model,Fused,Validation - Original,0.5204,,,,,12.2449
+VERITE Corrected Model,Fused,Validation - Twin,0.5306,,,,,12.2449
+VERITE Corrected Model,Fused,Test - Original,0.5196,,,,,7.8431
+VERITE Corrected Model,Fused,Test - Twin,0.5196,,,,,7.8431
