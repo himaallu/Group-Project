@@ -37,3 +37,4 @@ contribution statement.
 | Y4 | Youssef | 2026-11-20 | `src/copies/arabic_twins.py`: 642 Arabic and mixed twins (147 `_A`, 192 `_M`, 145 `_B_A`, 158 `_C_A`) from 200 test sources, 3,044-name glossary, 50-row hand-check sheet |
 | Y5 | Youssef | 2026-11-20 | `src/eval/run_y5_ar.py` + `y5_diagnostics.py`: E7, twin_noent AR macro-F1 0.597 vs EN 0.605, cross-lingual 73.9% (`_A`) / 79.5% (`_M`), paired ESR AR 40.5 vs EN 58.5; twin head's Arabic ESR inflated by a contradicted bias |
 | Y6 | Youssef | 2026-11-20 | `results/Y6/`: 20 Arabic-only twin failures (12 translation problems) and 36 X-FACT AR failures (15 rumours restated in snippets) |
+| T1 (AR) | Youssef | 2026-11-21 | `results/T1/sheet_youssef.csv`: 20 Arabic notes rated (pre-rated by an LLM, checked by Youssef): verdict backed by snippets 10%, sentences supported yes/partly/no 25/50/25%, readability 3.7 |
