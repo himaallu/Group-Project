@@ -38,3 +38,4 @@ contribution statement.
 | Y5 | Youssef | 2026-11-20 | `src/eval/run_y5_ar.py` + `y5_diagnostics.py`: E7, twin_noent AR macro-F1 0.597 vs EN 0.605, cross-lingual 73.9% (`_A`) / 79.5% (`_M`), paired ESR AR 40.5 vs EN 58.5; twin head's Arabic ESR inflated by a contradicted bias |
 | Y6 | Youssef | 2026-11-20 | `results/Y6/`: 20 Arabic-only twin failures (12 translation problems) and 36 X-FACT AR failures (15 rumours restated in snippets) |
 | T1 (AR) | Youssef | 2026-11-21 | `results/T1/sheet_youssef.csv`: 20 Arabic notes rated (pre-rated by an LLM, checked by Youssef): verdict backed by snippets 10%, sentences supported yes/partly/no 25/50/25%, readability 3.7 |
+| Y4 (check) | Youssef | 2026-11-21 | `results/Y4/check_50.csv`: 50 translations checked (LLM pre-check, reviewed by Youssef), 27/50 correct (claims 13/25, snippets 14/25) |
