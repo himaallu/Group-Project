@@ -1,0 +1,13 @@
+{
+  "model": "stabilityai/stable-diffusion-xl-base-1.0",
+  "total": 500,
+  "completed": 500,
+  "failed": 0,
+  "pending": 0,
+  "steps": 20,
+  "strength": 0.25,
+  "guidance_scale": 5.0,
+  "image_max_size": 512,
+  "elapsed_seconds": 2896.71,
+  "updated_at": "2026-11-21 19:20:12"
+}

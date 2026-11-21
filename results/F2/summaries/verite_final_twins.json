@@ -1,0 +1,15 @@
+{
+  "original_true_images": 338,
+  "manually_face_excluded": 39,
+  "face_eligible_true_images": 299,
+  "cosine_threshold": 0.92,
+  "final_eligible_true_image_twins": 218,
+  "all_original_files_exist": true,
+  "all_twin_files_exist": true,
+  "all_cosine_scores_pass": true,
+  "alignment_method": "original_embedding_index",
+  "ssim_used_as_hard_exclusion": false,
+  "originals_modified": false,
+  "twins_modified": false,
+  "final_manifest": "audit/verite/final_eligible_twins/verite_final_eligible_true_vae_twins.csv"
+}

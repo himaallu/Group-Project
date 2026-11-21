@@ -1,0 +1,21 @@
+{
+  "dataset": "M4FC",
+  "stage": "VAE reconstruction twins",
+  "candidate_count": 144,
+  "generated_successfully": 144,
+  "generation_failures": 0,
+  "oom_retries": 0,
+  "model": "stabilityai/sd-vae-ft-mse",
+  "device": "cuda",
+  "precision": "torch.float16",
+  "max_side": 512,
+  "jpeg_quality": 85,
+  "elapsed_seconds": 35.33456373214722,
+  "elapsed_minutes": 0.5889093955357869,
+  "mean_psnr": 26.59077813890245,
+  "median_psnr": 26.254328727722168,
+  "min_psnr": 18.984596252441406,
+  "max_psnr": 34.333900451660156,
+  "manifest": "audit/y1_m4fc/vae_reconstruction/m4fc_vae_144_reconstruction_manifest.csv",
+  "failure_csv": "audit/y1_m4fc/vae_reconstruction/m4fc_vae_144_generation_failures.csv"
+}

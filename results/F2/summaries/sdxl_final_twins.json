@@ -1,0 +1,22 @@
+{
+  "pipeline": "SDXL Img2Img GenImage twins",
+  "similarity_model": "SigLIP2",
+  "selection_threshold": 0.7,
+  "selected_pairs": 440,
+  "real": 191,
+  "fake": 249,
+  "discarded_pairs": 60,
+  "jpeg_quality": 85,
+  "expected_dimensions": [
+    512,
+    512
+  ],
+  "missing_files": 0,
+  "corrupt_files": 0,
+  "wrong_format": 0,
+  "wrong_dimensions": 0,
+  "conversion_errors": 0,
+  "manifest": "data/copies/vision/genimage_sdxl_img2img_500/final_selected_similarity_070_jpeg85/final_sdxl_twin_manifest_similarity070_jpeg85.csv",
+  "dataset_directory": "data/copies/vision/genimage_sdxl_img2img_500/final_selected_similarity_070_jpeg85",
+  "audit_status": "PASS"
+}

@@ -1,0 +1,19 @@
+{
+    "dataset": "VERITE",
+    "original_model": "SigLIP2",
+    "twin_model": "VAE reconstruction + SigLIP2",
+    "embedding_dimension": 1152,
+    "total_images": 664,
+    "threshold": 0.92,
+    "passed": 473,
+    "manual_review": 191,
+    "pass_percentage": 71.23493975903614,
+    "review_percentage": 28.76506024096386,
+    "mean_cosine_similarity": 0.9326080679893494,
+    "median_cosine_similarity": 0.9402397871017456,
+    "minimum_cosine_similarity": 0.6993358135223389,
+    "maximum_cosine_similarity": 0.9888471364974976,
+    "standard_deviation": 0.03518383204936981,
+    "alignment_validation": "PASS",
+    "results_csv": "audit/verite/vae_twin_similarity/verite_twin_cosine_similarity.csv"
+}

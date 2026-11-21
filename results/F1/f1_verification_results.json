@@ -1,0 +1,28 @@
+{
+    "stage": "F1 - GenImage data preparation",
+    "completion_timestamp": "2026-11-21T13:00:51.632006",
+    "total_selected_samples": 13000,
+    "unique_exact_byte_hashes": 13000,
+    "exact_byte_duplicates_in_final_selection": 0,
+    "exact_byte_uniqueness_check": true,
+    "expected_total_samples": 13000,
+    "total_sample_count_check": true,
+    "split_counts": {
+        "test": 2000,
+        "train": 9000,
+        "validation": 2000
+    },
+    "generator_counts": {
+        "BigGAN": 6000,
+        "Stable Diffusion v1.4": 1000,
+        "real": 6000
+    },
+    "split_generator_class_counts": {
+        "test|fake|Stable Diffusion v1.4": 1000,
+        "test|real|real": 1000,
+        "train|fake|BigGAN": 5000,
+        "train|real|real": 4000,
+        "validation|fake|BigGAN": 1000,
+        "validation|real|real": 1000
+    }
+}

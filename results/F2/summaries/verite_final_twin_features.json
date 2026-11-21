@@ -1,0 +1,42 @@
+{
+  "dataset": "VERITE",
+  "subset": "True images",
+  "number_of_selected_pairs": 218,
+  "selection_criteria": {
+    "true_images_only": true,
+    "manual_face_exclusions_applied": true,
+    "cosine_similarity_threshold": 0.92,
+    "ssim_used_as_hard_filter": false
+  },
+  "features": {
+    "original_siglip2_raw": [
+      218,
+      1152
+    ],
+    "original_siglip2_normalized": [
+      218,
+      1152
+    ],
+    "twin_siglip2_normalized": [
+      218,
+      1152
+    ],
+    "original_clip_raw": [
+      218,
+      768
+    ],
+    "original_clip_normalized": [
+      218,
+      768
+    ]
+  },
+  "alignment": {
+    "original_index_used": true,
+    "twin_embedding_row_used": true,
+    "unique_original_indices": true
+  },
+  "normalized_embeddings_verified": true,
+  "all_features_finite": true,
+  "originals_modified": false,
+  "twins_modified": false
+}

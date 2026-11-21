@@ -1,0 +1,15 @@
+{
+  "dataset": "M4FC",
+  "stage": "Final VAE twin eligibility",
+  "candidate_count": 144,
+  "threshold": 0.92,
+  "criterion": "Both CLIP and SigLIP2 cosine similarity >= 0.92",
+  "eligible_count": 21,
+  "excluded_count": 123,
+  "eligible_percentage": 14.5833,
+  "clip_pass_count": 107,
+  "siglip2_pass_count": 22,
+  "joint_pass_count": 21,
+  "manifest_path": "audit/y1_m4fc/vae_similarity_144/final_joint_eligible_092/m4fc_vae_final_joint_eligible_092.csv",
+  "excluded_path": "audit/y1_m4fc/vae_similarity_144/final_joint_eligible_092/m4fc_vae_excluded_joint_eligible_092.csv"
+}
