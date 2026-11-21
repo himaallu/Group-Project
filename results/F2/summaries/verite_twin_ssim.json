@@ -1,0 +1,14 @@
+{
+    "dataset": "VERITE",
+    "total_images": 664,
+    "successful": 664,
+    "failed": 0,
+    "mean_ssim": 0.7704798507465866,
+    "median_ssim": 0.796309416373673,
+    "minimum_ssim": 0.27952092568496273,
+    "maximum_ssim": 0.9731999777341352,
+    "standard_deviation": 0.12590377760293428,
+    "q25": 0.7008140009998346,
+    "q75": 0.8569321364138734,
+    "failed_images": []
+}

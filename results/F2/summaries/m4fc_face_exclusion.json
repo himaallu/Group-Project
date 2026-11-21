@@ -1,0 +1,24 @@
+{
+  "id_column_used": "clean_image_id",
+  "original_eligible_images": 155,
+  "manually_excluded_images": 11,
+  "remaining_candidate_images": 144,
+  "excluded_image_ids": [
+    "m4fc_000206",
+    "m4fc_000314",
+    "m4fc_000317",
+    "m4fc_000324",
+    "m4fc_000348",
+    "m4fc_000445",
+    "m4fc_000470",
+    "m4fc_000478",
+    "m4fc_000518",
+    "m4fc_000663",
+    "m4fc_000667"
+  ],
+  "exclusion_reason": "Manual contact-sheet review: prominent potentially identifiable face(s)",
+  "duplicate_original_ids": 0,
+  "duplicate_remaining_ids": 0,
+  "validation": "PASS",
+  "original_images_modified": false
+}

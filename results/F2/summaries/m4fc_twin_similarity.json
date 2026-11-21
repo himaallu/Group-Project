@@ -1,0 +1,56 @@
+{
+  "dataset": "M4FC",
+  "stage": "Original vs VAE twin similarity",
+  "candidate_count": 144,
+  "threshold": 0.92,
+  "embedding_shapes": {
+    "siglip2": {
+      "original_shape": [
+        144,
+        1152
+      ],
+      "twin_shape": [
+        144,
+        1152
+      ]
+    },
+    "clip": {
+      "original_shape": [
+        144,
+        768
+      ],
+      "twin_shape": [
+        144,
+        768
+      ]
+    }
+  },
+  "both_models_pass": 21,
+  "siglip2_only_pass": 1,
+  "clip_only_pass": 86,
+  "both_fail": 36,
+  "models": {
+    "siglip2": {
+      "count": 144,
+      "mean": 0.8805762814978758,
+      "median": 0.8815985321998596,
+      "min": 0.7105507850646973,
+      "max": 0.9872663617134094,
+      "pass": 22,
+      "fail": 122
+    },
+    "clip": {
+      "count": 144,
+      "mean": 0.9315502279334598,
+      "median": 0.9419237375259399,
+      "min": 0.6606523394584656,
+      "max": 0.9816280603408813,
+      "pass": 107,
+      "fail": 37
+    }
+  },
+  "elapsed_seconds": 54.68677520751953,
+  "results_csv": "features/vision/m4fc/vae_similarity_144/m4fc_144_original_vae_cosine_similarity.csv",
+  "pivot_csv": "features/vision/m4fc/vae_similarity_144/m4fc_144_similarity_pivot.csv",
+  "elapsed_minutes": 0.9114462534586588
+}

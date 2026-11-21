@@ -78,7 +78,7 @@ def manifest_rows(split: str, limit: int | None = None) -> pd.DataFrame:
     if split not in SPLITS:
         raise ValueError(split)
     rows = pd.read_csv(SPLITS_DIR / f"genimage_{split}_manifest.csv")
-    rows = rows.assign(image_path=rows["exported_path"], image_id=rows["md5"])
+    rows = rows.assign(image_path=rows["raw_export_path"], image_id=rows["md5"])
     if limit:
         rows = rows.groupby("generator", group_keys=False).head(limit)
     return rows.reset_index(drop=True)

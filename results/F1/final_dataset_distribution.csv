@@ -1,0 +1,7 @@
+split,class_name,generator,count
+test,fake,Stable Diffusion v1.4,1000
+test,real,real,1000
+train,fake,BigGAN,5000
+train,real,real,4000
+validation,fake,BigGAN,1000
+validation,real,real,1000

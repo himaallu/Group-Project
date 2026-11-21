@@ -1,0 +1,46 @@
+{
+    "dataset": "M4FC",
+    "image_count": 603,
+    "dataset_manifest": "data/processed/vision/m4fc_images_f2_clean/m4fc_f2_clean_manifest.csv",
+    "siglip2": {
+        "model": "SigLIP2-so400m",
+        "image_count": 603,
+        "embedding_shape": [
+            603,
+            1152
+        ],
+        "normalized_shape": [
+            603,
+            1152
+        ],
+        "raw_dtype": "float32",
+        "normalized_dtype": "float32",
+        "all_finite": true,
+        "normalized_unit_norms": true,
+        "successful_batches": 151,
+        "final_batch_size": 4,
+        "elapsed_seconds": 79.47107172012329,
+        "output_directory": "features/vision/m4fc/siglip2_so400m"
+    },
+    "clip": {
+        "model": "CLIP-ViT-L14",
+        "image_count": 603,
+        "embedding_shape": [
+            603,
+            768
+        ],
+        "normalized_shape": [
+            603,
+            768
+        ],
+        "raw_dtype": "float32",
+        "normalized_dtype": "float32",
+        "all_finite": true,
+        "normalized_unit_norms": true,
+        "successful_batches": 76,
+        "final_batch_size": 8,
+        "elapsed_seconds": 36.333250522613525,
+        "output_directory": "features/vision/m4fc/clip_vitl14"
+    },
+    "overall_status": "EXTRACTION_COMPLETED"
+}

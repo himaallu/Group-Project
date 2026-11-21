@@ -1,0 +1,57 @@
+{
+  "dataset": "VERITE",
+  "image_count": 664,
+  "input_fingerprint": "fa91d185ab8f64a8a0e4df2edccadcc62271de28f2a81202fec0ec9a906b73ee",
+  "manifest_path": "features/vision/verite/verite_embedding_manifest.csv",
+  "failed_image_count": 0,
+  "siglip2": {
+    "model": "google/siglip2-so400m-patch14-384",
+    "rows": 664,
+    "raw_shape": [
+      664,
+      1152
+    ],
+    "normalized_shape": [
+      664,
+      1152
+    ],
+    "raw_dtype": "float32",
+    "normalized_dtype": "float32",
+    "raw_finite": true,
+    "normalized_finite": true,
+    "normalized_norms_mean": 1.0,
+    "normalized_norms_min": 0.9999998807907104,
+    "normalized_norms_max": 1.0000001192092896,
+    "fingerprint": "fa91d185ab8f64a8a0e4df2edccadcc62271de28f2a81202fec0ec9a906b73ee",
+    "inference_precision": "FP16",
+    "storage_precision": "FP32",
+    "batch_size": 16,
+    "elapsed_seconds": 41.73364496231079
+  },
+  "clip": {
+    "model": "openai/clip-vit-large-patch14",
+    "rows": 664,
+    "raw_shape": [
+      664,
+      768
+    ],
+    "normalized_shape": [
+      664,
+      768
+    ],
+    "raw_dtype": "float32",
+    "normalized_dtype": "float32",
+    "raw_finite": true,
+    "normalized_finite": true,
+    "normalized_norms_mean": 1.0,
+    "normalized_norms_min": 0.9999998807907104,
+    "normalized_norms_max": 1.0000001192092896,
+    "fingerprint": "fa91d185ab8f64a8a0e4df2edccadcc62271de28f2a81202fec0ec9a906b73ee",
+    "inference_precision": "FP16",
+    "storage_precision": "FP32",
+    "batch_size": 16,
+    "elapsed_seconds": 16.45905590057373
+  },
+  "cross_model_alignment": true,
+  "cross_model_audit_pass": true
+}

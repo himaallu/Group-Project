@@ -1,103 +1,37 @@
-# F2 — Vision Features and Image Twins
+# F2: Vision features and image twins (Feba)
 
-**Project:** TwinCheck  
-**Owner:** Feba  
-**Status:** **Completed — core F2 artifacts generated and validated; review limitations documented**
+1. **What ran:** `notebooks/Feba_F2_vision_features.ipynb` on Colab (T4). It extracts SigLIP 2 and CLIP ViT-L/14 embeddings for GenImage, VERITE and M4FC, makes VAE twins of VERITE and M4FC true images and SDXL img2img twins of GenImage test images, and keeps the twins that stay close to the original.
+2. **Settings:**
+   - SigLIP 2 `google/siglip2-so400m-patch14-384`, CLIP `openai/clip-vit-large-patch14`, FP16 inference.
+   - VAE `stabilityai/sd-vae-ft-mse`, longest side 512.
+   - SDXL `stabilityai/stable-diffusion-xl-base-1.0`, strength 0.25, 20 steps, guidance 5.0, 512 px.
+   - Kept if SigLIP 2 cosine ≥ 0.92 (VERITE), CLIP and SigLIP 2 ≥ 0.92 (M4FC), SigLIP 2 ≥ 0.70 (SDXL). Faces removed by manual review of OpenCV-flagged images.
+3. **W&B:** not used (no training).
+4. **Key numbers:**
 
-## 1. Scope
+   | Embeddings | SigLIP 2 | CLIP |
+   |---|---:|---:|
+   | GenImage (F1 split) | 13,000 × 1152 | 13,000 × 768 |
+   | VERITE images | 664 × 1152 | 664 × 768 |
+   | VERITE captions | 1,001 × 1152 | – |
+   | M4FC images | 603 × 1152 | 603 × 768 |
 
-F2 uses the F1 vision data and the M4FC images to extract image/text embeddings, create image twins, and export shared-format records for downstream evaluation.
+   | Twins | Candidates | Face exclusions | Kept |
+   |---|---:|---:|---:|
+   | VERITE VAE | 338 | 39 | 218 |
+   | M4FC VAE | 155 | 11 | 21 |
+   | GenImage SDXL | 500 | – | 440 (191 real, 249 SD) |
 
-## 2. Embeddings
+   - `vae.jsonl`: 436 `_V` records from the 218 VERITE twins (train 300, val 64, test 72).
+5. **Where files are:**
+   - `features/vision/`: embedding row manifests. The `.npy` arrays are on Drive (`MyDrive/TwinCheck/features/vision/`).
+   - `data/copies/vision/`: twin tables, similarity tables, `manifests/vae_manifest.csv`, `vae.jsonl`.
+   - `data/processed/vision/m4fc_f2_clean_manifest.csv`.
+   - `results/F2/summaries/`: step summaries (JSON).
+   - Images (originals and twins) stay on Drive, not in git.
 
-| Dataset | SigLIP 2 image | SigLIP 2 text | CLIP ViT-L/14 image |
-|---|---:|---:|---:|
-| VERITE | 663 | 1,001 captions | 663 |
-| GenImage | 18,000 | Not generated | 18,000 |
-| M4FC | 603 | 770 Arabic claims | 603 |
-| Final JPEG85 originals + twins | 1,200 | — | 1,200 |
-
-- Final JPEG85 embedding shapes: SigLIP 2 `(1200, 1152)`; CLIP ViT-L/14 `(1200, 768)`.
-- The final JPEG85 embeddings were checked for finite values and normalized vectors.
-- GenImage float16 embedding copies are included in the repository; float32 originals remain on Drive.
-- GenImage embeddings cover the real, BigGAN and Stable Diffusion v1.4 images in the GenImage train and validation folders. The `split` column in their manifest is that source folder. The experiment splits come from the F1 manifests (`data/processed/vision/genimage_{train,validation,test}_manifest.csv`): train and validation use real + BigGAN, and the unseen-generator test uses real + Stable Diffusion v1.4. All 13,000 images in these splits have embeddings; join on `image_id` = `md5`.
-- Each embedding array has a corresponding row manifest. Join by the manifest key/ID, not by assumptions about row order.
-
-## 3. Image twins
-
-### VAE round-trip
-
-| Dataset | Generated | Accepted before final face screen | Retained pairs |
-|---|---:|---:|---:|
-| VERITE | 338 | 311 | 311 |
-| M4FC | 156 | 142 | 141 |
-| **Total** | **494** | **453** | **452** |
-
-The M4FC pair `m4fc_000478` was excluded after the final face review.
-
-### SDXL img2img
-
-- Strength: `0.15`; seed: `42`.
-- Approved source images processed: `249` (152 M4FC, 97 VERITE; 201 test and 48 validation sources).
-- Similarity accepted before manual face review: `157`; rejected: `92`.
-- Manually excluded for faces: `9`; final retained: `148` pairs.
-- 30 pairs were visually inspected; this was not a full visual review.
-- No VERITE training sources were used.
-
-## 4. JPEG quality 85 and face screening
-
-Originals and twins were re-saved from decoded RGB pixels at JPEG quality 85.
-
-| Twin method/source | Final pairs |
-|---|---:|
-| VERITE VAE | 311 |
-| M4FC VAE | 141 |
-| SDXL | 148 |
-| **Total** | **600** |
-
-The final manifest contains 1,200 image files (600 originals and 600 twins). A Haar frontal-face cascade screened 601 twins before the final exclusion. Four detections exceeded the 10% image-area threshold: one confirmed large face was excluded and three were false positives retained after review.
-
-## 5. Shared-format records
-
-| Output | Twin images | Records |
-|---|---:|---:|
-| `data/copies/vision/vae.jsonl` | 452 | 903 |
-| `data/copies/vision/sdxl.jsonl` | 148 | 295 |
-| `data/copies/vision/sources.csv` | 249 approved sources; 148 have a retained twin | — |
-
-Each twin image creates a `_V` record for every source claim/record using that image. Source claim, label, evidence, language, and split are preserved; twin image path and method/similarity metadata are added. IDs may overlap between VAE and SDXL files if one source has twins from both methods; uniqueness is checked within each file.
-
-VERITE records are generated by `src/vision/load_verite.py`:
-- `true` → `supported`
-- `miscaptioned` and `out-of-context` → `contradicted`
-- split by image, seed 42: 701 / 149 / 151 records (train / validation / test)
-
-Twin records are generated by `src/vision/make_twin_records.py` from the manifests.
-
-## 6. Key output locations
-
-- `data/processed/vision/verite.jsonl`
-- `data/copies/vision/vae.jsonl`
-- `data/copies/vision/sdxl.jsonl`
-- `data/copies/vision/sources.csv`
-- `data/copies/vision/manifests/`
-- `features/vision/` (embedding arrays and row manifests)
-- `features/vision/F2_completion_audit.json`
-- `features/vision/F2_completion_report.md`
-
-The actual news-photo and twin image files are not stored in Git. Paths are repo-relative and the images remain in the owner's Drive workspace.
-
-## 7. Validation
-
-The completion audit records that checked image embeddings passed validation and final JPEG85 embedding arrays are finite and normalized. The twin JSONL files were checked with the shared loader validator (`python -m src.eval.loaders --check`). Converter tests are available at `tests/vision/test_f2_records.py`.
-
-## 8. Limitations and quality-review notes
-
-1. M4FC's 770 text embeddings are Arabic claim embeddings. One extra embedding row (`m4fc_000027`) is not in the current 769-record test JSONL; join by `id`.
-2. SDXL visual review covered 30 pairs only.
-3. Haar frontal-face detection is not comprehensive and may miss faces in other orientations or sizes.
-4. MD5/exact-duplicate and embedding checks do not establish that every twin is semantically or visually acceptable.
-
-## 9. Completion assessment
-
-The F2 core outputs—image embeddings, generated twins, JPEG85 originals/twins, final embeddings, manifests, and shared-format records—were generated and validated. The documented limitations concern review coverage and detector limitations; they do not indicate that the core pipeline is incomplete.
+**Limitations:**
+- GenImage embeddings come from the 256×256 copies, where BigGAN images have a grey border.
+- SDXL twins use a lower threshold (0.70) and include AI-image sources.
+- M4FC twins have no `_V` records: Y1 labels their claims contradicted, in the test split.
+- Only 30 VERITE pairs were checked by eye.

@@ -2,17 +2,18 @@
 
 What it does
     * Reads the VERITE rows (``caption``, ``image_path``, ``label``) in their original
-      order, from the authors' ``VERITE.csv`` or a JSON Lines file with the same keys.
+      order, from the F1 manifest, the authors' ``VERITE.csv`` or a JSON Lines file.
     * Maps the labels: ``true`` -> ``supported``; ``miscaptioned`` and
       ``out-of-context`` -> ``contradicted`` (the caption does not describe the photo).
       The original label stays in ``orig_label``.
-    * Rebuilds the F1 split: 70 / 15 / 15 by **image** (no image in two splits),
-      stratified by the set of labels each image has, seed 42. This is the same code
-      as ``notebooks/Feba_F1_vision_data.ipynb`` and gives 701 / 149 / 151 records.
+    * Uses the F1 split when the input has a ``split`` column
+      (``data/processed/vision/verite_manifest.csv``: split by image, 704 / 151 / 146
+      records). Without it, splits images 70 / 15 / 15, stratified by label set, seed 42.
     * Writes one shared-format record per row, ids ``verite_000000`` ... in row order.
 
 Inputs
-    * ``--input``: ``data/raw/verite/VERITE.csv`` (or a ``.jsonl`` with the same keys).
+    * ``--input``: ``data/processed/vision/verite_manifest.csv`` (or ``VERITE.csv`` /
+      a ``.jsonl`` with the same keys).
     * ``--image-root``: folder (repo-relative) the VERITE ``images/...`` paths live in.
 
 Outputs
@@ -21,8 +22,8 @@ Outputs
       and image twins.
 
 How to run
-    python -m src.vision.load_verite --input data/raw/verite/VERITE.csv
-    python -m src.vision.load_verite --input data/raw/verite/VERITE.csv --limit 10   # 10-row test
+    python -m src.vision.load_verite --input data/processed/vision/verite_manifest.csv
+    python -m src.vision.load_verite --input data/processed/vision/verite_manifest.csv --limit 10
 """
 from __future__ import annotations
 
@@ -38,7 +39,8 @@ LABEL_MAP = {
     "miscaptioned": "contradicted",
     "out-of-context": "contradicted",
 }
-DEFAULT_IMAGE_ROOT = "data/raw/verite/images_download/extracted"
+DEFAULT_IMAGE_ROOT = "data/raw/vision/verite/images_extracted"
+SPLIT_NAMES = {"validation": "val"}
 DEFAULT_OUTPUT = "data/processed/vision/verite.jsonl"
 SEED = 42
 
@@ -60,7 +62,13 @@ def read_rows(path: str | Path) -> pd.DataFrame:
     missing = {"caption", "image_path", "label"} - set(df.columns)
     if missing:
         raise ValueError(f"{path} is missing columns {sorted(missing)}")
-    return df[["caption", "image_path", "label"]].reset_index(drop=True)
+    keep = ["caption", "image_path", "label"] + (["split"] if "split" in df.columns else [])
+    return df[keep].reset_index(drop=True)
+
+
+def manifest_split(df: pd.DataFrame) -> dict[str, str]:
+    """Image file name -> split, from the ``split`` column of the F1 manifest."""
+    return {Path(p).name: SPLIT_NAMES.get(s, s) for p, s in zip(df["image_path"], df["split"])}
 
 
 def image_split(df: pd.DataFrame, seed: int = SEED) -> dict[str, str]:
@@ -143,7 +151,8 @@ def main() -> None:
     args = ap.parse_args()
 
     df = read_rows(args.input)
-    records = to_records(df, image_split(df), args.image_root)
+    split = manifest_split(df) if "split" in df.columns else image_split(df)
+    records = to_records(df, split, args.image_root)
     if args.limit:
         records = records[:args.limit]
     write_jsonl(records, args.output)

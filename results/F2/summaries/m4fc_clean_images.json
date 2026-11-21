@@ -1,0 +1,18 @@
+{
+    "dataset": "M4FC",
+    "creation_method": "Fresh extraction and verified copy",
+    "source_zip": "data/raw/vision/m4fc/Y1_outputs.zip",
+    "total_original_manifest_records": 614,
+    "successful_image_records": 603,
+    "failed_download_records": 11,
+    "image_format": "JPEG",
+    "image_mode": "RGB",
+    "image_dimensions": "Original dimensions preserved",
+    "train_count": 363,
+    "dev_count": 70,
+    "test_count": 170,
+    "all_copies_hash_verified": true,
+    "all_files_exist": true,
+    "clean_manifest": "data/processed/vision/m4fc_images_f2_clean/m4fc_f2_clean_manifest.csv",
+    "failed_records_manifest": "audit/y1_m4fc/m4fc_failed_download_records.csv"
+}

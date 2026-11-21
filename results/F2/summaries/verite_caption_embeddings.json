@@ -1,0 +1,32 @@
+{
+  "dataset": "VERITE",
+  "model": "google/siglip2-so400m-patch14-384",
+  "task": "caption_text_embedding",
+  "total_caption_records": 1001,
+  "unique_images": 663,
+  "embedding_shape": [
+    1001,
+    1152
+  ],
+  "normalized_embedding_shape": [
+    1001,
+    1152
+  ],
+  "dtype": "float32",
+  "device": "cuda",
+  "batch_size": 16,
+  "elapsed_seconds": 2.79,
+  "caption_order_fingerprint": "5b924dd97e40fbb2a94293710264a8c843eebf53f5dbbfdaacea5daf3c2c79f6",
+  "all_embeddings_finite": true,
+  "all_normalized_embeddings_finite": true,
+  "unit_norm_validation": true,
+  "all_local_images_exist": true,
+  "label_distribution": {
+    "true": 338,
+    "miscaptioned": 338,
+    "out-of-context": 325
+  },
+  "raw_embedding_path": "features/vision/verite/siglip2_text/embeddings_raw.npy",
+  "normalized_embedding_path": "features/vision/verite/siglip2_text/embeddings_normalized.npy",
+  "manifest_path": "features/vision/verite/siglip2_text/text_embedding_manifest.csv"
+}

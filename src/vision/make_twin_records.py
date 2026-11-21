@@ -1,29 +1,22 @@
-"""Build shared-format ``_V`` image-twin records from the F2 twin manifests.
+"""Build shared-format ``_V`` image-twin records from the F2 VERITE twin manifest.
 
 What it does
-    * Reads a twin manifest (one row per twin image made in F2: VAE round-trip or
-      SDXL img2img, already filtered by SigLIP cosine >= 0.92 and face screening).
+    * Reads the twin manifest (one row per kept VERITE VAE twin from F2: true images,
+      faces screened, SigLIP 2 cosine >= 0.92).
     * For every twin image, finds **every** source record that uses the original image
-      (a VERITE photo appears with its true caption and a miscaptioned one; an M4FC
-      photo can carry several claims) and copies that record with
-      ``id = source id + "_V"`` and ``image_path`` = the twin image.
+      (a VERITE photo appears with its true caption and a miscaptioned one) and copies
+      that record with ``id = source id + "_V"`` and ``image_path`` = the twin image.
       Claim, label, evidence, language and split are unchanged, so the authenticity
       leakage metric (ALR, ``src/eval/metrics.py``) compares each twin with its source.
-    * Keeps ``method`` (VAE / SDXL), ``similarity`` and ``orig_image_path`` as extra fields.
-    * Rewrites ``data/copies/vision/sources.csv`` (SDXL source images) with repo-relative
-      paths and shared-format labels and splits.
+    * Keeps ``method``, ``similarity`` and ``orig_image_path`` as extra fields.
 
 Inputs
-    * ``data/copies/vision/manifests/{vae,sdxl}_manifest.csv``: ``image_id, dataset,
-      split, method, twin_image_path, jpeg85_original_path, similarity`` (kept twins),
-      and ``manifests/sdxl_sources_manifest.csv`` (all approved SDXL sources).
-      These are the F2 notebook outputs; the image files stay out of git (public repo).
-    * ``data/processed/vision/verite.jsonl`` (``src/vision/load_verite.py``) and
-      ``data/processed/ar/m4fc_ar_test.jsonl`` (Youssef, Y1).
+    * ``data/copies/vision/manifests/vae_manifest.csv``: ``image_id, dataset, split,
+      method, twin_image_path, similarity``. The image files stay out of git.
+    * ``data/processed/vision/verite.jsonl`` (``src/vision/load_verite.py``).
 
 Outputs
-    * ``data/copies/vision/vae.jsonl`` and ``data/copies/vision/sdxl.jsonl``.
-    * ``data/copies/vision/sources.csv``.
+    * ``data/copies/vision/vae.jsonl``.
 
 How to run
     python -m src.vision.make_twin_records
@@ -40,7 +33,6 @@ import pandas as pd
 VISION_COPIES = Path("data/copies/vision")
 SOURCE_FILES = {
     "VERITE": "data/processed/vision/verite.jsonl",
-    "M4FC": "data/processed/ar/m4fc_ar_test.jsonl",
 }
 SPLIT_NAMES = {"validation": "val"}  # F2 manifests say "validation"; the format says "val"
 
@@ -101,36 +93,6 @@ def twin_records(manifest: pd.DataFrame, by_image: dict[str, list[dict]]) -> lis
     return out
 
 
-def sources_table(approved: pd.DataFrame, sdxl_manifest: pd.DataFrame,
-                  by_image: dict[str, list[dict]]) -> pd.DataFrame:
-    """Build ``sources.csv``: one row per approved SDXL source image.
-
-    Args:
-        approved: ``manifests/sdxl_sources_manifest.csv`` (``image_id, dataset, split``),
-            the 249 real images sent to SDXL img2img.
-        sdxl_manifest: the kept SDXL twins (to mark which sources produced one).
-        by_image: output of :func:`records_by_image`.
-
-    Returns:
-        DataFrame ``id, dataset, split, label, source_image_path, twin_kept, record_ids``.
-        ``label`` is ``supported`` (only real, camera images were used as sources).
-    """
-    kept = set(sdxl_manifest["image_id"])
-    rows = []
-    for row in approved.itertuples(index=False):
-        recs = by_image[row.image_id]
-        rows.append({
-            "id": row.image_id,
-            "dataset": row.dataset,
-            "split": SPLIT_NAMES.get(row.split, row.split),
-            "label": "supported",
-            "source_image_path": recs[0]["image_path"],
-            "twin_kept": row.image_id in kept,
-            "record_ids": ";".join(r["id"] for r in recs),
-        })
-    return pd.DataFrame(rows)
-
-
 def write_jsonl(records: list[dict], path: str | Path) -> None:
     """Write records as JSON Lines (UTF-8)."""
     with open(path, "w", encoding="utf-8") as f:
@@ -139,7 +101,7 @@ def write_jsonl(records: list[dict], path: str | Path) -> None:
 
 
 def main() -> None:
-    """Command-line entry point: build vae.jsonl, sdxl.jsonl and sources.csv."""
+    """Command-line entry point: build vae.jsonl."""
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--limit", type=int, default=None,
                     help="only use the first N manifest rows and print instead of writing")
@@ -149,25 +111,17 @@ def main() -> None:
     for path in SOURCE_FILES.values():
         by_image.update(records_by_image(load_jsonl(path)))
 
-    for method in ("vae", "sdxl"):
-        manifest = pd.read_csv(VISION_COPIES / "manifests" / f"{method}_manifest.csv")
-        if args.limit:
-            manifest = manifest.head(args.limit)
-        twins = twin_records(manifest, by_image)
-        if args.limit:
-            for t in twins[:3]:
-                print(json.dumps(t, ensure_ascii=False)[:300])
-            continue
-        write_jsonl(twins, VISION_COPIES / f"{method}.jsonl")
-        counts = pd.DataFrame(twins).groupby(["source", "split", "label"]).size()
-        print(f"{method}: {len(manifest)} twin images -> {len(twins)} records\n"
-              f"{counts.to_string()}\n")
-        if method == "sdxl":
-            approved = pd.read_csv(VISION_COPIES / "manifests" / "sdxl_sources_manifest.csv")
-            table = sources_table(approved, manifest, by_image)
-            table.to_csv(VISION_COPIES / "sources.csv", index=False)
-            print(f"sources.csv: {len(table)} source images, "
-                  f"{int(table['twin_kept'].sum())} with a kept twin")
+    manifest = pd.read_csv(VISION_COPIES / "manifests" / "vae_manifest.csv")
+    if args.limit:
+        manifest = manifest.head(args.limit)
+    twins = twin_records(manifest, by_image)
+    if args.limit:
+        for t in twins[:3]:
+            print(json.dumps(t, ensure_ascii=False)[:300])
+        return
+    write_jsonl(twins, VISION_COPIES / "vae.jsonl")
+    counts = pd.DataFrame(twins).groupby(["source", "split", "label"]).size()
+    print(f"vae: {len(manifest)} twin images -> {len(twins)} records\n{counts.to_string()}")
 
 
 if __name__ == "__main__":
