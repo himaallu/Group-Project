@@ -141,19 +141,26 @@ features, mean ± sd over seeds 42/43/44, in % (`reports/tables/tab_main.csv`).
   is the shortcut the twins are built to expose.
 
 **Vision (MAAI901).** AI-image detectors trained on real + BigGAN, tested on real + unseen
-Stable Diffusion v1.4, seed 42 (`reports/tables/tab_detectors.csv`, F3/F5).
+Stable Diffusion v1.4. Every image gets the same pixel-only preprocessing (96 px, matched
+JPEG settings), so file format and size cannot give the answer away. Seed 42
+(`reports/tables/tab_detectors.csv`, F3/F5).
 
 | Detector | Accuracy | Recall (AI) | AUROC |
 |---|---|---|---|
-| CLIP ViT-L/14 + logistic regression (frozen) | 0.510 | 0.024 | 0.860 |
-| CLIP ViT-L/14 + linear SVM (frozen) | 0.507 | 0.014 | 0.903 |
-| ResNet-50 (last 4 blocks) | 0.505 | 0.012 | 0.713 |
-| ViT-B/16 (last 4 blocks) | 0.538 | 0.080 | 0.885 |
+| CLIP ViT-L/14 + logistic regression (frozen) | 0.542 | 0.156 | 0.620 |
+| CLIP ViT-L/14 + linear SVM (frozen) | 0.556 | 0.152 | 0.666 |
+| ResNet-50 (last 4 blocks) | 0.505 | 0.013 | 0.610 |
+| ViT-B/16 (last 4 blocks) | 0.555 | 0.126 | 0.754 |
 
-- All detectors rank unseen-generator images well (AUROC up to 0.90) but flag almost none at
-  the threshold learned on BigGAN. On VERITE, adding the authenticity score to the verdict
-  model changes no pair verdicts (ALR 7.8% on 51 test pairs for both, `tab_leakage.csv`).
-  ONNX: 15.5 ms (ResNet-50) / 85.7 ms (ViT-B/16) per image on CPU (`tab_onnx.csv`).
+- Once the format shortcut is removed (format and size alone gave AUROC 1.000, `results/F3/`),
+  no detector transfers well to the unseen generator. ViT-B/16 ranks best (AUROC 0.754).
+- Leakage on VERITE (36 test pairs, `tab_leakage.csv`): giving the verdict model the
+  authenticity score doubles the share of verdicts that change on the VAE twin, from 11.1%
+  (decoupled) to 22.2% (fused); 25.0% with the image embedding too. This supports keeping
+  authenticity out of the verdict (CLAUDE.md §3), but the test set is small.
+- ONNX on a 2-thread CPU: 96 ms (ResNet-50) / 482 ms (ViT-B/16) per image; INT8 makes the
+  files 4× smaller (`tab_onnx.csv`, `tab_onnx_int8.csv`).
+
 **Arabic and mixed language (E7, Y5).** 192 MultiFC test sources with Arabic twins (`_A` Arabic claim + evidence, `_M` Arabic claim + English evidence, `_B_A` / `_C_A` Arabic swap / unrelated), same models, no Arabic verdict training, mean over seeds 42/43/44, in % (`reports/tables/tab_arabic_E7.csv`).
 
 | Model | Lang | Macro-F1 | ESR | Unrelated | Cross-lingual |

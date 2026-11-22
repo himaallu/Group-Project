@@ -37,3 +37,4 @@ contribution statement.
 | Y6 | Youssef | 2026-11-20 | `results/Y6/`: 20 Arabic-only twin failures (12 translation problems) and 36 X-FACT AR failures (15 rumours restated in snippets) |
 | T1 (AR) | Youssef | 2026-11-21 | `results/T1/sheet_youssef.csv`: 20 Arabic notes rated (pre-rated by an LLM, checked by Youssef): verdict backed by snippets 10%, sentences supported yes/partly/no 25/50/25%, readability 3.7 |
 | Y4 (check) | Youssef | 2026-11-21 | `results/Y4/check_50.csv`: 50 translations checked (LLM pre-check, reviewed by Youssef), 27/50 correct (claims 13/25, snippets 14/25) |
+| R11 | Rathi | 2026-11-22 | branch `rathi/R11-final`: tables rebuilt for the final F3/F5 and Y5 results + `tab_onnx_int8`, README vision results, `docs/implementation.md` §9 (F2–F6, Y4–Y6, H7, hand-check, T1), MAAI901 review update, tag `v1.0.1` |

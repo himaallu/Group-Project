@@ -1,0 +1,15 @@
+\begin{table}[t]
+\centering
+\caption{ONNX FP32 vs INT8 on CPU: size, latency and test accuracy (500 images).}
+\label{tab:tab_onnx_int8}
+\begin{tabular}{lrrrrrrr}
+\toprule
+model & precision & ONNX MB & CPU ms (ONNX Runtime) & test images & accuracy & AUROC & same decision as PyTorch \\
+\midrule
+ResNet-50 (last 4 blocks) & FP32 & 94.0 & 96.19 & 500 & 0.512 & 0.626 & 1.000 \\
+ResNet-50 (last 4 blocks) & INT8 & 23.7 & 141.41 & 500 & 0.502 & 0.826 & 0.990 \\
+ViT-B/16 (last 4 blocks) & FP32 & 343.6 & 481.69 & 500 & 0.566 & 0.771 & 1.000 \\
+ViT-B/16 (last 4 blocks) & INT8 & 87.3 & 432.68 & 500 & 0.576 & 0.770 & 0.982 \\
+\bottomrule
+\end{tabular}
+\end{table}
