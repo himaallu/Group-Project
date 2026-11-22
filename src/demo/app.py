@@ -29,7 +29,7 @@ import argparse
 import html
 import re
 
-from src.demo.examples import EXAMPLES
+from src.demo.examples import EXAMPLES, TWIN_EXAMPLES
 
 VERDICT_STYLE = {   # label -> (shown text, colour)
     "supported": ("Supported", "#1a7f37"),
@@ -131,10 +131,21 @@ def verdict_method() -> str:
     return "evidence rule (strongest entail vs strongest contradict snippet)"
 
 
-def format_results(results: list[dict], note: str = "") -> str:
-    """HTML for all claims, with an optional banner (e.g. "Illustrative example")."""
+def method_banner(method: str) -> str:
+    """A line above the results naming the verdict step; the rule stand-in is marked."""
+    if method.startswith("trained"):
+        return (f'<div style="background:#ddf4ff;padding:6px 10px;border-radius:6px;'
+                f'margin:4px 0">Verdict by: {html.escape(method)}</div>')
+    return ('<div style="background:#ffebe9;padding:6px 10px;border-radius:6px;margin:4px 0">'
+            f'<b>Rule stand-in, not the trained model.</b> Verdict by: {html.escape(method)}'
+            '</div>')
+
+
+def format_results(results: list[dict], note: str = "", method: str = "") -> str:
+    """HTML for all claims, with optional banners (e.g. "Illustrative example", verdict step)."""
     banner = (f'<div style="background:#fff8c5;padding:6px 10px;border-radius:6px">'
               f'{html.escape(note)}</div>') if note else ""
+    banner += method_banner(method) if method else ""
     if not results:
         return banner + "<p>No check-worthy claim found in the message.</p>"
     return banner + "".join(claim_card(r) for r in results)
@@ -145,7 +156,8 @@ def run_check(message: str, evidence_text: str, lang: str, note: str = "") -> st
     from src.pipeline import check
 
     lang = None if lang in (None, "", "auto") else lang
-    return format_results(check(message, parse_evidence(evidence_text), lang), note)
+    return format_results(check(message, parse_evidence(evidence_text), lang), note,
+                          verdict_method())
 
 
 def build_app():
@@ -169,14 +181,17 @@ def build_app():
                 output = gr.HTML()
         button.click(lambda m, e, l: run_check(m, e, l), [message, evidence, lang], output)
 
-        gr.Markdown(f"### Ready examples — {ILLUSTRATIVE}")
-        with gr.Row():
-            for ex in EXAMPLES:
-                b = gr.Button(f"{ex['title']}", size="sm")
-                b.click(lambda ex=ex: (ex["message"], "\n".join(ex["evidence"]), ex["lang"],
-                                       run_check(ex["message"], "\n".join(ex["evidence"]),
-                                                 ex["lang"], ILLUSTRATIVE)),
-                        None, [message, evidence, lang, output])
+        # Twin examples first: one claim and two of its twins, the core idea of the project.
+        for heading, group in ((f"### Twin examples — {ILLUSTRATIVE}", TWIN_EXAMPLES),
+                               (f"### Ready examples — {ILLUSTRATIVE}", EXAMPLES)):
+            gr.Markdown(heading)
+            with gr.Row():
+                for ex in group:
+                    b = gr.Button(f"{ex['title']}", size="sm")
+                    b.click(lambda ex=ex: (ex["message"], "\n".join(ex["evidence"]), ex["lang"],
+                                           run_check(ex["message"], "\n".join(ex["evidence"]),
+                                                     ex["lang"], ILLUSTRATIVE)),
+                            None, [message, evidence, lang, output])
         status = ", ".join(f"{k}: {v}" for k, v in component_status().items())
         gr.Markdown(f"<small>Verdict by: {html.escape(verdict_method())}. "
                     f"Components: {html.escape(status)}</small>")
@@ -184,7 +199,7 @@ def build_app():
 
 
 def run_examples(path: str) -> list[dict]:
-    """Run the six examples through ``check`` and save what the model says.
+    """Run the 3 twin examples and the 6 ready examples through ``check``; save the results.
 
     Returns:
         One row per example: title, lang, expected, and per claim the label,
@@ -196,7 +211,7 @@ def run_examples(path: str) -> list[dict]:
     from src.pipeline import check, component_status
 
     rows = []
-    for ex in EXAMPLES:
+    for ex in TWIN_EXAMPLES + EXAMPLES:
         results = check(ex["message"], ex["evidence"], ex["lang"])
         rows.append({"title": ex["title"], "lang": ex["lang"], "expected": ex["expected"],
                      "claims": [{"claim": r["claim"], "label": r["label"],
