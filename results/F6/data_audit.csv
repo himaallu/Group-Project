@@ -1,0 +1,7 @@
+split,class_name,generator,original_format,images,width_min,width_median,width_max,height_min,height_median,height_max,non_square
+test,fake,Stable Diffusion v1.4,PNG,1000,512,512.0,512,512,512.0,512,0
+test,real,real,JPEG,1000,75,500.0,2246,64,375.0,2816,976
+train,fake,BigGAN,PNG,5000,128,128.0,128,128,128.0,128,0
+train,real,real,JPEG,4000,66,500.0,4272,51,375.0,2848,3873
+validation,fake,BigGAN,PNG,1000,128,128.0,128,128,128.0,128,0
+validation,real,real,JPEG,1000,60,500.0,2953,97,375.0,3938,973
