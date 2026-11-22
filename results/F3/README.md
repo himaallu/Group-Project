@@ -1,48 +1,44 @@
-# F3: Authenticity probe, image leakage test and baselines on English originals (Feba)
+# F3: Authenticity detector, image leakage test and baselines (Feba)
 
 1. **What ran:**
-   - `notebooks/Feba_F3_authenticity_leakage.ipynb`: a camera vs AI probe on cached CLIP ViT-L/14 GenImage embeddings (F2), then a VERITE image–caption test on original photos and their VAE twins, comparing a decoupled model with a fused model that also sees the authenticity score.
+   - `notebooks/Feba_F3_authenticity_leakage.ipynb` on Colab (T4). Every GenImage image gets the same preprocessing, CLIP embeds it, and a linear detector learns real vs AI. The notebook checks how much the file format, size and other simple cues could give away, then scores camera, AI and edited images and runs the VERITE leakage test.
    - `src/eval/baselines/{claim_only,similarity}.py` on the MultiFC and AVeriTeC test originals.
 2. **Settings:**
-   - GenImage splits from F1: train 4,000 real + 5,000 BigGAN, validation 1,000 real + 1,000 BigGAN, test 1,000 real + 1,000 Stable Diffusion v1.4. Stable Diffusion is never seen in training or validation, so the test measures transfer to an unseen generator.
-   - Probe: logistic regression and linear SVM (C = 1) on the 768-d CLIP embeddings, seed 42. The probe table uses each model's default decision rule (probability 0.5 for LR, margin 0 for SVM). For the VERITE authenticity predictions, the LR threshold is chosen on validation (best F1, 0.79).
-   - VERITE: true and miscaptioned captions of the same photo (out-of-context excluded). 323 photos with an accepted VAE twin (SigLIP cosine ≥ 0.92): train 223, validation 49, test 51.
-   - Decoupled model: SigLIP 2 image–caption similarity only. Fused model: similarity, authenticity score and their product. Both are logistic regression with standard scaling, trained on original training photos only; twins are only evaluated.
-   - A pair is correct when the model gives the true caption a higher probability than the miscaptioned one. ALR is the share of pairs whose verdict changes between the original and the twin.
+   - GenImage split from F1: train 4,000 real + 5,000 BigGAN, validation 1,000 real + 1,000 BigGAN, test 1,000 real + 1,000 Stable Diffusion v1.4.
+   - Preprocessing for every image: pixels only, centre square crop, 96×96 bicubic, JPEG with the compression settings of one of 500 real training photos, greyscale share matched between real and AI in each split.
+   - CLIP `openai/clip-vit-large-patch14` (image tower, FP16, 768-d). Logistic regression and linear SVM (C = 1), seed 42. Tables use the default decision rule (probability 0.5, margin 0); `F3_probe_results.csv` also has a validation-tuned threshold.
+   - VERITE: 218 photos with a VAE twin from F2 (train 150, validation 32, test 36). Decoupled, fused and fused + image embedding models, logistic regression, trained on original training photos only.
    - Claim-only: TF-IDF + logistic regression. Similarity: 12 features + LightGBM, seeds 42/43/44.
-3. **W&B:** the notebook does not log to W&B. The baseline runs `F4-claim_only-s42` and `F4-similarity-s4*` were logged offline on Feba's laptop and still need `wandb sync wandb/offline-run-*`.
-4. **Key numbers** (from the CSVs):
+3. **W&B:** not used. The notebook runs the baselines with `--no-wandb`.
+4. **Key numbers:**
 
-   Authenticity probe, unseen-generator test (`F3_FINAL_SUMMARY.csv`):
-
-   | Model | AUROC | Accuracy | Precision | Recall | F1 |
-   |---|---:|---:|---:|---:|---:|
-   | Logistic regression | 0.860 | 0.510 | 0.857 | 0.024 | 0.047 |
-   | Linear SVM | 0.903 | 0.507 | 1.000 | 0.014 | 0.028 |
-
-   The probe ranks Stable Diffusion images above real ones, but at the default decision rule it flags almost none of them (the validation-selected threshold flags even fewer: recall 0.001), so it does not transfer well to the unseen generator. On VERITE, mean authenticity score goes from 0.025 (original) to 0.031 (twin), and 0/323 binary predictions change (`F3_VERITE_authenticity_probe_original_twin_scores.csv`).
-
-   VERITE pair verdicts (`F3_corrected_pair_ALR_summary.csv`; all-pairs row from `F3_decoupled_similarity_baseline_summary.json`):
-
-   | Split | Model | Original acc. | Twin acc. | Changed | ALR |
+   | Input | Model | BigGAN acc. | SD v1.4 acc. | SD v1.4 AUROC | SD v1.4 recall |
    |---|---|---:|---:|---:|---:|
-   | All 323 pairs | Decoupled | 56.7% | 54.2% | 30 | 9.3% |
-   | Validation (49) | Decoupled | 53.1% | 49.0% | 6 | 12.2% |
-   | Validation (49) | Fused | 53.1% | 49.0% | 6 | 12.2% |
-   | Test (51) | Decoupled | 60.8% | 60.8% | 4 | 7.8% |
-   | Test (51) | Fused | 60.8% | 60.8% | 4 | 7.8% |
+   | File format and size only | LR | 1.000 | 1.000 | 1.000 | 1.000 |
+   | Simple cues of the 96 px input | LR | 0.546 | 0.520 | 0.486 | 0.773 |
+   | F2 embeddings | LR | 0.995 | 0.496 | 0.536 | 0.002 |
+   | Detector | LR | 0.958 | 0.542 | 0.620 | 0.156 |
+   | Detector | SVM | 0.981 | 0.556 | 0.666 | 0.152 |
 
-   Caption-level test accuracy, original → twin: decoupled 52.9% → 51.0%, fused 52.0% → 52.0% (`F3_corrected_caption_metrics.csv`). Adding the authenticity score does not change pair verdicts or ALR, so there is no evidence here that fusion helps or hurts robustness to VAE twins.
+   | VERITE test (36 pairs) | Original acc. | Twin acc. | ALR |
+   |---|---:|---:|---:|
+   | Decoupled | 52.8% | 52.8% | 11.1% |
+   | Fused | 55.6% | 55.6% | 22.2% |
+   | Fused + image embedding | 55.6% | 52.8% | 25.0% |
 
-   Baselines on English originals: macro-F1 on MultiFC test, claim-only 0.481, similarity 0.385 ± 0.005 (`baselines_originals.csv`).
+   - Flagged as AI: real test photos 7.2%, BigGAN 98.0%, SD v1.4 15.6%, SDXL edits 24.6%, VERITE photos 1.8%, VERITE twins 3.2%.
+   - Baselines, MultiFC macro-F1: claim-only 0.482, similarity 0.385 ± 0.005.
 5. **Where files are:**
-   - `results/F3/`: `F3_FINAL_SUMMARY.csv` (all main numbers), `F3_VERITE_authenticity_probe_original_twin_scores.csv`, `F3_decoupled_similarity_baseline_{results.csv,summary.json}`, `F3_corrected_{caption_metrics,pair_ALR_summary,pair_verdicts}.csv` (decoupled vs fused).
-   - Baseline predictions are in `results/F3/baselines/`.
-   - The GenImage manifest the notebook builds (`data/processed/vision/f3_authenticity_manifest.csv`) and the embeddings it reads stay on Drive.
+   - `F3_probe_results.csv`: every input, model, split and threshold rule.
+   - `F3_camera_ai_edited.csv`, `F3_verite_authenticity_scores.csv`: detector scores by group and per VERITE photo.
+   - `F3_leakage_ALR.csv`, `F3_pair_verdicts.csv`, `F3_caption_metrics.csv`: VERITE leakage test.
+   - `F3_summary.csv`: main numbers in one table.
+   - `F3_FINAL_SUMMARY.csv`, `F3_corrected_pair_ALR_summary.csv`: the same detector and leakage numbers in the layout read by `src/eval/figures.py`.
+   - `baselines_originals.csv`, `baselines/`: baseline scores and predictions.
+   - Detector embeddings are on Drive: `MyDrive/TwinCheck/features/vision/genimage/clip_vitl14_debiased96/` (`embeddings_normalized.npy`, `embedding_manifest.csv`).
 
 **Limitations:**
-- VERITE is small (51 test pairs), so a single changed verdict moves ALR by about 2 points.
-- The VERITE set includes 12 twins that F2 later removed in its face screen (8 train, 2 validation, 2 test). F2 keeps 311 VERITE twins; these results use 323.
-- Probe recall on the unseen generator is very low, and only one unseen generator (Stable Diffusion v1.4) is tested.
-- The fusion features are simple (three numbers per caption).
-- ALR measures verdict stability, not correctness.
+- One unseen generator only (SD v1.4), and the detector still misses most of its images.
+- Content and style differences between real and AI images are not removed.
+- 34 real photos smaller than 96 px are enlarged.
+- VERITE test has 36 pairs, so one changed verdict moves ALR by 2.8 points.

@@ -1,0 +1,7 @@
+model,split,pairs,original_accuracy,twin_accuracy,changed_verdicts,ALR_percent
+decoupled,test,36,0.5277777777777778,0.5277777777777778,4,11.11111111111111
+fused,test,36,0.5555555555555556,0.5555555555555556,8,22.22222222222222
+fused + image embedding,test,36,0.5555555555555556,0.5277777777777778,9,25.0
+decoupled,validation,32,0.8125,0.71875,3,9.375
+fused,validation,32,0.78125,0.6875,5,15.625
+fused + image embedding,validation,32,0.78125,0.6875,3,9.375
