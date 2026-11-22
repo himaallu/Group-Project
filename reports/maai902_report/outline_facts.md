@@ -1,4 +1,4 @@
-# MAAI902 report: fact sheet per section (Himasri) — updated Sat 21 Nov (final experiments)
+# MAAI902 report: fact sheet per section (Himasri) — updated Sun 22 Nov (final, incl. Feba's debiased vision rerun)
 
 Facts and numbers only, each with the file it comes from. **Write every sentence in your own words** (Turnitin < 10%, and no paragraphs shared with the MAAI901 report or with the paper). Figures/tables already generated are marked [FIG] / [TAB]. "pp" = percentage points.
 
@@ -65,6 +65,7 @@ Facts and numbers only, each with the file it comes from. **Write every sentence
 - **Qwen3-4B fine-tuned as the verdict model** (seed 42, `bootstrap_llm4b.json`): originals → **F1 0.500** (best), ESR 0.306, unrelated 0.148, paraphrase 0.787; + twins → F1 0.442, ESR 0.673, unrelated 0.992, paraphrase 0.874 (twins: ESR +36.7, unrelated +84.4 pp, p < 0.001); MLP twin loss still higher ESR (+21.7, p < 0.001).
 - **Arabic / mixed twins (E7, `results/Y5/README.md`)**: fair system twin_noent — Arabic F1 0.597 vs English 0.605, unrelated 100% in both, cross-lingual consistency 73.9% (`_A`) / 79.5% (`_M`); twin (with entity features) 63.0% / 77.3%; notwin 62.4% (`_A`). X-FACT Arabic: all systems ≈ chance (0.19–0.33).
 - **Components:** retrieval recall@5 EN 0.945 / AR 0.92; reranker AUROC 0.980 → 0.998; explanation faithfulness 0.32; claim extraction 0.984 vs 0.786 rule (`results/R2`, `R5`, `Y3`).
+- **Design rule, image side (one sentence; details in MAAI901):** on VERITE, AI-fingerprinted image twins change 11.1% of verdicts when the verdict never sees the authenticity score, vs 22.2% when it is fused in and 25.0% with the image embedding too (36 test pairs, `results/F3/README.md`) — evidence for keeping authenticity out of the verdict.
 - **Human evaluation T1** (`results/T1/human_eval_summary.json`): EN agreement Himasri–Feba kappa verdict 0.49, sentences 0.35, readability 0.48 (weighted); verdict judged correct from the snippets 37.5% (Himasri) / 47.5% (Feba) EN, 10% AR (Youssef); fully supported notes 35% / 55% EN, 25% AR; readability 3.9 / 4.1 EN, 3.7 AR.
 
 ## 7. Analysis and limitations
