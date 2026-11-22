@@ -1,0 +1,2 @@
+group,missed_by_both,caught_by_vit_only,caught_by_resnet_only,caught_by_both
+Stable Diffusion v1.4 (test),872,115,2,11
