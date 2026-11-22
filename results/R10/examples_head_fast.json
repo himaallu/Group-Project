@@ -1,0 +1,130 @@
+{
+  "components": {
+    "extract_claims (Y3)": "real",
+    "get_evidence (R5)": "real",
+    "score_nli (R4)": "real",
+    "verdict (H3)": "real",
+    "calibrate (H4)": "real",
+    "explain (R5)": "real"
+  },
+  "verdict_method": "trained verdict head (H4, twin loss)",
+  "examples": [
+    {
+      "title": "Twin 1 · original (EN)",
+      "lang": "en",
+      "expected": "contradicted",
+      "claims": [
+        {
+          "claim": "Dubai Metro suspended all lines today because of heavy flooding.",
+          "label": "contradicted",
+          "confidence": 0.829,
+          "explanation": "Verdict: contradicted. Evidence: \"The RTA confirmed that the Red Line and the Green Line are operating normally today despite the heavy rain.\" [1]"
+        }
+      ]
+    },
+    {
+      "title": "Twin 2 · Arabic claim",
+      "lang": "ar",
+      "expected": "contradicted",
+      "claims": [
+        {
+          "claim": "مترو دبي أوقف جميع الخطوط اليوم بسبب الفيضانات الشديدة",
+          "label": "contradicted",
+          "confidence": 0.829,
+          "explanation": "الحكم: خاطئ. الدليل: \"The RTA confirmed that the Red Line and the Green Line are operating normally today despite the heavy rain.\" [1]"
+        }
+      ]
+    },
+    {
+      "title": "Twin 3 · unrelated evidence",
+      "lang": "en",
+      "expected": "unverified",
+      "claims": [
+        {
+          "claim": "Dubai Metro suspended all lines today because of heavy flooding.",
+          "label": "unverified",
+          "confidence": 0.971,
+          "explanation": "Verdict: unverified. Evidence: \"The Louvre Abu Dhabi will host a new exhibition of Islamic calligraphy next spring.\" [1]"
+        }
+      ]
+    },
+    {
+      "title": "Metro line reopens (EN)",
+      "lang": "en",
+      "expected": "supported",
+      "claims": [
+        {
+          "claim": "Dubai Metro's Red Line reopened on Monday after maintenance work.",
+          "label": "contradicted",
+          "confidence": 0.808,
+          "explanation": "Verdict: contradicted. Evidence: \"The RTA said the Red Line resumed full service on Monday after scheduled maintenance was completed.\" [1]"
+        }
+      ]
+    },
+    {
+      "title": "New metro station (AR)",
+      "lang": "ar",
+      "expected": "supported",
+      "claims": [
+        {
+          "claim": "افتتحت هيئة الطرق والمواصلات في دبي محطة مترو جديدة على الخط الأحمر.",
+          "label": "contradicted",
+          "confidence": 0.467,
+          "explanation": "الحكم: خاطئ. الدليل: \"أعلنت هيئة الطرق والمواصلات في دبي افتتاح محطة جديدة على الخط الأحمر للمترو.\" [1]"
+        }
+      ]
+    },
+    {
+      "title": "Schools closed for a month (EN)",
+      "lang": "en",
+      "expected": "contradicted",
+      "claims": [
+        {
+          "claim": "All schools in Abu Dhabi will close for a month because of heavy rain.",
+          "label": "contradicted",
+          "confidence": 0.745,
+          "explanation": "Verdict: contradicted. Evidence: \"Abu Dhabi's education authority said schools will move to remote learning for one day only because of the rain.\" [1]"
+        }
+      ]
+    },
+    {
+      "title": "Metro stopped by floods (mixed)",
+      "lang": "mixed",
+      "expected": "contradicted",
+      "claims": [
+        {
+          "claim": "مترو دبي أوقف all lines today بسبب heavy flooding in the city",
+          "label": "contradicted",
+          "confidence": 0.829,
+          "explanation": "الحكم: خاطئ. الدليل: \"The RTA confirmed that the Red Line and the Green Line are operating normally today despite the rain.\" [1]"
+        }
+      ]
+    },
+    {
+      "title": "New falcon species (EN)",
+      "lang": "en",
+      "expected": "unverified",
+      "claims": [
+        {
+          "claim": "A new species of falcon was discovered in the Hajar Mountains last week.",
+          "label": "supported",
+          "confidence": 0.491,
+          "explanation": "Verdict: supported. Evidence: \"The Hajar Mountains are a popular hiking destination during the winter months.\" [1]"
+        }
+      ]
+    },
+    {
+      "title": "Crewed Mars trip (AR)",
+      "lang": "ar",
+      "expected": "unverified",
+      "claims": [
+        {
+          "claim": "ستطلق الإمارات رحلة مأهولة إلى المريخ العام المقبل.",
+          "label": "contradicted",
+          "confidence": 0.531,
+          "explanation": "الحكم: خاطئ. الدليل: \"يزور ملايين السياح دبي كل عام للاستمتاع بالشواطئ والتسوق.\" [1]"
+        }
+      ]
+    }
+  ]
+}
