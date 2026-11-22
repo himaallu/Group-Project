@@ -23,9 +23,10 @@
    | GenImage SDXL | 500 | – | 440 (191 real, 249 SD) |
 
    - `vae.jsonl`: 436 `_V` records from the 218 VERITE twins (train 300, val 64, test 72).
+   - `m4fc_vae.jsonl`: 42 `_V` records from the 21 M4FC twins (21 supported, 21 contradicted, test).
 5. **Where files are:**
    - `features/vision/`: embedding row manifests. The `.npy` arrays are on Drive (`MyDrive/TwinCheck/features/vision/`).
-   - `data/copies/vision/`: twin tables, similarity tables, `manifests/vae_manifest.csv`, `vae.jsonl`.
+   - `data/copies/vision/`: twin tables, similarity tables, `manifests/vae_manifest.csv`, `vae.jsonl`, `m4fc_vae.jsonl`.
    - `data/processed/vision/m4fc_f2_clean_manifest.csv`.
    - `results/F2/summaries/`: step summaries (JSON).
    - Images (originals and twins) stay on Drive, not in git.
@@ -33,5 +34,4 @@
 **Limitations:**
 - GenImage embeddings come from the 256×256 copies, where BigGAN images have a grey border.
 - SDXL twins use a lower threshold (0.70) and include AI-image sources.
-- M4FC twins have no `_V` records: Y1 labels their claims contradicted, in the test split.
 - Only 30 VERITE pairs were checked by eye.

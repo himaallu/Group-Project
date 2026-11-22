@@ -2,11 +2,13 @@
 
 Run: python -m pytest tests/vision -q
 """
+import json
+
 import pandas as pd
 
 from src.eval.loaders import validate_record
 from src.vision.load_verite import image_split, to_records
-from src.vision.make_twin_records import records_by_image, twin_records
+from src.vision.make_twin_records import m4fc_manifest, records_by_image, twin_records
 
 
 def fake_verite(n_true: int = 10) -> pd.DataFrame:
@@ -43,4 +45,22 @@ def test_twins_copy_every_record_of_the_image():
     assert [t["id"] for t in twins] == ["verite_000000_V", "verite_000001_V"]
     assert [t["label"] for t in twins] == ["supported", "contradicted"]
     assert all(t["image_path"] == "twin/true_0_V.jpg" for t in twins)
+    assert all(validate_record(t) == [] for t in twins)
+
+
+def test_m4fc_twins_take_the_source_split():
+    records = [{"id": "m4fc_000010", "split": "test", "image_path": "m4fc_images/m4fc_000010.jpg", "label": "contradicted"},
+               {"id": "m4fc_tc_000010", "split": "test", "image_path": "m4fc_images/m4fc_000010.jpg", "label": "supported"}]
+    manifest = pd.DataFrame([{"image_id": "m4fc_000010", "dataset": "M4FC", "split": None, "method": "VAE",
+                              "twin_image_path": "twin/m4fc_000010.jpg", "similarity": 0.92}])
+    twins = twin_records(manifest, records_by_image(records))
+    assert [t["id"] for t in twins] == ["m4fc_000010_V", "m4fc_tc_000010_V"]
+    assert [(t["split"], t["label"]) for t in twins] == [("test", "contradicted"), ("test", "supported")]
+
+
+def test_m4fc_twin_file_has_21_pairs():
+    assert len(m4fc_manifest()) == 21
+    twins = [json.loads(line) for line in open("data/copies/vision/m4fc_vae.jsonl", encoding="utf-8")]
+    assert len(twins) == 42 and {t["split"] for t in twins} == {"test"}
+    assert sorted(t["label"] for t in twins) == ["contradicted"] * 21 + ["supported"] * 21
     assert all(validate_record(t) == [] for t in twins)
