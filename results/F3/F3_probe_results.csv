@@ -1,0 +1,25 @@
+input,model,split,threshold_rule,threshold,accuracy,balanced_accuracy,precision,recall,f1,auroc,real_flagged_as_ai
+original file format and size (never given to the detector),logistic regression,seen generator (BigGAN),default,0.5,1.0,1.0,1.0,1.0,1.0,1.0,0.0
+original file format and size (never given to the detector),logistic regression,seen generator (BigGAN),validation-tuned,0.9993615384234837,1.0,1.0,1.0,1.0,1.0,1.0,0.0
+original file format and size (never given to the detector),logistic regression,unseen generator (SD v1.4),default,0.5,1.0,1.0,1.0,1.0,1.0,1.0,0.0
+original file format and size (never given to the detector),logistic regression,unseen generator (SD v1.4),validation-tuned,0.9993615384234837,0.5,0.5,0.0,0.0,0.0,1.0,0.0
+F2 embeddings (256 padded copies),logistic regression,seen generator (BigGAN),default,0.5,0.995,0.995,0.9910714285714286,0.999,0.9950199203187251,0.9999439999999999,0.009
+F2 embeddings (256 padded copies),logistic regression,seen generator (BigGAN),validation-tuned,0.632158936569501,0.9965,0.9964999999999999,0.9950149551345963,0.998,0.9965052421367948,0.9999439999999999,0.005
+F2 embeddings (256 padded copies),logistic regression,unseen generator (SD v1.4),default,0.5,0.4965,0.4965,0.18181818181818182,0.002,0.003956478733926805,0.536376,0.009
+F2 embeddings (256 padded copies),logistic regression,unseen generator (SD v1.4),validation-tuned,0.632158936569501,0.4965,0.4965,0.1111111111111111,0.001,0.0019821605550049554,0.536376,0.008
+F2 embeddings (256 padded copies),linear SVM,seen generator (BigGAN),default,0.0,0.999,0.999,0.998003992015968,1.0,0.999000999000999,0.999991,0.002
+F2 embeddings (256 padded copies),linear SVM,seen generator (BigGAN),validation-tuned,0.06384091044554685,0.9995,0.9995,0.999000999000999,1.0,0.9995002498750625,0.999991,0.001
+F2 embeddings (256 padded copies),linear SVM,unseen generator (SD v1.4),default,0.0,0.498,0.498,0.16666666666666666,0.001,0.0019880715705765406,0.528237,0.005
+F2 embeddings (256 padded copies),linear SVM,unseen generator (SD v1.4),validation-tuned,0.06384091044554685,0.498,0.498,0.16666666666666666,0.001,0.0019880715705765406,0.528237,0.005
+"detector input cues (grayscale, JPEG blockiness)",logistic regression,seen generator (BigGAN),default,0.5,0.5455,0.5455,0.5291106845809341,0.827,0.6453374951229028,0.6072310000000001,0.736
+"detector input cues (grayscale, JPEG blockiness)",logistic regression,seen generator (BigGAN),validation-tuned,0.4498627053142265,0.519,0.519,0.5098958333333333,0.979,0.6705479452054794,0.6072310000000001,0.941
+"detector input cues (grayscale, JPEG blockiness)",logistic regression,unseen generator (SD v1.4),default,0.5,0.5195,0.5195000000000001,0.5129396151293961,0.773,0.6166733147187874,0.48571600000000004,0.734
+"detector input cues (grayscale, JPEG blockiness)",logistic regression,unseen generator (SD v1.4),validation-tuned,0.4498627053142265,0.495,0.495,0.49732905982905984,0.931,0.6483286908077994,0.48571600000000004,0.941
+debiased 96 px CLIP embeddings (detector),logistic regression,seen generator (BigGAN),default,0.5,0.9585,0.9585,0.9395973154362416,0.98,0.9593734703866863,0.9923659999999999,0.063
+debiased 96 px CLIP embeddings (detector),logistic regression,seen generator (BigGAN),validation-tuned,0.5910399770018057,0.964,0.964,0.9649298597194389,0.963,0.963963963963964,0.9923659999999999,0.035
+debiased 96 px CLIP embeddings (detector),logistic regression,unseen generator (SD v1.4),default,0.5,0.542,0.542,0.6842105263157895,0.156,0.254071661237785,0.6201789999999999,0.072
+debiased 96 px CLIP embeddings (detector),logistic regression,unseen generator (SD v1.4),validation-tuned,0.5910399770018057,0.538,0.538,0.7345679012345679,0.119,0.20481927710843373,0.6201789999999999,0.043
+debiased 96 px CLIP embeddings (detector),linear SVM,seen generator (BigGAN),default,0.0,0.981,0.981,0.9715686274509804,0.991,0.9811881188118812,0.9964249999999999,0.029
+debiased 96 px CLIP embeddings (detector),linear SVM,seen generator (BigGAN),validation-tuned,0.08377174270603582,0.983,0.983,0.9782178217821782,0.988,0.9830845771144279,0.9964249999999999,0.022
+debiased 96 px CLIP embeddings (detector),linear SVM,unseen generator (SD v1.4),default,0.0,0.5555,0.5555,0.7875647668393783,0.152,0.2548197820620285,0.6658930000000001,0.041
+debiased 96 px CLIP embeddings (detector),linear SVM,unseen generator (SD v1.4),validation-tuned,0.08377174270603582,0.55,0.55,0.8048780487804879,0.132,0.2268041237113402,0.6658930000000001,0.032

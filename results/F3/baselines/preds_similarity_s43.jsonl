@@ -1,7 +1,7 @@
 {"id": "multifc_000001", "pred_label": "contradicted", "probs": {"supported": 0.36092383953798873, "contradicted": 0.6016118881826565, "unverified": 0.037464272279354796}}
 {"id": "multifc_000016", "pred_label": "supported", "probs": {"supported": 0.611747952270687, "contradicted": 0.36191006077610616, "unverified": 0.026341986953206886}}
 {"id": "multifc_000024", "pred_label": "contradicted", "probs": {"supported": 0.10124180781817532, "contradicted": 0.8932628345007055, "unverified": 0.005495357681119232}}
-{"id": "multifc_000047", "pred_label": "supported", "probs": {"supported": 0.5755055244949665, "contradicted": 0.27953173647771046, "unverified": 0.144962739027323}}
+{"id": "multifc_000047", "pred_label": "supported", "probs": {"supported": 0.5755055244949666, "contradicted": 0.27953173647771046, "unverified": 0.14496273902732304}}
 {"id": "multifc_000064", "pred_label": "unverified", "probs": {"supported": 0.27981478241692465, "contradicted": 0.2893473838939383, "unverified": 0.430837833689137}}
 {"id": "multifc_000106", "pred_label": "contradicted", "probs": {"supported": 0.18747927746676282, "contradicted": 0.7858929696225601, "unverified": 0.026627752910677198}}
 {"id": "multifc_000107", "pred_label": "supported", "probs": {"supported": 0.5147080678307158, "contradicted": 0.47090799997978233, "unverified": 0.01438393218950198}}
@@ -46,7 +46,7 @@
 {"id": "multifc_000797", "pred_label": "supported", "probs": {"supported": 0.8262639408963854, "contradicted": 0.16888252272623974, "unverified": 0.004853536377374814}}
 {"id": "multifc_000804", "pred_label": "contradicted", "probs": {"supported": 0.3809762912456068, "contradicted": 0.6171163112846394, "unverified": 0.0019073974697539147}}
 {"id": "multifc_000808", "pred_label": "unverified", "probs": {"supported": 0.2769175962821573, "contradicted": 0.3387090255316537, "unverified": 0.38437337818618894}}
-{"id": "multifc_000810", "pred_label": "supported", "probs": {"supported": 0.4954385349000021, "contradicted": 0.35213883043120714, "unverified": 0.15242263466879083}}
+{"id": "multifc_000810", "pred_label": "supported", "probs": {"supported": 0.49543853490000217, "contradicted": 0.35213883043120714, "unverified": 0.1524226346687908}}
 {"id": "multifc_000812", "pred_label": "supported", "probs": {"supported": 0.510109703547896, "contradicted": 0.4521553396563327, "unverified": 0.037734956795771414}}
 {"id": "multifc_000829", "pred_label": "supported", "probs": {"supported": 0.6261929645016133, "contradicted": 0.3558431887251737, "unverified": 0.017963846773213065}}
 {"id": "multifc_000882", "pred_label": "supported", "probs": {"supported": 0.3613602317898372, "contradicted": 0.3577682853084761, "unverified": 0.2808714829016867}}
@@ -291,7 +291,7 @@
 {"id": "multifc_004151", "pred_label": "contradicted", "probs": {"supported": 0.16652485999202268, "contradicted": 0.47844315740397814, "unverified": 0.35503198260399915}}
 {"id": "multifc_004163", "pred_label": "contradicted", "probs": {"supported": 0.37135594836655605, "contradicted": 0.5395101213697501, "unverified": 0.08913393026369394}}
 {"id": "multifc_004191", "pred_label": "supported", "probs": {"supported": 0.493347433561736, "contradicted": 0.2853656070273186, "unverified": 0.2212869594109453}}
-{"id": "multifc_004205", "pred_label": "contradicted", "probs": {"supported": 0.3276589128715216, "contradicted": 0.4929365991152782, "unverified": 0.17940448801320016}}
+{"id": "multifc_004205", "pred_label": "contradicted", "probs": {"supported": 0.3276589128715216, "contradicted": 0.4929365991152782, "unverified": 0.1794044880132002}}
 {"id": "multifc_004216", "pred_label": "contradicted", "probs": {"supported": 0.26273543059430016, "contradicted": 0.6275581277985107, "unverified": 0.1097064416071892}}
 {"id": "multifc_004287", "pred_label": "supported", "probs": {"supported": 0.6505792941335438, "contradicted": 0.34046786309666754, "unverified": 0.008952842769788836}}
 {"id": "multifc_004292", "pred_label": "contradicted", "probs": {"supported": 0.10127944775333703, "contradicted": 0.8346525177315758, "unverified": 0.06406803451508705}}
@@ -307,7 +307,7 @@
 {"id": "multifc_004396", "pred_label": "supported", "probs": {"supported": 0.40357756136839484, "contradicted": 0.3438884040651444, "unverified": 0.2525340345664608}}
 {"id": "multifc_004401", "pred_label": "supported", "probs": {"supported": 0.49381868007667185, "contradicted": 0.3522987373848339, "unverified": 0.1538825825384943}}
 {"id": "multifc_004404", "pred_label": "contradicted", "probs": {"supported": 0.44783264373212905, "contradicted": 0.5295365268005272, "unverified": 0.02263082946734379}}
-{"id": "multifc_004416", "pred_label": "contradicted", "probs": {"supported": 0.23174742465814563, "contradicted": 0.7332016553986411, "unverified": 0.03505091994321318}}
+{"id": "multifc_004416", "pred_label": "contradicted", "probs": {"supported": 0.23174742465814563, "contradicted": 0.7332016553986411, "unverified": 0.035050919943213174}}
 {"id": "multifc_004426", "pred_label": "contradicted", "probs": {"supported": 0.26126160973900625, "contradicted": 0.6113685867980664, "unverified": 0.1273698034629273}}
 {"id": "multifc_004428", "pred_label": "contradicted", "probs": {"supported": 0.18865145944997824, "contradicted": 0.7226692700255657, "unverified": 0.08867927052445611}}
 {"id": "multifc_004429", "pred_label": "supported", "probs": {"supported": 0.4919465398638222, "contradicted": 0.48334259510499344, "unverified": 0.024710865031184328}}
@@ -371,12 +371,12 @@
 {"id": "multifc_005299", "pred_label": "contradicted", "probs": {"supported": 0.41642852771290684, "contradicted": 0.5721281656805639, "unverified": 0.01144330660652936}}
 {"id": "multifc_005300", "pred_label": "contradicted", "probs": {"supported": 0.4038992190732127, "contradicted": 0.590894883816155, "unverified": 0.005205897110632511}}
 {"id": "multifc_005301", "pred_label": "contradicted", "probs": {"supported": 0.4570503538429796, "contradicted": 0.537781116744596, "unverified": 0.005168529412424398}}
-{"id": "multifc_005316", "pred_label": "contradicted", "probs": {"supported": 0.43867488252883774, "contradicted": 0.5012769879446257, "unverified": 0.060048129526536535}}
+{"id": "multifc_005316", "pred_label": "contradicted", "probs": {"supported": 0.43867488252883774, "contradicted": 0.5012769879446257, "unverified": 0.06004812952653653}}
 {"id": "multifc_005347", "pred_label": "contradicted", "probs": {"supported": 0.27541336269639566, "contradicted": 0.7237961578108683, "unverified": 0.0007904794927361159}}
 {"id": "multifc_005348", "pred_label": "supported", "probs": {"supported": 0.6442735485141269, "contradicted": 0.3528349418241014, "unverified": 0.0028915096617716245}}
 {"id": "multifc_005365", "pred_label": "supported", "probs": {"supported": 0.60544272441043, "contradicted": 0.3905893524491891, "unverified": 0.003967923140380945}}
 {"id": "multifc_005428", "pred_label": "contradicted", "probs": {"supported": 0.3787723503961065, "contradicted": 0.49055825468408465, "unverified": 0.13066939491980886}}
-{"id": "multifc_005455", "pred_label": "supported", "probs": {"supported": 0.43187208006458355, "contradicted": 0.3600663042273441, "unverified": 0.20806161570807236}}
+{"id": "multifc_005455", "pred_label": "supported", "probs": {"supported": 0.43187208006458355, "contradicted": 0.3600663042273441, "unverified": 0.20806161570807233}}
 {"id": "multifc_005473", "pred_label": "unverified", "probs": {"supported": 0.27927042185848916, "contradicted": 0.23059072804076558, "unverified": 0.4901388501007453}}
 {"id": "multifc_005480", "pred_label": "supported", "probs": {"supported": 0.5799657535367573, "contradicted": 0.4180277386826862, "unverified": 0.0020065077805565355}}
 {"id": "multifc_005525", "pred_label": "supported", "probs": {"supported": 0.669988488653647, "contradicted": 0.23888911131806442, "unverified": 0.09112240002828859}}
@@ -498,7 +498,7 @@
 {"id": "multifc_007533", "pred_label": "contradicted", "probs": {"supported": 0.317439334307814, "contradicted": 0.6398838022718506, "unverified": 0.04267686342033538}}
 {"id": "multifc_007556", "pred_label": "contradicted", "probs": {"supported": 0.31840992471947727, "contradicted": 0.677683012058863, "unverified": 0.003907063221659628}}
 {"id": "multifc_007566", "pred_label": "contradicted", "probs": {"supported": 0.2075145101645847, "contradicted": 0.7886744242684743, "unverified": 0.0038110655669410325}}
-{"id": "multifc_007587", "pred_label": "contradicted", "probs": {"supported": 0.4610412806629431, "contradicted": 0.5062263193891371, "unverified": 0.032732399947919946}}
+{"id": "multifc_007587", "pred_label": "contradicted", "probs": {"supported": 0.4610412806629431, "contradicted": 0.5062263193891371, "unverified": 0.03273239994791994}}
 {"id": "multifc_007602", "pred_label": "supported", "probs": {"supported": 0.4789948120269477, "contradicted": 0.3446765527727673, "unverified": 0.176328635200285}}
 {"id": "multifc_007605", "pred_label": "contradicted", "probs": {"supported": 0.37183383047639723, "contradicted": 0.6119372235815014, "unverified": 0.01622894594210147}}
 {"id": "multifc_007611", "pred_label": "supported", "probs": {"supported": 0.4855232326363932, "contradicted": 0.38874317022062327, "unverified": 0.12573359714298366}}
@@ -527,7 +527,7 @@
 {"id": "multifc_008118", "pred_label": "supported", "probs": {"supported": 0.5403918425221068, "contradicted": 0.44004578693498114, "unverified": 0.019562370542911926}}
 {"id": "multifc_008121", "pred_label": "supported", "probs": {"supported": 0.6400670343157924, "contradicted": 0.355953880370262, "unverified": 0.003979085313945744}}
 {"id": "multifc_008131", "pred_label": "contradicted", "probs": {"supported": 0.44353089120513095, "contradicted": 0.4878863009501369, "unverified": 0.06858280784473217}}
-{"id": "multifc_008133", "pred_label": "contradicted", "probs": {"supported": 0.27577712381864783, "contradicted": 0.7102375131700427, "unverified": 0.013985363011309473}}
+{"id": "multifc_008133", "pred_label": "contradicted", "probs": {"supported": 0.27577712381864783, "contradicted": 0.7102375131700427, "unverified": 0.01398536301130947}}
 {"id": "multifc_008134", "pred_label": "contradicted", "probs": {"supported": 0.43897798256933845, "contradicted": 0.4424141239319142, "unverified": 0.11860789349874741}}
 {"id": "multifc_008152", "pred_label": "supported", "probs": {"supported": 0.5256876887546097, "contradicted": 0.44799524134593927, "unverified": 0.026317069899451203}}
 {"id": "multifc_008166", "pred_label": "contradicted", "probs": {"supported": 0.21963207068633445, "contradicted": 0.6860019469111237, "unverified": 0.09436598240254185}}
@@ -702,7 +702,7 @@
 {"id": "multifc_010331", "pred_label": "contradicted", "probs": {"supported": 0.21878203320727146, "contradicted": 0.5825412744196942, "unverified": 0.19867669237303448}}
 {"id": "multifc_010338", "pred_label": "contradicted", "probs": {"supported": 0.3499339115248136, "contradicted": 0.6345587842334511, "unverified": 0.015507304241735206}}
 {"id": "multifc_010347", "pred_label": "supported", "probs": {"supported": 0.6174657120188829, "contradicted": 0.3376256690060761, "unverified": 0.04490861897504098}}
-{"id": "multifc_010362", "pred_label": "contradicted", "probs": {"supported": 0.19744797642341783, "contradicted": 0.5029477226427187, "unverified": 0.2996043009338635}}
+{"id": "multifc_010362", "pred_label": "contradicted", "probs": {"supported": 0.19744797642341783, "contradicted": 0.5029477226427187, "unverified": 0.2996043009338634}}
 {"id": "multifc_010365", "pred_label": "supported", "probs": {"supported": 0.46554762213253154, "contradicted": 0.401034741753724, "unverified": 0.13341763611374452}}
 {"id": "multifc_010367", "pred_label": "supported", "probs": {"supported": 0.6341863171125453, "contradicted": 0.3527401458823291, "unverified": 0.01307353700512555}}
 {"id": "multifc_010374", "pred_label": "supported", "probs": {"supported": 0.44262291517379393, "contradicted": 0.33969187516412275, "unverified": 0.21768520966208346}}
@@ -856,7 +856,7 @@
 {"id": "multifc_012568", "pred_label": "supported", "probs": {"supported": 0.5904070487478824, "contradicted": 0.3672176102705671, "unverified": 0.04237534098155046}}
 {"id": "multifc_012569", "pred_label": "contradicted", "probs": {"supported": 0.3494192798829648, "contradicted": 0.6468272602603617, "unverified": 0.003753459856673564}}
 {"id": "multifc_012580", "pred_label": "supported", "probs": {"supported": 0.5774208293242281, "contradicted": 0.3825397650275393, "unverified": 0.04003940564823266}}
-{"id": "multifc_012597", "pred_label": "supported", "probs": {"supported": 0.6000310060541516, "contradicted": 0.39331450659860007, "unverified": 0.006654487347248354}}
+{"id": "multifc_012597", "pred_label": "supported", "probs": {"supported": 0.6000310060541516, "contradicted": 0.3933145065986, "unverified": 0.006654487347248354}}
 {"id": "multifc_012611", "pred_label": "supported", "probs": {"supported": 0.6338748534933263, "contradicted": 0.36146385236772566, "unverified": 0.004661294138948004}}
 {"id": "multifc_012612", "pred_label": "contradicted", "probs": {"supported": 0.28531315546518987, "contradicted": 0.3585041899370949, "unverified": 0.35618265459771525}}
 {"id": "multifc_012636", "pred_label": "contradicted", "probs": {"supported": 0.31319860346281303, "contradicted": 0.686112634975532, "unverified": 0.000688761561655016}}
@@ -907,7 +907,7 @@
 {"id": "multifc_013398", "pred_label": "supported", "probs": {"supported": 0.6917650117262186, "contradicted": 0.30562415738448917, "unverified": 0.0026108308892922485}}
 {"id": "multifc_013426", "pred_label": "supported", "probs": {"supported": 0.5309514387141937, "contradicted": 0.3912516519430571, "unverified": 0.07779690934274916}}
 {"id": "multifc_013434", "pred_label": "contradicted", "probs": {"supported": 0.48655556191301363, "contradicted": 0.5119850542411261, "unverified": 0.001459383845860252}}
-{"id": "multifc_013465", "pred_label": "contradicted", "probs": {"supported": 0.3283360191871373, "contradicted": 0.5922983236874582, "unverified": 0.07936565712540458}}
+{"id": "multifc_013465", "pred_label": "contradicted", "probs": {"supported": 0.3283360191871373, "contradicted": 0.5922983236874582, "unverified": 0.0793656571254046}}
 {"id": "multifc_013485", "pred_label": "contradicted", "probs": {"supported": 0.3908758682416927, "contradicted": 0.606317707688045, "unverified": 0.0028064240702623962}}
 {"id": "multifc_013498", "pred_label": "supported", "probs": {"supported": 0.63888784575749, "contradicted": 0.3578983305711975, "unverified": 0.0032138236713124043}}
 {"id": "multifc_013502", "pred_label": "supported", "probs": {"supported": 0.6785551874720234, "contradicted": 0.31473254797523376, "unverified": 0.006712264552742825}}
@@ -943,7 +943,7 @@
 {"id": "multifc_013990", "pred_label": "contradicted", "probs": {"supported": 0.36466291300679565, "contradicted": 0.5589846069802767, "unverified": 0.07635248001292766}}
 {"id": "multifc_013995", "pred_label": "supported", "probs": {"supported": 0.6112746159044387, "contradicted": 0.3596162727527371, "unverified": 0.029109111342824196}}
 {"id": "multifc_014027", "pred_label": "contradicted", "probs": {"supported": 0.03713736964886915, "contradicted": 0.9449368946549327, "unverified": 0.017925735696198167}}
-{"id": "multifc_014063", "pred_label": "contradicted", "probs": {"supported": 0.4936272951522198, "contradicted": 0.5044177765489586, "unverified": 0.0019549282988217667}}
+{"id": "multifc_014063", "pred_label": "contradicted", "probs": {"supported": 0.49362729515221976, "contradicted": 0.5044177765489586, "unverified": 0.0019549282988217667}}
 {"id": "multifc_014078", "pred_label": "contradicted", "probs": {"supported": 0.2756409208617476, "contradicted": 0.6691232681877368, "unverified": 0.05523581095051572}}
 {"id": "multifc_014082", "pred_label": "supported", "probs": {"supported": 0.6068270108739925, "contradicted": 0.3896215524002262, "unverified": 0.003551436725781268}}
 {"id": "multifc_014089", "pred_label": "contradicted", "probs": {"supported": 0.2767861486137419, "contradicted": 0.7079049933066426, "unverified": 0.015308858079615555}}
@@ -985,7 +985,7 @@
 {"id": "multifc_014778", "pred_label": "contradicted", "probs": {"supported": 0.22041118319065367, "contradicted": 0.6816915275456907, "unverified": 0.09789728926365565}}
 {"id": "multifc_014804", "pred_label": "contradicted", "probs": {"supported": 0.32671805831063033, "contradicted": 0.63689344244757, "unverified": 0.03638849924179981}}
 {"id": "multifc_014840", "pred_label": "supported", "probs": {"supported": 0.6304009256567644, "contradicted": 0.2688683849307245, "unverified": 0.10073068941251101}}
-{"id": "multifc_014848", "pred_label": "supported", "probs": {"supported": 0.550528275669151, "contradicted": 0.4475157810429277, "unverified": 0.001955943287921264}}
+{"id": "multifc_014848", "pred_label": "supported", "probs": {"supported": 0.550528275669151, "contradicted": 0.4475157810429277, "unverified": 0.0019559432879212636}}
 {"id": "multifc_014863", "pred_label": "supported", "probs": {"supported": 0.5048370084592547, "contradicted": 0.47665469080304634, "unverified": 0.018508300737699095}}
 {"id": "multifc_014892", "pred_label": "supported", "probs": {"supported": 0.5505541665833623, "contradicted": 0.4446322462186771, "unverified": 0.004813587197960611}}
 {"id": "multifc_014904", "pred_label": "supported", "probs": {"supported": 0.4236860632971343, "contradicted": 0.23393849887804244, "unverified": 0.3423754378248232}}
@@ -1033,7 +1033,7 @@
 {"id": "multifc_015583", "pred_label": "contradicted", "probs": {"supported": 0.46764863692162184, "contradicted": 0.5073089849411009, "unverified": 0.02504237813727729}}
 {"id": "multifc_015595", "pred_label": "contradicted", "probs": {"supported": 0.4045032390193804, "contradicted": 0.5891009569350286, "unverified": 0.0063958040455909925}}
 {"id": "multifc_015602", "pred_label": "contradicted", "probs": {"supported": 0.3489576427944607, "contradicted": 0.5934567436988497, "unverified": 0.05758561350668964}}
-{"id": "multifc_015605", "pred_label": "contradicted", "probs": {"supported": 0.4428560186202326, "contradicted": 0.4801096554735344, "unverified": 0.07703432590623303}}
+{"id": "multifc_015605", "pred_label": "contradicted", "probs": {"supported": 0.44285601862023266, "contradicted": 0.48010965547353446, "unverified": 0.07703432590623302}}
 {"id": "multifc_015625", "pred_label": "contradicted", "probs": {"supported": 0.43980721590417776, "contradicted": 0.5077798729945031, "unverified": 0.052412911101319154}}
 {"id": "multifc_015655", "pred_label": "supported", "probs": {"supported": 0.5317058815587558, "contradicted": 0.45330012317101, "unverified": 0.014993995270234376}}
 {"id": "multifc_015665", "pred_label": "contradicted", "probs": {"supported": 0.31681351177282, "contradicted": 0.3889046908985957, "unverified": 0.29428179732858417}}
@@ -1180,7 +1180,7 @@
 {"id": "multifc_017763", "pred_label": "contradicted", "probs": {"supported": 0.2384544034666054, "contradicted": 0.7002388721466065, "unverified": 0.06130672438678805}}
 {"id": "multifc_017776", "pred_label": "supported", "probs": {"supported": 0.5178050684823403, "contradicted": 0.473926986324646, "unverified": 0.008267945193013748}}
 {"id": "multifc_017792", "pred_label": "contradicted", "probs": {"supported": 0.3211842026853261, "contradicted": 0.5710956243107463, "unverified": 0.1077201730039276}}
-{"id": "multifc_017798", "pred_label": "supported", "probs": {"supported": 0.7518674854202959, "contradicted": 0.24384495510751877, "unverified": 0.0042875594721852915}}
+{"id": "multifc_017798", "pred_label": "supported", "probs": {"supported": 0.7518674854202958, "contradicted": 0.24384495510751872, "unverified": 0.004287559472185291}}
 {"id": "multifc_017809", "pred_label": "contradicted", "probs": {"supported": 0.21152468158549015, "contradicted": 0.7189464603210686, "unverified": 0.06952885809344128}}
 {"id": "multifc_017817", "pred_label": "contradicted", "probs": {"supported": 0.14428129899905556, "contradicted": 0.4716488439968021, "unverified": 0.38406985700414237}}
 {"id": "multifc_017827", "pred_label": "supported", "probs": {"supported": 0.6206070283257085, "contradicted": 0.3763521695508701, "unverified": 0.003040802123421531}}
@@ -1207,7 +1207,7 @@
 {"id": "multifc_018126", "pred_label": "supported", "probs": {"supported": 0.48702064538554163, "contradicted": 0.4241410814692692, "unverified": 0.08883827314518913}}
 {"id": "multifc_018135", "pred_label": "contradicted", "probs": {"supported": 0.2669340837821118, "contradicted": 0.7287011515892875, "unverified": 0.004364764628600653}}
 {"id": "multifc_018150", "pred_label": "contradicted", "probs": {"supported": 0.39725311063668645, "contradicted": 0.574353543370819, "unverified": 0.028393345992494635}}
-{"id": "multifc_018153", "pred_label": "supported", "probs": {"supported": 0.6051198738797249, "contradicted": 0.33409856540540084, "unverified": 0.06078156071487423}}
+{"id": "multifc_018153", "pred_label": "supported", "probs": {"supported": 0.6051198738797249, "contradicted": 0.33409856540540084, "unverified": 0.060781560714874214}}
 {"id": "multifc_018161", "pred_label": "contradicted", "probs": {"supported": 0.30340793088521145, "contradicted": 0.6641322205908746, "unverified": 0.032459848523913974}}
 {"id": "multifc_018180", "pred_label": "contradicted", "probs": {"supported": 0.29346050880297325, "contradicted": 0.7054729224487571, "unverified": 0.001066568748269677}}
 {"id": "multifc_018190", "pred_label": "contradicted", "probs": {"supported": 0.13789528032842432, "contradicted": 0.8164772059301452, "unverified": 0.045627513741430654}}
@@ -1216,7 +1216,7 @@
 {"id": "multifc_018264", "pred_label": "contradicted", "probs": {"supported": 0.319565513354774, "contradicted": 0.4993813413303933, "unverified": 0.1810531453148327}}
 {"id": "multifc_018278", "pred_label": "contradicted", "probs": {"supported": 0.10554701724648266, "contradicted": 0.8614670549246971, "unverified": 0.03298592782882017}}
 {"id": "multifc_018284", "pred_label": "contradicted", "probs": {"supported": 0.36981549243494405, "contradicted": 0.6203731092734698, "unverified": 0.009811398291586195}}
-{"id": "multifc_018286", "pred_label": "supported", "probs": {"supported": 0.542700719677938, "contradicted": 0.45406182490844443, "unverified": 0.003237455413617633}}
+{"id": "multifc_018286", "pred_label": "supported", "probs": {"supported": 0.542700719677938, "contradicted": 0.45406182490844443, "unverified": 0.0032374554136176325}}
 {"id": "multifc_018291", "pred_label": "contradicted", "probs": {"supported": 0.34225631396682193, "contradicted": 0.37050935682359426, "unverified": 0.28723432920958386}}
 {"id": "multifc_018319", "pred_label": "contradicted", "probs": {"supported": 0.27543502540276804, "contradicted": 0.7227590215433223, "unverified": 0.0018059530539096427}}
 {"id": "multifc_018341", "pred_label": "supported", "probs": {"supported": 0.6379038774076643, "contradicted": 0.3469229650658906, "unverified": 0.015173157526445196}}
@@ -1358,7 +1358,7 @@
 {"id": "multifc_020636", "pred_label": "contradicted", "probs": {"supported": 0.1979420068809857, "contradicted": 0.7895455705968925, "unverified": 0.01251242252212194}}
 {"id": "multifc_020637", "pred_label": "contradicted", "probs": {"supported": 0.23458524498183408, "contradicted": 0.599907157175438, "unverified": 0.1655075978427279}}
 {"id": "multifc_020656", "pred_label": "supported", "probs": {"supported": 0.7885077283335234, "contradicted": 0.18665566085112503, "unverified": 0.02483661081535145}}
-{"id": "multifc_020657", "pred_label": "contradicted", "probs": {"supported": 0.35092549913337445, "contradicted": 0.6424481161015559, "unverified": 0.006626384765069688}}
+{"id": "multifc_020657", "pred_label": "contradicted", "probs": {"supported": 0.3509254991333744, "contradicted": 0.6424481161015559, "unverified": 0.006626384765069688}}
 {"id": "multifc_020675", "pred_label": "supported", "probs": {"supported": 0.6840323763533079, "contradicted": 0.3097738936033115, "unverified": 0.006193730043380593}}
 {"id": "multifc_020688", "pred_label": "contradicted", "probs": {"supported": 0.17002016277326465, "contradicted": 0.80424120618023, "unverified": 0.025738631046505374}}
 {"id": "multifc_020689", "pred_label": "supported", "probs": {"supported": 0.6745277319964769, "contradicted": 0.3097393615006292, "unverified": 0.01573290650289397}}
@@ -1686,7 +1686,7 @@
 {"id": "multifc_025250", "pred_label": "supported", "probs": {"supported": 0.83570159555735, "contradicted": 0.15872089371933298, "unverified": 0.00557751072331701}}
 {"id": "multifc_025283", "pred_label": "supported", "probs": {"supported": 0.4862317638530207, "contradicted": 0.46727853545143616, "unverified": 0.046489700695543174}}
 {"id": "multifc_025286", "pred_label": "contradicted", "probs": {"supported": 0.19882825654478395, "contradicted": 0.5270557139870683, "unverified": 0.2741160294681479}}
-{"id": "multifc_025291", "pred_label": "supported", "probs": {"supported": 0.6037017489265551, "contradicted": 0.36370564698433594, "unverified": 0.03259260408910893}}
+{"id": "multifc_025291", "pred_label": "supported", "probs": {"supported": 0.6037017489265551, "contradicted": 0.3637056469843359, "unverified": 0.03259260408910893}}
 {"id": "multifc_025303", "pred_label": "contradicted", "probs": {"supported": 0.29516316361199646, "contradicted": 0.6465887395118544, "unverified": 0.058248096876149215}}
 {"id": "multifc_025307", "pred_label": "supported", "probs": {"supported": 0.6506185225658372, "contradicted": 0.32096430613390203, "unverified": 0.028417171300260776}}
 {"id": "multifc_025328", "pred_label": "contradicted", "probs": {"supported": 0.40882102734196096, "contradicted": 0.5908873796579847, "unverified": 0.00029159300005450586}}
@@ -1777,7 +1777,7 @@
 {"id": "multifc_026534", "pred_label": "contradicted", "probs": {"supported": 0.35161878778967337, "contradicted": 0.5713727560006238, "unverified": 0.07700845620970298}}
 {"id": "multifc_026540", "pred_label": "unverified", "probs": {"supported": 0.23205511529798778, "contradicted": 0.29300602782517454, "unverified": 0.4749388568768376}}
 {"id": "multifc_026543", "pred_label": "contradicted", "probs": {"supported": 0.3845457197213363, "contradicted": 0.44650614699177055, "unverified": 0.1689481332868932}}
-{"id": "multifc_026566", "pred_label": "contradicted", "probs": {"supported": 0.11902139697880082, "contradicted": 0.4714184247047486, "unverified": 0.4095601783164506}}
+{"id": "multifc_026566", "pred_label": "contradicted", "probs": {"supported": 0.11902139697880083, "contradicted": 0.47141842470474865, "unverified": 0.4095601783164506}}
 {"id": "multifc_026575", "pred_label": "supported", "probs": {"supported": 0.8149885510864264, "contradicted": 0.16881232058285758, "unverified": 0.016199128330716052}}
 {"id": "multifc_026599", "pred_label": "supported", "probs": {"supported": 0.504664299296613, "contradicted": 0.24867908391839313, "unverified": 0.2466566167849938}}
 {"id": "multifc_026607", "pred_label": "supported", "probs": {"supported": 0.6905254945290126, "contradicted": 0.30033384125301726, "unverified": 0.00914066421797014}}
@@ -1829,7 +1829,7 @@
 {"id": "multifc_027200", "pred_label": "supported", "probs": {"supported": 0.5227212873099798, "contradicted": 0.38734431512888395, "unverified": 0.08993439756113618}}
 {"id": "multifc_027213", "pred_label": "contradicted", "probs": {"supported": 0.1805193911224006, "contradicted": 0.6654425744543392, "unverified": 0.15403803442326022}}
 {"id": "multifc_027224", "pred_label": "contradicted", "probs": {"supported": 0.4023427765213066, "contradicted": 0.5878420827591452, "unverified": 0.009815140719548221}}
-{"id": "multifc_027264", "pred_label": "contradicted", "probs": {"supported": 0.24951474751628036, "contradicted": 0.7370745268391004, "unverified": 0.013410725644619323}}
+{"id": "multifc_027264", "pred_label": "contradicted", "probs": {"supported": 0.24951474751628036, "contradicted": 0.7370745268391004, "unverified": 0.013410725644619322}}
 {"id": "multifc_027278", "pred_label": "contradicted", "probs": {"supported": 0.256221720013899, "contradicted": 0.7131797930342507, "unverified": 0.030598486951850346}}
 {"id": "multifc_027286", "pred_label": "contradicted", "probs": {"supported": 0.30344135971928093, "contradicted": 0.652852124467051, "unverified": 0.04370651581366813}}
 {"id": "multifc_027304", "pred_label": "unverified", "probs": {"supported": 0.1698446038200587, "contradicted": 0.29787374531997557, "unverified": 0.5322816508599657}}
@@ -1860,7 +1860,7 @@
 {"id": "multifc_027635", "pred_label": "contradicted", "probs": {"supported": 0.17023568313109894, "contradicted": 0.652123230202805, "unverified": 0.17764108666609607}}
 {"id": "multifc_027636", "pred_label": "supported", "probs": {"supported": 0.49085152325752396, "contradicted": 0.469699180474818, "unverified": 0.039449296267658016}}
 {"id": "multifc_027643", "pred_label": "contradicted", "probs": {"supported": 0.32053155176461356, "contradicted": 0.6057391568010847, "unverified": 0.0737292914343018}}
-{"id": "multifc_027645", "pred_label": "supported", "probs": {"supported": 0.49731269264370537, "contradicted": 0.4932398337384059, "unverified": 0.009447473617888722}}
+{"id": "multifc_027645", "pred_label": "supported", "probs": {"supported": 0.49731269264370537, "contradicted": 0.4932398337384059, "unverified": 0.00944747361788872}}
 {"id": "multifc_027668", "pred_label": "contradicted", "probs": {"supported": 0.33992224979161306, "contradicted": 0.611681854731356, "unverified": 0.048395895477030985}}
 {"id": "multifc_027671", "pred_label": "supported", "probs": {"supported": 0.5513995824405385, "contradicted": 0.42794257354745974, "unverified": 0.020657844012001735}}
 {"id": "multifc_027672", "pred_label": "contradicted", "probs": {"supported": 0.3480204856822202, "contradicted": 0.6136103780767359, "unverified": 0.03836913624104401}}
@@ -2030,7 +2030,7 @@
 {"id": "multifc_030285", "pred_label": "contradicted", "probs": {"supported": 0.21033062809241504, "contradicted": 0.6053302141600143, "unverified": 0.1843391577475706}}
 {"id": "multifc_030294", "pred_label": "supported", "probs": {"supported": 0.6357096436844281, "contradicted": 0.36209882354033596, "unverified": 0.0021915327752359474}}
 {"id": "multifc_030317", "pred_label": "contradicted", "probs": {"supported": 0.4591739688569437, "contradicted": 0.533813682850857, "unverified": 0.007012348292199414}}
-{"id": "multifc_030323", "pred_label": "supported", "probs": {"supported": 0.5806755974248373, "contradicted": 0.40257294741328886, "unverified": 0.016751455161873825}}
+{"id": "multifc_030323", "pred_label": "supported", "probs": {"supported": 0.5806755974248374, "contradicted": 0.40257294741328886, "unverified": 0.01675145516187383}}
 {"id": "multifc_030356", "pred_label": "contradicted", "probs": {"supported": 0.4721635621846026, "contradicted": 0.5184050507725074, "unverified": 0.009431387042889995}}
 {"id": "multifc_030365", "pred_label": "contradicted", "probs": {"supported": 0.12831103569474656, "contradicted": 0.8291033601875312, "unverified": 0.04258560411772229}}
 {"id": "multifc_030378", "pred_label": "supported", "probs": {"supported": 0.4985599265612528, "contradicted": 0.44607605717420024, "unverified": 0.05536401626454707}}
@@ -2088,7 +2088,7 @@
 {"id": "multifc_031135", "pred_label": "supported", "probs": {"supported": 0.6876508141035486, "contradicted": 0.19181256399835905, "unverified": 0.12053662189809244}}
 {"id": "multifc_031140", "pred_label": "supported", "probs": {"supported": 0.5960407365666139, "contradicted": 0.2855443201128137, "unverified": 0.1184149433205724}}
 {"id": "multifc_031149", "pred_label": "contradicted", "probs": {"supported": 0.15191741129968034, "contradicted": 0.8184648490528678, "unverified": 0.029617739647451746}}
-{"id": "multifc_031187", "pred_label": "supported", "probs": {"supported": 0.701379594956745, "contradicted": 0.29817525051894156, "unverified": 0.0004451545243135181}}
+{"id": "multifc_031187", "pred_label": "supported", "probs": {"supported": 0.701379594956745, "contradicted": 0.29817525051894156, "unverified": 0.000445154524313518}}
 {"id": "multifc_031209", "pred_label": "supported", "probs": {"supported": 0.6432676036409615, "contradicted": 0.3408215435504318, "unverified": 0.015910852808606674}}
 {"id": "multifc_031214", "pred_label": "supported", "probs": {"supported": 0.6235330627073753, "contradicted": 0.3602540484705114, "unverified": 0.016212888822113355}}
 {"id": "multifc_031231", "pred_label": "unverified", "probs": {"supported": 0.10363122782229119, "contradicted": 0.3265503509654997, "unverified": 0.569818421212209}}
@@ -2116,7 +2116,7 @@
 {"id": "averitec_003077", "pred_label": "contradicted", "probs": {"supported": 0.3375244392245383, "contradicted": 0.6342719765134924, "unverified": 0.02820358426196938}}
 {"id": "averitec_003080", "pred_label": "contradicted", "probs": {"supported": 0.2508323541250143, "contradicted": 0.7368508391179195, "unverified": 0.012316806757066262}}
 {"id": "averitec_003081", "pred_label": "contradicted", "probs": {"supported": 0.43563366331480946, "contradicted": 0.5536651615434771, "unverified": 0.010701175141713525}}
-{"id": "averitec_003082", "pred_label": "supported", "probs": {"supported": 0.5859955708134911, "contradicted": 0.41285692218030673, "unverified": 0.0011475070062021103}}
+{"id": "averitec_003082", "pred_label": "supported", "probs": {"supported": 0.5859955708134911, "contradicted": 0.41285692218030673, "unverified": 0.00114750700620211}}
 {"id": "averitec_003083", "pred_label": "contradicted", "probs": {"supported": 0.19918628576790293, "contradicted": 0.7971123592965349, "unverified": 0.0037013549355621868}}
 {"id": "averitec_003084", "pred_label": "supported", "probs": {"supported": 0.7557306537856995, "contradicted": 0.24370394539454313, "unverified": 0.0005654008197573786}}
 {"id": "averitec_003085", "pred_label": "contradicted", "probs": {"supported": 0.07830386894627328, "contradicted": 0.9187804366145523, "unverified": 0.0029156944391744172}}

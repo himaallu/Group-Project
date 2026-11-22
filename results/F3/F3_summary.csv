@@ -1,0 +1,23 @@
+part,input,model,split,accuracy,recall,real_flagged_as_ai,auroc,original_accuracy,twin_accuracy,ALR_percent,dataset,macro_f1
+authenticity probe,original file format and size (never given to the detector),logistic regression,seen generator (BigGAN),1.0,1.0,0.0,1.0,,,,,
+authenticity probe,original file format and size (never given to the detector),logistic regression,unseen generator (SD v1.4),1.0,1.0,0.0,1.0,,,,,
+authenticity probe,F2 embeddings (256 padded copies),logistic regression,seen generator (BigGAN),0.995,0.999,0.009,0.9999439999999999,,,,,
+authenticity probe,F2 embeddings (256 padded copies),logistic regression,unseen generator (SD v1.4),0.4965,0.002,0.009,0.536376,,,,,
+authenticity probe,F2 embeddings (256 padded copies),linear SVM,seen generator (BigGAN),0.999,1.0,0.002,0.999991,,,,,
+authenticity probe,F2 embeddings (256 padded copies),linear SVM,unseen generator (SD v1.4),0.498,0.001,0.005,0.528237,,,,,
+authenticity probe,"detector input cues (grayscale, JPEG blockiness)",logistic regression,seen generator (BigGAN),0.5455,0.827,0.736,0.6072310000000001,,,,,
+authenticity probe,"detector input cues (grayscale, JPEG blockiness)",logistic regression,unseen generator (SD v1.4),0.5195,0.773,0.734,0.48571600000000004,,,,,
+authenticity probe,debiased 96 px CLIP embeddings (detector),logistic regression,seen generator (BigGAN),0.9585,0.98,0.063,0.9923659999999999,,,,,
+authenticity probe,debiased 96 px CLIP embeddings (detector),logistic regression,unseen generator (SD v1.4),0.542,0.156,0.072,0.6201789999999999,,,,,
+authenticity probe,debiased 96 px CLIP embeddings (detector),linear SVM,seen generator (BigGAN),0.981,0.991,0.029,0.9964249999999999,,,,,
+authenticity probe,debiased 96 px CLIP embeddings (detector),linear SVM,unseen generator (SD v1.4),0.5555,0.152,0.041,0.6658930000000001,,,,,
+VERITE leakage,,decoupled,test,,,,,0.5277777777777778,0.5277777777777778,11.11111111111111,,
+VERITE leakage,,fused,test,,,,,0.5555555555555556,0.5555555555555556,22.22222222222222,,
+VERITE leakage,,fused + image embedding,test,,,,,0.5555555555555556,0.5277777777777778,25.0,,
+VERITE leakage,,decoupled,validation,,,,,0.8125,0.71875,9.375,,
+VERITE leakage,,fused,validation,,,,,0.78125,0.6875,15.625,,
+VERITE leakage,,fused + image embedding,validation,,,,,0.78125,0.6875,9.375,,
+English baselines,,claim_only,,,,,0.5216309444194778,,,,averitec,0.3339341504446046
+English baselines,,claim_only,,,,,0.7190930392526985,,,,multifc,0.4817263510726377
+English baselines,,similarity,,,,,0.453867697472974,,,,averitec,0.2808820797377794
+English baselines,,similarity,,,,,0.6089407985479762,,,,multifc,0.3854954052637698

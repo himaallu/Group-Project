@@ -1,0 +1,13 @@
+model,version,split,captions,accuracy
+decoupled,original,validation,64,0.640625
+decoupled,original,test,72,0.4722222222222222
+decoupled,twin,validation,64,0.640625
+decoupled,twin,test,72,0.4861111111111111
+fused,original,validation,64,0.59375
+fused,original,test,72,0.5277777777777778
+fused,twin,validation,64,0.578125
+fused,twin,test,72,0.4861111111111111
+fused + image embedding,original,validation,64,0.5625
+fused + image embedding,original,test,72,0.5
+fused + image embedding,twin,validation,64,0.59375
+fused + image embedding,twin,test,72,0.5

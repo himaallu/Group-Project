@@ -83,11 +83,12 @@ results/F2/README.md). Figure: original vs twin examples.}
 \section{Methods}
 \label{sec:methods}
 \todo{SigLIP 2 image and caption embeddings; image--caption match features.}
-\todo{CLIP ViT-L/14 logistic regression and linear SVM probes on the F2 embeddings (UnivFD-style;
+\todo{Same preprocessing for every image (centre crop, 96 px, JPEG with real-photo settings,
+greyscale share matched); CLIP ViT-L/14 logistic regression and linear SVM detectors (UnivFD-style;
 notebooks/Feba\_F3\_authenticity\_leakage.ipynb).}
 \todo{ResNet-50 and ViT-B/16 (last 4 blocks unfrozen) detectors (results/F5).}
-\todo{Leakage models on VERITE: decoupled (image--caption similarity) vs fused (similarity,
-authenticity score and their product), logistic regression (results/F3/README.md).}
+\todo{Leakage models on VERITE: decoupled (image--caption similarity), fused (similarity,
+authenticity score and their product) and fused + image embedding, logistic regression (results/F3/README.md).}
 
 % ---------------------------------------------------------------------
 \section{Experimental Setup}
@@ -99,18 +100,18 @@ authenticity score and their product), logistic regression (results/F3/README.md
 \section{Results: AI-Image Detection}
 \label{sec:detection}
 \todo{Table: probes on the unseen Stable Diffusion v1.4 test split, accuracy, precision, recall,
-F1, AUROC (results/F3/F3\_FINAL\_SUMMARY.csv).}
+F1, AUROC, with the file-format and simple-cue checks (results/F3/F3\_probe\_results.csv).}
 \todo{CNN vs ViT vs CLIP probe table (results/F5/cnn\_vit.csv).}
 \todo{Twins: authenticity scores of VERITE originals vs VAE twins
-(results/F3/F3\_VERITE\_authenticity\_probe\_original\_twin\_scores.csv).}
+(results/F3/F3\_verite\_authenticity\_scores.csv, results/F3/F3\_camera\_ai\_edited.csv).}
 
 % ---------------------------------------------------------------------
 \section{Results: Authenticity Leakage}
 \label{sec:leakage}
 \todo{Table: pair accuracy and ALR for decoupled vs fused on VERITE validation and test
-(results/F3/F3\_corrected\_pair\_ALR\_summary.csv), with caption-level metrics
-(results/F3/F3\_corrected\_caption\_metrics.csv).}
-\todo{Interpretation, honestly: what the small VERITE test set (51 pairs) and the near-chance
+(results/F3/F3\_leakage\_ALR.csv), with caption-level metrics
+(results/F3/F3\_caption\_metrics.csv).}
+\todo{Interpretation, honestly: what the small VERITE test set (36 pairs) and the near-chance
 scores mean.}
 
 % ---------------------------------------------------------------------
