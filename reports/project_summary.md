@@ -1,4 +1,4 @@
-# TwinCheck — project summary (status Sat 21 Nov 2026)
+# TwinCheck — project summary (status Sun 22 Nov 2026)
 
 One page per question: what we built, which models and why, what came out and why, and what it means. Every number has its source file. For report wording use your own words (Turnitin).
 
@@ -36,7 +36,7 @@ MultiFC 16,847 / 2,104 / 2,106 claims (own split, fact-check snippets removed); 
 - **Smaller LLM is better:** Qwen3-4B vs 8B — judge 0.391 vs 0.233 on MultiFC, 0.613 vs 0.494 on AVeriTeC (best AVeriTeC score of any model).
 - **Arabic:** fair system (no English entity features) Arabic F1 0.597 vs English 0.605, cross-lingual consistency 74% (`_A`) / 80% (`_M`); X-FACT Arabic ≈ chance for all systems (`results/Y5`).
 - **Ablations:** reranker matters most (−5 F1, −21 ESR); entity match small (`results/H5`).
-- **Vision:** detectors near-perfect on BigGAN but miss most unseen Stable Diffusion images (recall 0.01 / 0.08); ViT ranks better (AUROC 0.885 vs 0.713); image twins change ~8–9% of verdicts and fusing the authenticity score changes nothing (`results/F3`, `results/F5`).
+- **Vision:** a model using only file format and size separates real from AI images perfectly (1.000), so Feba rebuilt the detectors on a debiased 96 px input. On the unseen Stable Diffusion generator they still miss most images (recall ResNet 0.013, ViT 0.126, CLIP probe 0.156; AUROC 0.610 / 0.754 / 0.620); ViT generalises best. Leakage on VERITE: decoupled 11.1% of verdicts change vs fused 22.2% (25.0% with the image embedding), so keeping the authenticity score out of the verdict halves leakage (`results/F3`, `results/F5`).
 - **Human evaluation:** twin hand-check kappa 0.57 (`_B` only 22.5% valid); T1 kappa 0.35–0.49; gold verdict supported by the snippets in 38–48% of EN notes, 10% AR.
 
 ## 6. Why the results came out this way
@@ -46,7 +46,7 @@ MultiFC 16,847 / 2,104 / 2,106 claims (own split, fact-check snippets removed); 
 - **Twins add the missing signal:** `_B` / `_C` examples tell a model that evidence must matter, which is why twin training raises ESR and the unrelated rate for both the MLP and Qwen3-4B; part of the ESR gain is a bias towards "contradicted" (paired ESR 76% vs 33%).
 - **`_B` twins are noisy:** automatic swaps often produce nonsense or do not touch the claim (only 22.5% valid), so ESR measures sensitivity to corrupted evidence more than to true contradictions.
 - **Arabic gap:** mostly the same head errors as English (85%); the rest is translation (only 54% of checked translations fully correct) and English-only entity features.
-- **Vision shortcut:** AI images are fixed-size PNGs and real ones varied JPEGs, so detectors may learn format cues that do not transfer to a new generator (`results/F6`).
+- **Vision shortcut, confirmed and removed:** AI images were fixed-size PNGs and real ones varied JPEGs; file format alone gives 100% accuracy. After debiasing (96 px, matched JPEG, matched greyscale), detection of an unseen generator stays hard (`results/F3`, `results/F6`).
 
 ## 7. Conclusion
 Accuracy alone would have picked the model that reads the evidence least. Twins reveal this and, used in training, make both a small head and a 4B LLM follow the evidence for a small accuracy cost; the small head with the twin loss does it best and is interpretable. The quality of the evidence (search snippets), the `_B` twin generator and Arabic translation are the main limits; future work: validated claim-entity swaps, human-labelled on-topic NLI data, multilingual entity matching, real forwarded messages and dialects.
