@@ -3,8 +3,8 @@
 _Owner: Rathi (R9). For each model and dataset: checkpoint, hyperparameters, training
 time, GPU, data sizes and twin counts. Every number here is copied from a file in
 `results/` (named next to it). Status at the results freeze (Wed 18 Nov 2026, 23:00),
-updated for `v1.0` (Fri 20 Nov) with the baselines (F4) and the vision side (F1–F5);
-Arabic twins and experiments (Y4/Y5) are added when their results are pushed._
+updated on Sun 22 Nov with the final vision results (F1–F6), the baselines (F4), the Arabic
+twins and experiments (Y4–Y6), model selection (H7), the twin hand-check and T1._
 
 ## 1. Environment
 
@@ -141,11 +141,16 @@ Copied from each owner's `results/<task-id>/README.md` (details there).
 | Twin loss + calibration | Himasri (H4) | grid λ_inv ∈ {0, 0.5, 1, 2} × λ_sens ∈ {0, 0.5, 1}, chosen λ_inv = 1, λ_sens = 0.5; temperature scaling (T 0.80–0.89, τ = 0) | ESR 52.2 → 89.7, unrelated 42.4 → 100.0, macro-F1 36.3 → 35.2 (%, 3 seeds); bootstrap p < 0.001 for ESR and unrelated |
 | Ablations, AVeriTeC, Arabic | Himasri (H5) | 4 variants × seeds 42/43/44; paired bootstrap 1,000 resamples | no reranker: macro-F1 30.1, ESR 68.7; AVeriTeC macro-F1 38.3 (twin) vs 38.0; X-FACT AR near chance (AUROC 0.51–0.54) |
 | Vision data | Feba (F1) | VERITE split by image ID; GenImage train/val = real + BigGAN, test = real + Stable Diffusion v1.4 (unseen generator); seed 42; MD5 overlap check | VERITE 1,001 records / 663 images (701 / 149 / 151); GenImage 9,000 / 2,000 / 2,000; no overlap |
-| Vision features + image twins | Feba (F2) | SigLIP 2 (so400m) and CLIP ViT-L/14 embeddings; `_V` twins by SD VAE round trip + SDXL img2img (strength 0.15), kept if SigLIP cosine ≥ 0.92, Haar face screen, JPEG 85 | final set 600 originals + 600 twins; embeddings VERITE 663, M4FC 603, GenImage 18,000 |
-| Authenticity probe + leakage | Feba (F3) | logistic regression / linear SVM (C = 1) on frozen CLIP features; VERITE decoupled (SigLIP similarity) vs fused (+ authenticity) logistic regression, 323 twin pairs | unseen-generator AUROC 0.860 / 0.903, recall 0.024 / 0.014; VERITE test ALR 7.8% (4/51) for both models |
+| Vision features + image twins | Feba (F2) | SigLIP 2 (so400m) and CLIP ViT-L/14 embeddings; `_V` twins by SD VAE round trip (VERITE, M4FC true images) + SDXL img2img (GenImage test), kept if SigLIP cosine ≥ 0.92 (SDXL 0.70), Haar face screen | kept twins: VERITE 218 of 338, M4FC 21 of 155, SDXL 440 of 500; `_V` records VERITE 436, M4FC 42 |
+| Authenticity detector + leakage | Feba (F3) | pixel-only preprocessing for every image (centre crop, 96 px, JPEG with real-photo settings, greyscale share matched) so format and size give nothing away (format + size alone: AUROC 1.000); CLIP ViT-L/14 + logistic regression / linear SVM (C = 1); VERITE decoupled vs fused (+ authenticity) vs fused + image embedding, 218 twin pairs (150 / 32 / 36) | unseen-generator AUROC 0.620 / 0.666, recall 0.156 / 0.152; VERITE test ALR 11.1% decoupled vs 22.2% fused (25.0% + image embedding) |
 | Baselines audit (E0) | Feba (F4) | claim-only TF-IDF + LR (C = 10); 12 similarity features + LightGBM (seeds 42/43/44); zero-shot NLI rule (t = 0.05 on val); Qwen3-8B 4-bit LLM judge (Colab L4) | MultiFC macro-F1 0.481 / 0.385 / 0.346 / 0.233; ESR 0.445 / 0.592 / 0.623 / 0.100 |
-| CNN vs ViT detectors | Feba (F5) | ResNet-50 and ViT-B/16, ImageNet weights, last 4 blocks + head trained; 3 epochs, AdamW lr 1e-4, wd 0.05, cosine, batch 64, AMP; augmentation crop / flip / JPEG 60–95 / blur; seed 42; NVIDIA L4; not logged to W&B | val accuracy 0.991 / 0.997; unseen test accuracy 0.505 / 0.538, AUROC 0.713 / 0.885; ONNX CPU 15.51 / 85.73 ms per image |
-
-Not yet in results/: Arabic twins (Y4) and Arabic experiments E7 (Y5).
+| CNN vs ViT detectors | Feba (F5) | ResNet-50 and ViT-B/16, ImageNet weights, last 4 blocks + head trained on the F3 96 px input; 3 epochs, AdamW lr 1e-4, wd 0.05, cosine, batch 64, fp16; seed 42; Colab T4; not logged to W&B | val accuracy 0.842 / 0.992; unseen test accuracy 0.504 / 0.555, AUROC 0.610 / 0.754; ONNX CPU (2 threads) 96 / 482 ms per image, INT8 4× smaller |
+| Vision error analysis | Feba (F6) | 8 test cases chosen by fixed rules, Grad-CAM with both F5 detectors on the 96 px input | scores reproduce F5 exactly; `reports/figures/fig_f6_error_cases.png` |
+| Twin hand-check | Himasri + Feba (H4) | 120 test twins rated valid / not valid, 30 rated by both | kappa 0.571 (agreement 83.3%); valid: `_P` 97.5%, `_C` 100%, `_B` 22.5% |
+| Arabic + mixed twins | Youssef (Y4) | 200 test sources with a `_B` twin; Qwen3-8B 4-bit, greedy, entity glossary; a twin is dropped if any translation fails; Colab T4, 158 min | kept `_A` 147, `_M` 192, `_B_A` 145, `_C_A` 158 (642 of 800); hand check 27 / 50 translations correct |
+| Arabic experiments (E7) | Youssef (Y5) | H5 heads + F4 baselines on the Arabic twins and X-FACT AR test, seeds 42/43/44 | twin loss, no entity match: macro-F1 EN 60.5 / AR 59.7, cross-lingual AR 73.9 / mixed 79.5; twin head's AR ESR 96.8 is bias (supported recall 1.8%); X-FACT AR near chance |
+| Arabic error analysis | Youssef (Y6) | 20 Arabic-only failures (twin_noent, seed 42) by cause | 12 of 20 are translation problems; ~85% of Arabic errors are also English errors |
+| Model selection | Himasri (H7) | other verdict classifiers on the same features (LR, LightGBM, twins as data); NLI checkpoints on the 300 gold pairs; Qwen3-4B vs 8B | MLP + twin loss best ESR (89.7 vs ≤ 80.4, p < 0.001); Qwen3-4B QLoRA verdict model macro-F1 0.500 but ESR 0.31 (0.67 with twins) |
+| Human evaluation | everyone (T1) | 60 notes: 40 EN rated by Himasri + Feba, 20 AR by Youssef | EN agreement: verdict-correct kappa 0.494, sentences-supported 0.349, readability 0.477 (weighted) |
 
 All tables and figures in `reports/` are rebuilt from these files by `python -m src.eval.figures` (R8).

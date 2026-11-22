@@ -71,3 +71,21 @@ skeleton with TODOs), checked against `results/F1`–`F5`, `notes/F1`–`F5.md` 
 Good: the F3 and F5 READMEs already state the small-sample and single-generator limits
 honestly, and the Grad-CAM finding (all 3 Stable Diffusion images missed by both models)
 is a strong error-analysis case.
+
+## Update, Sun 22 Nov (after F1–F6 were re-run with the 96 px preprocessing)
+
+The full draft is still not in `reports/maai901_report/main.tex` (34 TODOs), so this pass
+checks the new results only:
+
+- **Items 3–4 no longer apply as written.** On the new VERITE split (36 test pairs), the fused
+  model's ALR is double the decoupled model's: 22.2% vs 11.1%, and 25.0% with the image
+  embedding too (`tab_leakage.csv`). This is now evidence *for* the decoupling rule. Say it with
+  care: 4 vs 8 changed verdicts out of 36, and on validation it is 9.4% vs 15.6%.
+- **Item 5 is fixed:** F3 now uses the 218 face-screened F2 twins.
+- **Item 6 changes:** with the format shortcut removed, AUROC falls to 0.61–0.75 (ViT-B/16 best,
+  0.754), so the detectors no longer "rank well". The format-only result (AUROC 1.000) is a
+  strong finding for the Data section: the original GenImage files give the answer away.
+- **New, INT8 ONNX** (`tab_onnx_int8.csv`): ResNet-50 INT8 has a max output difference of 10.7
+  vs FP32, yet its AUROC rises from 0.626 to 0.826. That suggests the quantised model is
+  broken rather than better. Check it before reporting, or report only ViT-B/16 INT8 (0.770 vs 0.771).
+- The README vision numbers and every table in `reports/tables/tab_{detectors,robustness,leakage,onnx,onnx_int8}` are updated.

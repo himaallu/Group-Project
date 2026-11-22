@@ -21,6 +21,7 @@ What it does
         results/F3/F3_FINAL_SUMMARY.csv + F5/cnn_vit.csv -> tab_detectors, tab_robustness
         results/F3/F3_corrected_pair_ALR_summary.csv     -> tab_leakage
         results/F5/onnx_latency.csv             -> tab_onnx
+        results/F5/onnx_int8.csv                -> tab_onnx_int8
 
     Colours: the first categorical slots of the shared chart palette, in fixed order
     (blue, orange, aqua, yellow), so a model keeps its colour in every figure.
@@ -300,6 +301,17 @@ def onnx_table(lat: pd.DataFrame) -> pd.DataFrame:
                          for _, r in lat.iterrows()])
 
 
+def onnx_int8_table(q: pd.DataFrame) -> pd.DataFrame:
+    """F5 ONNX FP32 vs INT8: size, CPU ms, test accuracy / AUROC and agreement with PyTorch."""
+    return pd.DataFrame([{"model": DETECTORS.get(r["arch"], r["arch"]),
+                          "precision": r["precision"].upper(), "ONNX MB": f"{r['onnx_mb']:.1f}",
+                          "CPU ms (ONNX Runtime)": f"{r['ort_cpu_ms_mean']:.2f}",
+                          "test images": int(r["test_images"]), "accuracy": r["test_accuracy"],
+                          "AUROC": r["test_auroc"],
+                          "same decision as PyTorch": r["same_decision_as_pytorch"]}
+                         for _, r in q.iterrows()])
+
+
 # --------------------------------------------------------------------------
 # Figures
 # --------------------------------------------------------------------------
@@ -565,6 +577,12 @@ def build_all(results: Path, tables: Path, figures: Path, gold_paths: list[str])
                     tables)
     else:
         skip("tab_onnx")
+    int8 = results / "F5" / "onnx_int8.csv"
+    if int8.exists():
+        write_table(onnx_int8_table(pd.read_csv(int8)), "tab_onnx_int8",
+                    "ONNX FP32 vs INT8 on CPU: size, latency and test accuracy (500 images).", tables)
+    else:
+        skip("tab_onnx_int8")
 
 
 def main() -> None:

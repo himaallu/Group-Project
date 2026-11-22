@@ -1,0 +1,5 @@
+model,precision,ONNX MB,CPU ms (ONNX Runtime),test images,accuracy,AUROC,same decision as PyTorch
+ResNet-50 (last 4 blocks),FP32,94.0,96.19,500,0.512,0.6255839999999999,1.0
+ResNet-50 (last 4 blocks),INT8,23.7,141.41,500,0.502,0.8260480000000001,0.99
+ViT-B/16 (last 4 blocks),FP32,343.6,481.69,500,0.566,0.770816,1.0
+ViT-B/16 (last 4 blocks),INT8,87.3,432.68,500,0.576,0.769552,0.982

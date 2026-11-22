@@ -53,3 +53,13 @@ def test_vision_tables():
                          "ort_cpu_ms_mean": 15.5097, "torch_gpu_ms_mean": 6.6619, "gpu": "NVIDIA L4"}])
     row = onnx_table(lat).iloc[0]
     assert row["ONNX MB"] == "94.0" and row["CPU ms (ONNX Runtime)"] == "15.51"
+
+
+def test_onnx_int8_table():
+    from src.eval.figures import onnx_int8_table
+
+    q = pd.DataFrame([{"arch": "vit_b16", "precision": "int8", "onnx_mb": 87.3, "max_abs_diff": 0.2,
+                       "ort_cpu_ms_mean": 432.678, "ort_cpu_ms_p50": 398.8, "test_images": 500,
+                       "test_accuracy": 0.576, "test_auroc": 0.77, "same_decision_as_pytorch": 0.982}])
+    row = onnx_int8_table(q).iloc[0]
+    assert row["precision"] == "INT8" and row["ONNX MB"] == "87.3" and row["CPU ms (ONNX Runtime)"] == "432.68"
