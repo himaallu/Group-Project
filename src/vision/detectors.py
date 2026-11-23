@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+import pickle
 import random
 from pathlib import Path
 
@@ -121,3 +122,49 @@ def build_model(arch: str, pretrained: bool = True) -> nn.Module:
 
 def target_layer(model: nn.Module, arch: str) -> nn.Module:
     return model.layer4[-1] if arch == "resnet50" else model.encoder.layers[-1].ln_1
+
+
+class CachedImages(Dataset):
+    def __init__(self, blobs: list[bytes], labels, transform, corruption: str = "clean"):
+        self.blobs, self.labels = blobs, labels
+        self.transform, self.corruption = transform, corruption
+
+    def __len__(self) -> int:
+        return len(self.blobs)
+
+    def __getitem__(self, i: int):
+        image = corrupt(Image.open(io.BytesIO(self.blobs[i])).convert("RGB"), self.corruption)
+        return self.transform(image), torch.tensor(float(self.labels[i])), i
+
+
+def load_cache(path: str | Path, md5s) -> list[bytes]:
+    with open(path, "rb") as f:
+        cache = pickle.load(f)
+    index = {m: i for i, m in enumerate(cache["md5"])}
+    missing = [m for m in md5s if m not in index]
+    if missing:
+        raise ValueError(f"{len(missing)} images are not in {path}")
+    return [cache["jpeg"][index[m]] for m in md5s]
+
+
+def frozen_batchnorms(model: nn.Module) -> dict[str, nn.Module]:
+    return {name: m for name, m in model.named_modules()
+            if isinstance(m, nn.modules.batchnorm._BatchNorm)
+            and not any(p.requires_grad for p in m.parameters())}
+
+
+def freeze_batchnorm(model: nn.Module) -> nn.Module:
+    for m in frozen_batchnorms(model).values():
+        m.eval()
+    return model
+
+
+def restore_imagenet_batchnorm(model: nn.Module, reference: dict | None = None) -> list[str]:
+    if reference is None:
+        reference = models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V2).state_dict()
+    names = frozen_batchnorms(model)
+    with torch.no_grad():
+        for name, m in names.items():
+            for key in ("running_mean", "running_var", "num_batches_tracked"):
+                getattr(m, key).copy_(reference[f"{name}.{key}"])
+    return sorted(names)
