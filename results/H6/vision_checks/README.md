@@ -1,0 +1,7 @@
+# H6 · Extra checks on the vision results (Himasri)
+
+1. **What ran:** `python -m src.eval.vision_checks` on files already in `results/` (no model rerun): `results/F3/F3_pair_verdicts.csv`, `F3_verite_authenticity_scores.csv`, `results/F6/predictions.csv`.
+2. **Leakage significance (VERITE, decoupled vs fused):** test 36 pairs, 4 vs 8 changed verdicts, every decoupled change is also a fused change, exact McNemar p = 0.125; validation + test 68 pairs, 7 vs 13, p = 0.031 (settings were chosen on validation, so the test value is the main one).
+3. **Why fused changes more verdicts:** the authenticity score barely moves for most photos (median shift +0.005; |shift| > 0.1 for 27 of 218 photos, 12%). But of the 18 photos whose verdict only the fused model changed (all splits; no model saw twins in training), 10 (56%) had |shift| > 0.1; on validation + test 3 of 6. All flipped pairs have tiny caption-score gaps (test median 0.004–0.005 vs 0.013–0.015 overall), so the stand-in verdict model is fragile.
+4. **CNN vs ViT, unseen generator (SD v1.4 test):** AUROC ResNet-50 0.610 [0.585–0.635], ViT-B/16 0.754 [0.732–0.775]; difference +0.143 [0.114–0.172], bootstrap p < 0.001. **ResNet-50 validation:** AUROC 0.982, BigGAN median score 0.787, 111 of 313 misses between 0.2 and 0.5, real 99th percentile 0.166; accuracy rises with a lower cut-off (explored on validation only, never chosen on test). Confirms Feba's RCA point 4.
+5. **Files:** `vision_checks.json` (all numbers). No W&B (team decision).
