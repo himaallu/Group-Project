@@ -5,3 +5,12 @@
 - **Key numbers:** demo on R6 examples: evidence rule 5 of 6 expected verdicts, trained head 2 of 6. Tests: 152 pass, 8 skipped (local run; torch and lightgbm tests skipped here, they run in Colab).
 - **Still to do:** you record the 2–3 min video with the R10 notebook (set `VERDICT` to what the group agrees). Second review pass once Feba pushes the full MAAI901 draft (F7, Fri 21:00).
 - **Files:** `src/demo/{app,snapshot}.py`, `src/explain/generate.py`, `tests/demo/test_r10.py`, `reports/slides/`, `notebooks/R10_demo_colab.ipynb`, `notes/R10*.md`.
+- **Update, Sun 22 Nov:**
+  - Demo has 3 twin example buttons (original EN → contradicted, Arabic twin → contradicted, unrelated evidence → unverified; Himasri tested them with the trained head at 83% / 83% / 97%).
+  - A banner above every result names the verdict step and marks the rule stand-in in red.
+  - The R10 notebook now defaults to the trained head and a FAST mode (~5 min to the link).
+  - The video script is built around the twins.
+  - Rule-run results from today's Colab: `results/R10/examples_rule.json`, 5 of 6.
+- **Colab run with the trained head (FAST mode), Sun 22 Nov:** `results/R10/examples_head_fast.json`, every component real.
+  - Twins as expected: original EN → contradicted 0.829, Arabic twin → contradicted 0.829, unrelated evidence → unverified 0.971. Arabic and English give the same answer, and unrelated evidence gives unverified.
+  - Ready examples: 2 of 6 right (both contradicted ones). The head calls the supported and unverified examples contradicted or supported, which is its known "supported" weakness. The demo video therefore uses the twin buttons.

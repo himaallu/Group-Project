@@ -60,3 +60,23 @@ def test_snapshot_renders_saved_examples():
     assert page.count("Illustrative example") == 1
     assert "الادعاء" in page and "CLAIM" not in page          # R10 note fix applied
     assert "Verdict by: evidence rule" in page                 # R6 rule run (verdict stub)
+
+
+def test_twin_examples_change_one_thing():
+    from src.demo.examples import TWIN_EXAMPLES
+    from src.pipeline import detect_language
+
+    orig, arabic, unrelated = TWIN_EXAMPLES
+    assert [t["expected"] for t in TWIN_EXAMPLES] == ["contradicted", "contradicted", "unverified"]
+    assert arabic["evidence"] == orig["evidence"] and detect_language(arabic["message"]) == "ar"
+    assert unrelated["message"] == orig["message"] and unrelated["evidence"] != orig["evidence"]
+
+
+def test_method_banner_marks_the_rule():
+    from src.demo.app import format_results
+
+    rule = format_results([], method="evidence rule (strongest entail vs strongest contradict snippet)")
+    head = format_results([], method="trained verdict head (H4, twin loss)")
+    assert "Rule stand-in, not the trained model" in rule
+    assert "Verdict by: trained verdict head" in head and "Rule stand-in" not in head
+    assert "Verdict by" not in format_results([])          # no method given -> no banner
