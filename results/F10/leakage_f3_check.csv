@@ -1,0 +1,4 @@
+model,rows,max_abs_diff_p,same_verdict,test_ALR_percent_f10
+decoupled,436,5.551115123125783e-17,1.0,11.11111111111111
+fused,436,3.3306690738754696e-16,1.0,22.22222222222222
+fused + image embedding,436,5.162537064506978e-15,1.0,25.0

@@ -1,0 +1,58 @@
+{
+  "seed": 44,
+  "arch": "vit_b16",
+  "run": "vit_b16_s44",
+  "split": "F1 (train/val real + BigGAN, test real + SD v1.4)",
+  "input": "F3 preprocessing: centre crop, 96 px, JPEG with real-photo settings, greyscale share matched",
+  "epochs": 3,
+  "lr": 0.0001,
+  "batch": 64,
+  "unfrozen": "last 4 blocks + head",
+  "augmentation": "rrc0.6, hflip, jpeg60-95, blur p0.3",
+  "mixed_precision": "fp16",
+  "freeze_bn": false,
+  "restore_imagenet_bn": false,
+  "n_train": 9000,
+  "n_val": 2000,
+  "n_test": 2000,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.13631712308857177,
+      "val_accuracy": 0.99,
+      "seconds": 58.6
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.019029275161524615,
+      "val_accuracy": 0.9885,
+      "seconds": 57.8
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.009368234269320964,
+      "val_accuracy": 0.9915,
+      "seconds": 62.1
+    }
+  ],
+  "validation": {
+    "n": 2000,
+    "accuracy": 0.9915,
+    "precision": 0.991008991008991,
+    "recall": 0.992,
+    "f1": 0.991504247876062,
+    "auroc": 0.9994965,
+    "acc_BigGAN": 0.992,
+    "acc_real": 0.991
+  },
+  "test": {
+    "n": 2000,
+    "accuracy": 0.559,
+    "precision": 0.8933333333333333,
+    "recall": 0.134,
+    "f1": 0.23304347826086957,
+    "auroc": 0.7569825,
+    "acc_Stable Diffusion v1.4": 0.134,
+    "acc_real": 0.984
+  }
+}

@@ -1,0 +1,7 @@
+model_a,model_b,photos,changed_a,changed_b,both,only_a,only_b,p_exact,seed
+decoupled,fused,218,29,40,27,2,13,0.00738525390625,42
+decoupled,fused + image embedding,218,29,37,27,2,10,0.03857421875,42
+decoupled,fused,218,29,37,26,3,11,0.057373046875,43
+decoupled,fused + image embedding,218,29,35,26,3,9,0.14599609375,43
+decoupled,fused,218,29,40,26,3,14,0.012725830078125,44
+decoupled,fused + image embedding,218,29,38,25,4,13,0.049041748046875,44

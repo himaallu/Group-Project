@@ -1,0 +1,5 @@
+model,split,accuracy,precision,recall,f1,auroc
+resnet50,validation,0.0,0.0,0.0,0.0,0.0
+resnet50,test,0.0,0.0,0.0,3.469446951953614e-18,0.0
+vit_b16,validation,0.0,0.0,0.0,0.0,0.0
+vit_b16,test,0.0,0.0,0.0,5.551115123125783e-17,0.0
