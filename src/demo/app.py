@@ -10,6 +10,8 @@ What it does
     Six ready examples (src/demo/examples.py) are made up and shown as
     "Illustrative example". Arabic text is shown right-to-left.
     The verdict never uses any "is the image AI-made?" score (CLAUDE.md §3).
+    Optional image (F11, src/demo/vision.py): an uploaded picture gets a separate card
+    with the F5 detector's P(AI); the claim verdict does not change.
 
 Inputs
     Typed in the browser. Models load on first use (GPU recommended).
@@ -21,6 +23,7 @@ How to run (repo root)
     python -m src.demo.app            # http://127.0.0.1:7860
     python -m src.demo.app --share    # in Colab
     python -m src.demo.app --run-examples results/R6/examples.json   # record the 6 examples
+    python -m src.demo.app --share --vision-ckpt CKPT.pt --jpeg-pool POOL.json   # + image card
 """
 
 from __future__ import annotations
@@ -29,7 +32,9 @@ import argparse
 import html
 import re
 
+from src.demo import vision
 from src.demo.examples import EXAMPLES, TWIN_EXAMPLES
+from src.demo.vision_card import image_note
 
 VERDICT_STYLE = {   # label -> (shown text, colour)
     "supported": ("Supported", "#1a7f37"),
@@ -134,16 +139,16 @@ def verdict_method() -> str:
 def method_banner(method: str) -> str:
     """A line above the results naming the verdict step; the rule stand-in is marked."""
     if method.startswith("trained"):
-        return (f'<div style="background:#ddf4ff;padding:6px 10px;border-radius:6px;'
+        return (f'<div style="background:#ddf4ff;color:#1f2328;padding:6px 10px;border-radius:6px;'
                 f'margin:4px 0">Verdict by: {html.escape(method)}</div>')
-    return ('<div style="background:#ffebe9;padding:6px 10px;border-radius:6px;margin:4px 0">'
+    return ('<div style="background:#ffebe9;color:#1f2328;padding:6px 10px;border-radius:6px;margin:4px 0">'
             f'<b>Rule stand-in, not the trained model.</b> Verdict by: {html.escape(method)}'
             '</div>')
 
 
 def format_results(results: list[dict], note: str = "", method: str = "") -> str:
     """HTML for all claims, with optional banners (e.g. "Illustrative example", verdict step)."""
-    banner = (f'<div style="background:#fff8c5;padding:6px 10px;border-radius:6px">'
+    banner = (f'<div style="background:#fff8c5;color:#1f2328;padding:6px 10px;border-radius:6px">'
               f'{html.escape(note)}</div>') if note else ""
     banner += method_banner(method) if method else ""
     if not results:
@@ -151,13 +156,20 @@ def format_results(results: list[dict], note: str = "", method: str = "") -> str
     return banner + "".join(claim_card(r) for r in results)
 
 
-def run_check(message: str, evidence_text: str, lang: str, note: str = "") -> str:
-    """Check a message and return the result HTML (what the Check button calls)."""
+def run_check(message: str, evidence_text: str, lang: str, note: str = "", image=None) -> str:
+    """Check a message and return the result HTML (what the Check button calls).
+
+    With an ``image`` (F11), its card and a note follow the claim cards. The image
+    is never passed to ``check``, so the claim verdict is the same with or without it.
+    """
     from src.pipeline import check
 
     lang = None if lang in (None, "", "auto") else lang
-    return format_results(check(message, parse_evidence(evidence_text), lang), note,
-                          verdict_method())
+    out = format_results(check(message, parse_evidence(evidence_text), lang), note,
+                         verdict_method())
+    if image is not None:
+        out += vision.image_html(image) + image_note()
+    return out
 
 
 def build_app():
@@ -176,10 +188,12 @@ def build_app():
                 evidence = gr.Textbox(label="Evidence (optional, one snippet per line; "
                                             "empty = search the offline library)", lines=4)
                 lang = gr.Dropdown(["auto", "en", "ar", "mixed"], value="auto", label="Language")
+                image = gr.Image(type="pil", label="Image (optional)", height=220)
                 button = gr.Button("Check", variant="primary")
             with gr.Column():
                 output = gr.HTML()
-        button.click(lambda m, e, l: run_check(m, e, l), [message, evidence, lang], output)
+        button.click(lambda m, e, l, i: run_check(m, e, l, image=i), [message, evidence, lang, image],
+                     output)
 
         # Twin examples first: one claim and two of its twins, the core idea of the project.
         for heading, group in ((f"### Twin examples — {ILLUSTRATIVE}", TWIN_EXAMPLES),
@@ -188,14 +202,35 @@ def build_app():
             with gr.Row():
                 for ex in group:
                     b = gr.Button(f"{ex['title']}", size="sm")
-                    b.click(lambda ex=ex: (ex["message"], "\n".join(ex["evidence"]), ex["lang"],
+                    b.click(lambda ex=ex: (ex["message"], "\n".join(ex["evidence"]), ex["lang"], None,
                                            run_check(ex["message"], "\n".join(ex["evidence"]),
                                                      ex["lang"], ILLUSTRATIVE)),
-                            None, [message, evidence, lang, output])
+                            None, [message, evidence, lang, image, output])
+
+        # Image examples (F11): pictures and captions from --demo-images, never in git.
+        image_examples = vision.load_image_examples()
+        if image_examples:
+            gr.Markdown(f"### Image examples — {ILLUSTRATIVE}")
+            with gr.Row():
+                for ex in image_examples:
+                    b = gr.Button(ex["title"], size="sm")
+                    b.click(lambda ex=ex: _image_example(ex), None,
+                            [message, evidence, lang, image, output])
         status = ", ".join(f"{k}: {v}" for k, v in component_status().items())
         gr.Markdown(f"<small>Verdict by: {html.escape(verdict_method())}. "
-                    f"Components: {html.escape(status)}</small>")
+                    f"Components: {html.escape(status)}, {html.escape(vision.status())}</small>")
     return app
+
+
+def _image_example(ex: dict) -> tuple:
+    """Fill the inputs for an image example and run the check (F11)."""
+    from PIL import Image
+
+    picture = Image.open(ex["image_path"]).convert("RGB")
+    evidence = "\n".join(ex["evidence"])
+    lang = ex.get("lang", "auto")
+    return ex["message"], evidence, lang, picture, run_check(ex["message"], evidence, lang,
+                                                             ILLUSTRATIVE, image=picture)
 
 
 def run_examples(path: str) -> list[dict]:
@@ -231,7 +266,11 @@ def main() -> None:
     ap.add_argument("--port", type=int, default=7860)
     ap.add_argument("--run-examples", metavar="JSON",
                     help="run the 6 examples, save the results here and exit")
+    ap.add_argument("--vision-ckpt", help="F5 detector checkpoint (image card, F11)")
+    ap.add_argument("--jpeg-pool", help="JPEG settings from src.vision.infer --build-pool")
+    ap.add_argument("--demo-images", help="folder with examples.json + images for the image buttons")
     args = ap.parse_args()
+    vision.configure(args.vision_ckpt, args.jpeg_pool, args.demo_images)
     if args.run_examples:
         for row in run_examples(args.run_examples):
             got = ", ".join(c["label"] for c in row["claims"]) or "no claim"

@@ -1,0 +1,102 @@
+"""Unit tests for the F11 image card (no GPU, checkpoint or Drive needed).
+
+Run: python -m pytest tests/demo/test_vision_card.py -q
+The fake-model tests need torch and torchvision; they are skipped where those are missing.
+"""
+
+import io
+import json
+
+import numpy as np
+import pytest
+from PIL import Image
+
+from src.demo import vision
+from src.demo.app import ILLUSTRATIVE, run_check
+from src.demo.vision_card import CAVEAT, IMAGE_NOTE, image_card, unavailable_card
+from src.vision.infer import encode_jpeg, label_for, pixel_key, square96
+
+POOL = [[[[16] * 64, [17] * 64], 2], [[[8] * 64, [9] * 64], 0]]   # two made-up JPEG settings
+
+
+def picture(w=300, h=200, seed=0):
+    """A random RGB test picture."""
+    rng = np.random.default_rng(seed)
+    return Image.fromarray(rng.integers(0, 256, (h, w, 3), dtype=np.uint8))
+
+
+def test_label_at_threshold():
+    assert label_for(0.5) == "AI-generated" and label_for(0.91) == "AI-generated"
+    assert label_for(0.4999) == "Real" and label_for(0.0) == "Real"
+
+
+def test_card_contents():
+    ai = image_card({"p_ai": 0.913, "label": "AI-generated", "model": "ViT-B/16 (F5, seed 42)"}, picture())
+    assert "AI-generated" in ai and "#cf222e" in ai and "P(AI) = 0.91" in ai
+    assert 'aria-valuenow="91"' in ai and "data:image/jpeg;base64," in ai
+    assert "ViT-B/16 (F5, seed 42)" in ai and "Show heatmap" not in ai
+    real = image_card({"p_ai": 0.02, "label": "Real", "model": "m"}, picture(), heatmap=picture(50, 50))
+    assert "Real" in real and "#1a7f37" in real and CAVEAT.replace("'", "&#x27;") in real
+    assert "Show heatmap" in real
+    assert "Image check not available" in unavailable_card("no checkpoint")
+
+
+def test_square96_and_jpeg_follow_f3():
+    a = square96(picture(300, 200))
+    assert a.shape == (96, 96, 3) and a.dtype == np.uint8
+    blob = encode_jpeg(a, "some-md5", POOL)
+    assert blob == encode_jpeg(a, "some-md5", POOL)               # same key -> same bytes
+    tables = Image.open(io.BytesIO(blob)).quantization
+    assert [list(t) for t in tables.values()] in ([[16] * 64, [17] * 64], [[8] * 64, [9] * 64])
+    assert pixel_key(a) == pixel_key(square96(picture(300, 200)))  # stable for the same picture
+
+
+def test_text_only_is_unchanged(monkeypatch):
+    monkeypatch.setenv("TWINCHECK_EXPLAINER", "template")
+    monkeypatch.setenv("TWINCHECK_EXTRACTOR", "split")
+    args = ("Dubai Metro suspended all lines today.", "The RTA said the lines ran normally.", "en",
+            ILLUSTRATIVE)
+    text_only = run_check(*args)
+    assert text_only == run_check(*args, image=None)
+    assert "Image check" not in text_only and IMAGE_NOTE not in text_only
+
+
+def test_image_without_checkpoint_keeps_text(monkeypatch):
+    monkeypatch.setenv("TWINCHECK_EXPLAINER", "template")
+    monkeypatch.setenv("TWINCHECK_EXTRACTOR", "split")
+    vision.configure(None, None)
+    args = ("Dubai Metro suspended all lines today.", "The RTA said the lines ran normally.", "en")
+    with_image = run_check(*args, image=picture())
+    assert with_image.startswith(run_check(*args))                # claim cards identical
+    assert "Image check not available" in with_image and IMAGE_NOTE in with_image
+    assert vision.status() == "image check (F11): not available"
+
+
+def test_image_examples_from_folder(tmp_path):
+    picture().save(tmp_path / "a.jpg")
+    (tmp_path / "examples.json").write_text(json.dumps([
+        {"title": "AI image", "message": "m", "evidence": ["e"], "lang": "en", "image": "a.jpg"},
+        {"title": "missing", "message": "m", "evidence": ["e"], "lang": "en", "image": "nope.jpg"}]))
+    examples = vision.load_image_examples(str(tmp_path))
+    assert [e["title"] for e in examples] == ["AI image"]
+    assert vision.load_image_examples(str(tmp_path / "none")) == []
+
+
+def test_check_image_with_fake_model():
+    torch = pytest.importorskip("torch")
+    pytest.importorskip("torchvision")
+    from src.vision.infer import check_image
+
+    class Fake(torch.nn.Module):
+        """Returns a fixed logit for every input."""
+
+        def __init__(self, logit):
+            super().__init__()
+            self.logit = torch.nn.Parameter(torch.tensor([logit]), requires_grad=False)
+
+        def forward(self, x):
+            return self.logit.expand(x.shape[0], 1)
+
+    at = check_image(picture(), Fake(0.0), POOL)                    # sigmoid(0) = 0.5 -> AI
+    assert at["label"] == "AI-generated" and abs(at["p_ai"] - 0.5) < 1e-6
+    assert check_image(picture(), Fake(-2.0), POOL)["label"] == "Real"
