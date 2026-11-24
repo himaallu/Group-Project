@@ -77,6 +77,45 @@ def image_card(result: dict, image: Image.Image, heatmap: Image.Image | None = N
         f'{heat}</div></div></div>')
 
 
+VERDICT_WORDS = {"supported": "Supported", "contradicted": "Contradicted", "unverified": "Unverified"}
+READING = {   # (claim verdict, image label) -> what the two results mean together
+    ("supported", "AI-generated"): "The evidence supports the claim, but the picture shows signs of AI "
+                                   "generation: the claim may be true while this image is not an authentic photo.",
+    ("contradicted", "AI-generated"): "The evidence contradicts the claim, and the picture shows signs of AI "
+                                      "generation: treat this post as likely misleading.",
+    ("unverified", "AI-generated"): "The evidence does not confirm the claim, and the picture shows signs of AI "
+                                    "generation: treat this post with caution.",
+    ("supported", "Real"): "The evidence supports the claim, and no AI signal was found in the picture.",
+    ("contradicted", "Real"): "The evidence contradicts the claim. No AI signal was found in the picture, "
+                              "but a real photo can still be used out of context.",
+    ("unverified", "Real"): "The evidence does not confirm the claim, and no AI signal was found in the picture.",
+}
+
+
+def summary_card(claim_results: list[dict], image_result: dict | None) -> str:
+    """Final result: each claim verdict and the image result together, in plain words.
+
+    The claim verdicts are shown exactly as ``check`` gave them; the image result is
+    never used to change them (CLAUDE.md §3). The text only explains what the two
+    separate results mean together.
+    """
+    if image_result is None or not claim_results:
+        return ""
+    label, p_ai = image_result["label"], float(image_result["p_ai"])
+    rows = []
+    for r in claim_results:
+        verdict = VERDICT_WORDS.get(r["label"], r["label"])
+        reading = READING.get((r["label"], label), "")
+        rows.append(f'<li><b>Claim:</b> {verdict} ({round(100 * float(r["confidence"]))}%, from the text '
+                    f'evidence) · <b>Image:</b> {html.escape(label)} (P(AI) = {p_ai:.2f})<br>'
+                    f'{html.escape(reading)}</li>')
+    return (f'<div style="{CARD};border-width:2px">'
+            '<div style="font-weight:600;margin-bottom:4px">Final result: text and image together</div>'
+            f'<ul style="margin:0;padding-left:18px">{"".join(rows)}</ul>'
+            f'<div style="{MUTED};margin-top:6px">The claim verdict is not changed by the image; '
+            'the two results are reported side by side.</div></div>')
+
+
 def unavailable_card(reason: str) -> str:
     """Shown instead of the image card when the detector cannot be loaded."""
     return (f'<div style="{CARD}"><b>Image check not available.</b> '

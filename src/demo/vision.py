@@ -64,12 +64,12 @@ def _load() -> tuple:
     raise RuntimeError(_state["error"])
 
 
-def image_html(image) -> str:
-    """Image card for ``image`` (PIL), or the "not available" card."""
+def image_check(image) -> tuple[str, dict | None]:
+    """(image card HTML, result) for ``image`` (PIL); result is None if the check is not available."""
     try:
         model, pool = _load()
     except RuntimeError as err:
-        return unavailable_card(str(err))
+        return unavailable_card(str(err)), None
     from src.vision.infer import check_image, gradcam_overlay
 
     result = check_image(image, model, pool)
@@ -77,7 +77,12 @@ def image_html(image) -> str:
         heatmap = gradcam_overlay(image, model, pool)
     except Exception:                                  # the heat map is optional
         heatmap = None
-    return image_card(result, image, heatmap)
+    return image_card(result, image, heatmap), result
+
+
+def image_html(image) -> str:
+    """Image card for ``image`` (PIL), or the "not available" card."""
+    return image_check(image)[0]
 
 
 def status() -> str:

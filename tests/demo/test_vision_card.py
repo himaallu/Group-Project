@@ -130,3 +130,22 @@ def test_saved_pool_is_the_f3_size():
 
     pool = load_jpeg_pool(DEFAULT_POOL)
     assert len(pool) == 500 and all(len(t) >= 2 and s in (0, 1, 2) for t, s in pool)
+
+
+def test_summary_card_reports_both_without_changing_the_verdict(monkeypatch):
+    from src.demo.vision_card import summary_card
+
+    claims = [{"label": "unverified", "confidence": 1.0}]
+    ai = summary_card(claims, {"p_ai": 0.91, "label": "AI-generated"})
+    assert "Final result" in ai and "Unverified" in ai and "AI-generated" in ai and "caution" in ai
+    assert "Real" in summary_card(claims, {"p_ai": 0.02, "label": "Real"})
+    assert summary_card(claims, None) == ""                       # image check not available
+
+    monkeypatch.setenv("TWINCHECK_EXPLAINER", "template")
+    monkeypatch.setenv("TWINCHECK_EXTRACTOR", "split")
+    monkeypatch.setattr(vision, "image_check", lambda img: ("<div>card</div>",
+                                                            {"p_ai": 0.91, "label": "AI-generated"}))
+    args = ("Dubai Metro suspended all lines today.", "The RTA said the lines ran normally.", "en")
+    out = run_check(*args, image=picture())
+    assert out.startswith(run_check(*args))                       # claim cards identical to text-only
+    assert "Final result" in out and IMAGE_NOTE in out

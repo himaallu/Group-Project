@@ -34,7 +34,7 @@ import re
 
 from src.demo import vision
 from src.demo.examples import EXAMPLES, TWIN_EXAMPLES
-from src.demo.vision_card import image_note
+from src.demo.vision_card import image_note, summary_card
 
 VERDICT_STYLE = {   # label -> (shown text, colour)
     "supported": ("Supported", "#1a7f37"),
@@ -165,10 +165,11 @@ def run_check(message: str, evidence_text: str, lang: str, note: str = "", image
     from src.pipeline import check
 
     lang = None if lang in (None, "", "auto") else lang
-    out = format_results(check(message, parse_evidence(evidence_text), lang), note,
-                         verdict_method())
+    results = check(message, parse_evidence(evidence_text), lang)
+    out = format_results(results, note, verdict_method())
     if image is not None:
-        out += vision.image_html(image) + image_note()
+        card, image_result = vision.image_check(image)
+        out += card + summary_card(results, image_result) + image_note()
     return out
 
 
