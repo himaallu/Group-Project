@@ -34,6 +34,7 @@ import re
 
 from src.demo import vision
 from src.demo.examples import EXAMPLES, TWIN_EXAMPLES
+from src.demo.image_examples import CREDIT, load_examples
 from src.demo.vision_card import image_note, summary_card
 
 VERDICT_STYLE = {   # label -> (shown text, colour)
@@ -156,20 +157,30 @@ def format_results(results: list[dict], note: str = "", method: str = "") -> str
     return banner + "".join(claim_card(r) for r in results)
 
 
-def run_check(message: str, evidence_text: str, lang: str, note: str = "", image=None) -> str:
+def run_check(message: str, evidence_text: str, lang: str, note: str = "", image=None,
+              image_example: dict | None = None) -> str:
     """Check a message and return the result HTML (what the Check button calls).
 
-    With an ``image`` (F11), its card and a note follow the claim cards. The image
-    is never passed to ``check``, so the claim verdict is the same with or without it.
+    With an ``image`` (F11), its card, a final result for text and image together, and a
+    note follow the claim cards. The image is never passed to ``check``, so the claim
+    verdict is the same with or without it. ``image_example`` (a built-in case) adds its
+    description, its cached F3 input and its known label.
     """
     from src.pipeline import check
 
     lang = None if lang in (None, "", "auto") else lang
+    if image is not None and not (message or "").strip():      # image only: no claim to check
+        card, _ = vision.image_check(image)
+        return (card + '<p style="opacity:0.8">Paste a message as well to check its claim; '
+                       'the claim verdict comes from the text evidence only.</p>')
     results = check(message, parse_evidence(evidence_text), lang)
     out = format_results(results, note, verdict_method())
     if image is not None:
-        card, image_result = vision.image_check(image)
-        out += card + summary_card(results, image_result) + image_note()
+        ex = image_example or {}
+        card, image_result = vision.image_check(image, blob=ex.get("blob"), truth=ex.get("truth"))
+        case = (f'<div style="margin:8px 0 0;opacity:0.85"><b>Case:</b> {html.escape(ex["case"])}</div>'
+                if ex.get("case") else "")
+        out += case + card + summary_card(results, image_result) + image_note()
     return out
 
 
@@ -208,7 +219,19 @@ def build_app():
                                                      ex["lang"], ILLUSTRATIVE)),
                             None, [message, evidence, lang, image, output])
 
-        # Image examples (F11): pictures and captions from --demo-images, never in git.
+        # Text + image cases (F11): known-label images from the repo, one per case in the brief.
+        cases = load_examples()
+        if cases:
+            gr.Markdown(f"### Text + image cases — {ILLUSTRATIVE}. Each card shows the image's "
+                        f"known label and whether the detector got it right.")
+            with gr.Row():
+                for ex in cases:
+                    b = gr.Button(ex["title"], size="sm")
+                    b.click(lambda ex=ex: _case_example(ex), None,
+                            [message, evidence, lang, image, output])
+            gr.Markdown(f"<small>{html.escape(CREDIT)}</small>")
+
+        # More image examples from --demo-images (pictures + examples.json, not in git).
         image_examples = vision.load_image_examples()
         if image_examples:
             gr.Markdown(f"### Image examples — {ILLUSTRATIVE}")
@@ -221,6 +244,13 @@ def build_app():
         gr.Markdown(f"<small>Verdict by: {html.escape(verdict_method())}. "
                     f"Components: {html.escape(status)}, {html.escape(vision.status())}</small>")
     return app
+
+
+def _case_example(ex: dict) -> tuple:
+    """Fill the inputs for a built-in text + image case and run the check (F11)."""
+    evidence = "\n".join(ex["evidence"])
+    return ex["message"], evidence, ex["lang"], ex["image"], run_check(
+        ex["message"], evidence, ex["lang"], ILLUSTRATIVE, image=ex["image"], image_example=ex)
 
 
 def _image_example(ex: dict) -> tuple:

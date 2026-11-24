@@ -143,9 +143,48 @@ def test_summary_card_reports_both_without_changing_the_verdict(monkeypatch):
 
     monkeypatch.setenv("TWINCHECK_EXPLAINER", "template")
     monkeypatch.setenv("TWINCHECK_EXTRACTOR", "split")
-    monkeypatch.setattr(vision, "image_check", lambda img: ("<div>card</div>",
+    monkeypatch.setattr(vision, "image_check", lambda img, **kw: ("<div>card</div>",
                                                             {"p_ai": 0.91, "label": "AI-generated"}))
     args = ("Dubai Metro suspended all lines today.", "The RTA said the lines ran normally.", "en")
     out = run_check(*args, image=picture())
     assert out.startswith(run_check(*args))                       # claim cards identical to text-only
     assert "Final result" in out and IMAGE_NOTE in out
+
+
+def test_builtin_cases_cover_the_brief():
+    from src.demo.image_examples import is_ai, load_examples
+
+    cases = load_examples()
+    assert len(cases) == 6
+    truths = [c["truth"] for c in cases]
+    assert truths[0] == "Real" and is_ai(truths[1]) and is_ai(truths[2]) and is_ai(truths[3])
+    twin_a, twin_b = cases[4], cases[5]                          # image twin: same text, other image
+    assert twin_a["message"] == twin_b["message"] and twin_a["evidence"] == twin_b["evidence"]
+    assert twin_a["truth"] == "Real" and is_ai(twin_b["truth"]) and twin_b["blob"] is None
+
+
+def test_truth_line_marks_right_and_wrong():
+    hit = image_card({"p_ai": 0.99, "label": "AI-generated", "model": "m"}, picture(), truth="AI-generated (BigGAN)")
+    miss = image_card({"p_ai": 0.01, "label": "Real", "model": "m"}, picture(), truth="AI-generated (SD v1.4)")
+    real = image_card({"p_ai": 0.01, "label": "Real", "model": "m"}, picture(), truth="Real")
+    assert "detector correct" in hit and "detector wrong" in miss and "detector correct" in real
+
+
+def test_image_twin_keeps_the_claim_verdict(monkeypatch):
+    from src.demo.image_examples import load_examples
+
+    monkeypatch.setenv("TWINCHECK_EXPLAINER", "template")
+    monkeypatch.setenv("TWINCHECK_EXTRACTOR", "split")
+    scores = iter([{"p_ai": 0.01, "label": "Real"}, {"p_ai": 0.93, "label": "AI-generated"}])
+    monkeypatch.setattr(vision, "image_check", lambda img, blob=None, truth=None: ("<div>card</div>", next(scores)))
+    a, b = load_examples()[4:6]
+    out_a = run_check(a["message"], "\n".join(a["evidence"]), a["lang"], image=a["image"], image_example=a)
+    out_b = run_check(b["message"], "\n".join(b["evidence"]), b["lang"], image=b["image"], image_example=b)
+    claims = run_check(a["message"], "\n".join(a["evidence"]), a["lang"])
+    assert out_a.startswith(claims) and out_b.startswith(claims)  # identical claim cards for both twins
+
+
+def test_image_only_shows_image_card(monkeypatch):
+    vision.configure(None, None)
+    out = run_check("", "", "auto", image=picture())
+    assert "Image check not available" in out and "Paste a message" in out

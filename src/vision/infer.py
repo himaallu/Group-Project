@@ -199,14 +199,22 @@ def label_for(p_ai: float) -> str:
     return "AI-generated" if p_ai >= THRESHOLD else "Real"
 
 
-def check_image(image: Image.Image, model, pool: list) -> dict:
-    """Score one picture: {"p_ai", "label", "model"}."""
-    p_ai = score_tensor(model, preprocess(image, pool))
+def check_image(image: Image.Image, model, pool: list, blob: bytes | None = None) -> dict:
+    """Score one picture: {"p_ai", "label", "model"}.
+
+    ``blob``: an already debiased F3 JPEG (a cached example); it is scored as it is, which
+    reproduces the F10 score exactly, instead of preprocessing ``image`` again.
+    """
+    p_ai = score_tensor(model, blob_to_tensor(blob) if blob else preprocess(image, pool))
     return {"p_ai": p_ai, "label": label_for(p_ai), "model": MODEL_NAME}
 
 
-def gradcam_overlay(image: Image.Image, model, pool: list, arch: str = "vit_b16") -> Image.Image:
-    """Grad-CAM heat map (src/vision/gradcam.py) over the 224 px input the detector saw."""
+def gradcam_overlay(image: Image.Image, model, pool: list, arch: str = "vit_b16",
+                    blob: bytes | None = None) -> Image.Image:
+    """Grad-CAM heat map (src/vision/gradcam.py) over the 224 px input the detector saw.
+
+    ``blob``: an already debiased F3 JPEG (cached example) to use instead of ``image``.
+    """
     import matplotlib
 
     matplotlib.use("Agg")
@@ -215,7 +223,7 @@ def gradcam_overlay(image: Image.Image, model, pool: list, arch: str = "vit_b16"
     from src.vision.gradcam import grad_cam, unnormalise
 
     device = next(model.parameters()).device
-    x = preprocess(image, pool).to(device)
+    x = (blob_to_tensor(blob) if blob else preprocess(image, pool)).to(device)
     cams, _ = grad_cam(model, arch, x)
     base = unnormalise(x[0])                               # H x W x 3 in [0, 1]
     heat = colormaps["jet"](cams[0])[..., :3]

@@ -46,8 +46,18 @@ def thumbnail(image: Image.Image, max_side: int = 240) -> str:
     return "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode("ascii")
 
 
-def image_card(result: dict, image: Image.Image, heatmap: Image.Image | None = None) -> str:
-    """HTML card for one image check; ``heatmap`` (Grad-CAM) adds a "Show heatmap" toggle."""
+def truth_line(label: str, truth: str) -> str:
+    """For an example with a known label: the label and whether the detector got it right."""
+    right = (label == "AI-generated") == truth.startswith("AI")
+    mark = ('<b style="color:#1a7f37">✓ detector correct</b>' if right
+            else '<b style="color:#cf222e">✗ detector wrong</b>')
+    return f'<div style="margin-top:6px">Known label: {html.escape(truth)} · {mark}</div>'
+
+
+def image_card(result: dict, image: Image.Image, heatmap: Image.Image | None = None,
+               truth: str | None = None) -> str:
+    """HTML card for one image check; ``heatmap`` (Grad-CAM) adds a "Show heatmap" toggle;
+    ``truth`` (built-in examples) adds the known label and a ✓ / ✗."""
     p_ai = float(result["p_ai"])
     label = result["label"]
     colour = BADGE.get(label, "#57606a")
@@ -74,6 +84,7 @@ def image_card(result: dict, image: Image.Image, heatmap: Image.Image | None = N
         f'<div style="{MUTED};margin-top:6px">Model: '
         f'{html.escape(result.get("model", ""))} · threshold 0.5</div>'
         f'<div style="{MUTED};margin-top:4px">{html.escape(CAVEAT)}</div>'
+        f'{truth_line(label, truth) if truth else ""}'
         f'{heat}</div></div></div>')
 
 
