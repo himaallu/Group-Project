@@ -188,3 +188,13 @@ def test_image_only_shows_image_card(monkeypatch):
     vision.configure(None, None)
     out = run_check("", "", "auto", image=picture())
     assert "Image check not available" in out and "Paste a message" in out
+
+
+def test_warning_when_library_missing_and_no_evidence(monkeypatch):
+    from src.demo.app import library_warning
+
+    monkeypatch.setattr("src.pipeline.component_status", lambda: {"get_evidence (R5)": "stub"})
+    assert "Offline evidence library not loaded" in library_warning("")
+    assert library_warning("The RTA said the lines ran normally.") == ""      # pasted evidence
+    monkeypatch.setattr("src.pipeline.component_status", lambda: {"get_evidence (R5)": "real"})
+    assert library_warning("") == ""

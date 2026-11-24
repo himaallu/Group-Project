@@ -157,6 +157,22 @@ def format_results(results: list[dict], note: str = "", method: str = "") -> str
     return banner + "".join(claim_card(r) for r in results)
 
 
+def library_warning(evidence_text: str) -> str:
+    """A warning when the evidence box is empty and the offline library is not loaded.
+
+    Without the library and without pasted evidence there is nothing to read, so every
+    claim would be Unverified; this says why instead of failing silently.
+    """
+    from src.pipeline import component_status
+
+    if parse_evidence(evidence_text) is not None or component_status()["get_evidence (R5)"] == "real":
+        return ""
+    return ('<div style="background:#ffebe9;color:#1f2328;padding:6px 10px;border-radius:6px;'
+            'margin:4px 0"><b>Offline evidence library not loaded</b>, so there is no evidence to '
+            'check and the claim can only be Unverified. Paste evidence (one snippet per line) or '
+            'run <code>python -m src.retrieval.build_index download</code>.</div>')
+
+
 def run_check(message: str, evidence_text: str, lang: str, note: str = "", image=None,
               image_example: dict | None = None) -> str:
     """Check a message and return the result HTML (what the Check button calls).
@@ -174,7 +190,7 @@ def run_check(message: str, evidence_text: str, lang: str, note: str = "", image
         return (card + '<p style="opacity:0.8">Paste a message as well to check its claim; '
                        'the claim verdict comes from the text evidence only.</p>')
     results = check(message, parse_evidence(evidence_text), lang)
-    out = format_results(results, note, verdict_method())
+    out = library_warning(evidence_text) + format_results(results, note, verdict_method())
     if image is not None:
         ex = image_example or {}
         card, image_result = vision.image_check(image, blob=ex.get("blob"), truth=ex.get("truth"))
