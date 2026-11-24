@@ -219,13 +219,13 @@ def test_external_class_names():
 def test_combine_flags_ai_if_any_check_says_so():
     ours_real = {"p_ai": 0.01, "label": "Real", "model": "ViT-B/16 (F5, seed 42)"}
     vision.configure(None, None, external="Organika/sdxl-detector")
-    assert vision.combine(ours_real, 0.97, None)["flagged_by"] == ["external detector"]
+    assert vision.combine(ours_real, 0.97, None)["flagged_by"] == ["second detector"]
     assert vision.combine(ours_real, 0.10, "IPTC tag")["label"] == "AI-generated"
     both_real = vision.combine(ours_real, 0.10, None)
     assert both_real["label"] == "Real" and both_real["flagged_by"] == []
     card = image_card(vision.combine(ours_real, 0.97, None), picture())
-    assert "External detector (Organika/sdxl-detector" in card and "not trained or tested by us" in card
-    assert "Our detector" in card and "Flagged as AI by: external detector" in card and "AI-generated" in card
+    assert "How this was decided" in card and "Second detector (Organika/sdxl-detector" in card
+    assert "not trained or evaluated by us" in card and "Flagged as AI by: second detector" in card
 
 
 def test_upload_path_keeps_original_bytes(tmp_path):

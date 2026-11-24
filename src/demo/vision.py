@@ -65,9 +65,9 @@ def combine(ours: dict, external_p: float | None, provenance: str | None) -> dic
     """
     flagged = []
     if provenance:
-        flagged.append("provenance metadata")
+        flagged.append("file tags")
     if external_p is not None and external_p >= 0.5:
-        flagged.append("external detector")
+        flagged.append("second detector")
     if ours["label"] == "AI-generated":
         flagged.append("our detector")
     return {**ours, "ours_label": ours["label"], "external": external_p, "provenance": provenance,

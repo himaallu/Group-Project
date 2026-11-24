@@ -29,9 +29,7 @@ import io
 from PIL import Image
 
 BADGE = {"AI-generated": "#cf222e", "Real": "#1a7f37"}      # same red / green as the claim cards
-CAVEAT = ("Our detector was trained on BigGAN; on new generators it misses most AI images (recall "
-          "0.13 on Stable Diffusion v1.4). 'Real' means no check found an AI signal, not that the "
-          "image is proven authentic.")
+CAVEAT = "'Real' means no check found an AI signal, not that the image is proven authentic."
 IMAGE_NOTE = ("The claim verdict uses the text evidence only; the image result is shown "
               "separately and does not change it.")
 CARD = "border:1px solid #d0d7de;border-radius:8px;padding:12px;margin:8px 0"   # as the claim cards
@@ -56,22 +54,27 @@ def truth_line(label: str, truth: str) -> str:
 
 
 def check_rows(result: dict) -> str:
-    """One line per check (our detector, external detector, provenance tag) for a combined result."""
+    """Compact line + a collapsed "How this was decided" section with each check's result."""
     if "ours_label" not in result:
         return ""
     rows = [f'Our detector ({html.escape(result.get("model", ""))}, trained by us): '
-            f'P(AI) = {float(result["p_ai"]):.2f} → {html.escape(result["ours_label"])}']
+            f'P(AI) = {float(result["p_ai"]):.2f} → {html.escape(result["ours_label"])} (trained on BigGAN; '
+            'misses most images from newer generators, recall 0.13 on Stable Diffusion v1.4)']
     if result.get("external_model"):
         ext = result.get("external")
-        rows.append(f'External detector ({html.escape(result["external_model"])}; public model, not trained '
-                    f'or tested by us): ' + ("not available" if ext is None else
-                                            f'P(AI) = {ext:.2f} → {"AI-generated" if ext >= 0.5 else "Real"}'))
-    rows.append("Provenance metadata: " + (html.escape(result["provenance"]) if result.get("provenance")
-                                           else "no AI tag found (tags are often removed by screenshots "
-                                                "and social media)"))
+        rows.append(f'Second detector ({html.escape(result["external_model"])}, a public model trained on newer '
+                    f'generators; not trained or evaluated by us): ' + ("not available" if ext is None else
+                                f'P(AI) = {ext:.2f} → {"AI-generated" if ext >= 0.5 else "Real"}'))
+    rows.append("File tags: " + (html.escape(result["provenance"]) if result.get("provenance")
+                                 else "no AI tag found (tags are often removed by screenshots and social media)"))
     flagged = result.get("flagged_by") or []
     rows.append("Flagged as AI by: " + (", ".join(flagged) if flagged else "none of the checks"))
-    return "".join(f'<div style="{MUTED};margin-top:4px">{r}</div>' for r in rows)
+    n = 2 + bool(result.get("external_model"))
+    summary = f"Checked by {n} independent checks (detectors and file tags)."
+    details = "".join(f"<li>{r}</li>" for r in rows)
+    return (f'<div style="{MUTED};margin-top:6px">{summary}</div>'
+            f'<details style="{MUTED};margin-top:4px"><summary style="cursor:pointer">How this was decided'
+            f'</summary><ul style="margin:4px 0;padding-left:18px">{details}</ul></details>')
 
 
 def image_card(result: dict, image: Image.Image, heatmap: Image.Image | None = None,
@@ -99,7 +102,7 @@ def image_card(result: dict, image: Image.Image, heatmap: Image.Image | None = N
         '<div style="flex:1;min-width:180px">'
         f'<div style="margin:2px 0 6px"><span style="background:{colour};color:#fff;'
         f'padding:2px 8px;border-radius:12px">{html.escape(label)}</span> '
-        f'{"strongest " if "ours_label" in result else ""}P(AI) = {p_ai:.2f}</div>'
+        f'P(AI) = {p_ai:.2f}</div>'
         f'<div role="progressbar" aria-valuenow="{pct}" aria-valuemin="0" aria-valuemax="100" '
         f'aria-label="P(AI) {pct}%" style="background:#eaeef2;border-radius:4px;height:8px">'
         f'<div style="background:{colour};width:{pct}%;height:8px;border-radius:4px"></div></div>'
