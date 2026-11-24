@@ -30,3 +30,4 @@ matplotlib>=3.8
 wandb>=0.18
 gradio>=4.44
 pytest>=8.0
+ddgs>=9.0

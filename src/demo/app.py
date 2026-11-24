@@ -43,6 +43,8 @@ VERDICT_STYLE = {   # label -> (shown text, colour)
     "unverified": ("Unverified", "#9a6700"),
 }
 ILLUSTRATIVE = "Illustrative example (made up, not real news)"
+OFFLINE, WEB = "Offline library", "Live web search"
+SOURCE = {"default": OFFLINE}         # --evidence-source sets the start value
 
 
 def parse_evidence(text: str) -> list[str] | None:
@@ -157,6 +159,30 @@ def format_results(results: list[dict], note: str = "", method: str = "") -> str
     return banner + "".join(claim_card(r) for r in results)
 
 
+def live_check(message: str, lang: str | None) -> tuple[list[dict], str]:
+    """Check each claim against live web evidence (R10): (results, banner HTML).
+
+    Claims are extracted as in ``check``; each claim gets its own search
+    (src/retrieval/live.py) and is then checked with that evidence. Demo only.
+    """
+    from src.pipeline import check, detect_language, extract_claims
+    from src.retrieval import live
+
+    results, errors = [], []
+    for claim in extract_claims(message, lang or detect_language(message)):
+        results += check(claim, live.search(claim), lang)
+        if live.last_error:
+            errors.append(live.last_error)
+    banner = ('<div style="background:#ddf4ff;color:#1f2328;padding:6px 10px;border-radius:6px;margin:4px 0">'
+              '<b>Evidence: live web search</b> (DuckDuckGo; your claim is sent to it). Fact-checking '
+              'sites are removed and the reranker keeps the 5 most relevant results. Results change '
+              'over time; the reported experiments use the offline library.</div>')
+    if errors:
+        banner += ('<div style="background:#ffebe9;color:#1f2328;padding:6px 10px;border-radius:6px;'
+                   f'margin:4px 0">{html.escape(errors[0])}</div>')
+    return results, banner
+
+
 def library_warning(evidence_text: str) -> str:
     """A warning when the evidence box is empty and the offline library is not loaded.
 
@@ -174,13 +200,14 @@ def library_warning(evidence_text: str) -> str:
 
 
 def run_check(message: str, evidence_text: str, lang: str, note: str = "", image=None,
-              image_example: dict | None = None) -> str:
+              image_example: dict | None = None, source: str = OFFLINE) -> str:
     """Check a message and return the result HTML (what the Check button calls).
 
     With an ``image`` (F11), its card, a final result for text and image together, and a
     note follow the claim cards. The image is never passed to ``check``, so the claim
     verdict is the same with or without it. ``image_example`` (a built-in case) adds its
-    description, its cached F3 input and its known label.
+    description, its cached F3 input and its known label. ``source`` (when no evidence is
+    pasted): the offline library or live web search (R10, demo only).
     """
     from src.pipeline import check
 
@@ -189,8 +216,12 @@ def run_check(message: str, evidence_text: str, lang: str, note: str = "", image
         card, _ = vision.image_check(image)
         return (card + '<p style="opacity:0.8">Paste a message as well to check its claim; '
                        'the claim verdict comes from the text evidence only.</p>')
-    results = check(message, parse_evidence(evidence_text), lang)
-    out = library_warning(evidence_text) + format_results(results, note, verdict_method())
+    if source == WEB and parse_evidence(evidence_text) is None:
+        results, banner = live_check(message, lang)
+    else:
+        results = check(message, parse_evidence(evidence_text), lang)
+        banner = library_warning(evidence_text)
+    out = banner + format_results(results, note, verdict_method())
     if image is not None:
         ex = image_example or {}
         card, image_result = vision.image_check(image, blob=ex.get("blob"), truth=ex.get("truth"))
@@ -216,12 +247,15 @@ def build_app():
                 evidence = gr.Textbox(label="Evidence (optional, one snippet per line; "
                                             "empty = search the offline library)", lines=4)
                 lang = gr.Dropdown(["auto", "en", "ar", "mixed"], value="auto", label="Language")
+                source = gr.Radio([OFFLINE, WEB], value=SOURCE["default"],
+                                  label="Evidence source when the evidence box is empty "
+                                        "(live web search: DuckDuckGo, demo only)")
                 image = gr.Image(type="pil", label="Image (optional)", height=220)
                 button = gr.Button("Check", variant="primary")
             with gr.Column():
                 output = gr.HTML()
-        button.click(lambda m, e, l, i: run_check(m, e, l, image=i), [message, evidence, lang, image],
-                     output)
+        button.click(lambda m, e, l, i, s: run_check(m, e, l, image=i, source=s),
+                     [message, evidence, lang, image, source], output)
 
         # Twin examples first: one claim and two of its twins, the core idea of the project.
         for heading, group in ((f"### Twin examples — {ILLUSTRATIVE}", TWIN_EXAMPLES),
@@ -318,7 +352,10 @@ def main() -> None:
     ap.add_argument("--jpeg-pool", default="models/F11/jpeg_pool.json",
                     help="F3 JPEG settings (src.vision.infer --pool-from-cache)")
     ap.add_argument("--demo-images", help="folder with examples.json + images for the image buttons")
+    ap.add_argument("--evidence-source", choices=["offline", "web"], default="offline",
+                    help="start value of the evidence source (web = live DuckDuckGo search, R10)")
     args = ap.parse_args()
+    SOURCE["default"] = WEB if args.evidence_source == "web" else OFFLINE
     vision.configure(args.vision_ckpt, args.jpeg_pool, args.demo_images)
     if args.run_examples:
         for row in run_examples(args.run_examples):
