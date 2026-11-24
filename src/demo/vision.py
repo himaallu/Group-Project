@@ -30,14 +30,49 @@ from pathlib import Path
 
 from src.demo.vision_card import image_card, unavailable_card
 
-SETTINGS = {"ckpt": None, "jpeg_pool": None, "examples_dir": None}
-_state = {"model": None, "pool": None, "error": None}
+SETTINGS = {"ckpt": None, "jpeg_pool": None, "examples_dir": None, "external": None}
+_state = {"model": None, "pool": None, "error": None, "external": None, "external_error": None}
 
 
-def configure(ckpt: str | None, jpeg_pool: str | None, examples_dir: str | None = None) -> None:
-    """Remember the paths from the command line; nothing is loaded yet."""
-    SETTINGS.update(ckpt=ckpt, jpeg_pool=jpeg_pool, examples_dir=examples_dir)
-    _state.update(model=None, pool=None, error=None)
+def configure(ckpt: str | None, jpeg_pool: str | None, examples_dir: str | None = None,
+              external: str | None = None) -> None:
+    """Remember the paths and the external detector id ("none"/None = off); nothing is loaded yet."""
+    SETTINGS.update(ckpt=ckpt, jpeg_pool=jpeg_pool, examples_dir=examples_dir,
+                    external=None if external in (None, "", "none") else external)
+    _state.update(model=None, pool=None, error=None, external=None, external_error=None)
+
+
+def _external():
+    """The external detector pipeline, loaded once; None if off or it cannot be loaded."""
+    if not SETTINGS["external"] or _state["external_error"]:
+        return None
+    if _state["external"] is None:
+        try:
+            from src.vision.external import load_external
+
+            _state["external"] = load_external(SETTINGS["external"])
+        except Exception as err:                       # the second opinion is optional
+            _state["external_error"] = f"{type(err).__name__}: {err}"
+            return None
+    return _state["external"]
+
+
+def combine(ours: dict, external_p: float | None, provenance: str | None) -> dict:
+    """Final image result from the three checks: AI-generated if any of them says so.
+
+    Returns the F5 result extended with "ours_label", "external" (P or None),
+    "provenance" (tag or None) and "flagged_by" (names of the checks that said AI).
+    """
+    flagged = []
+    if provenance:
+        flagged.append("provenance metadata")
+    if external_p is not None and external_p >= 0.5:
+        flagged.append("external detector")
+    if ours["label"] == "AI-generated":
+        flagged.append("our detector")
+    return {**ours, "ours_label": ours["label"], "external": external_p, "provenance": provenance,
+            "external_model": SETTINGS["external"], "flagged_by": flagged,
+            "label": "AI-generated" if flagged else "Real"}
 
 
 def _load() -> tuple:
@@ -64,10 +99,13 @@ def _load() -> tuple:
     raise RuntimeError(_state["error"])
 
 
-def image_check(image, blob: bytes | None = None, truth: str | None = None) -> tuple[str, dict | None]:
+def image_check(image, blob: bytes | None = None, truth: str | None = None,
+                raw: bytes | None = None) -> tuple[str, dict | None]:
     """(image card HTML, result) for ``image`` (PIL); result is None if the check is not available.
 
-    ``blob`` (cached F3 input) and ``truth`` (known label) are given for the built-in examples.
+    Runs our F5 detector, the external detector (if switched on) and the provenance-tag
+    check on the uploaded file bytes ``raw``; see ``combine``. ``blob`` (cached F3 input)
+    and ``truth`` (known label) are given for the built-in examples.
     """
     try:
         model, pool = _load()
@@ -75,7 +113,19 @@ def image_check(image, blob: bytes | None = None, truth: str | None = None) -> t
         return unavailable_card(str(err)), None
     from src.vision.infer import check_image, gradcam_overlay
 
-    result = check_image(image, model, pool, blob=blob)
+    from src.vision.provenance import ai_provenance
+
+    ours = check_image(image, model, pool, blob=blob)
+    external_p = None
+    classifier = _external()
+    if classifier is not None:
+        try:
+            from src.vision.external import external_p_ai
+
+            external_p = external_p_ai(image, classifier)
+        except Exception:
+            external_p = None
+    result = combine(ours, external_p, ai_provenance(raw))
     try:
         heatmap = gradcam_overlay(image, model, pool, blob=blob)
     except Exception:                                  # the heat map is optional

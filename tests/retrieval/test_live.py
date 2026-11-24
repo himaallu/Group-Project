@@ -37,4 +37,4 @@ def test_demo_uses_live_evidence(monkeypatch):
     monkeypatch.setenv("TWINCHECK_EXTRACTOR", "split")
     monkeypatch.setattr(live, "search", lambda claim, k=5: [HITS[0]])
     out = run_check("Gold rates in Dubai: 24K AED 437.75.", "", "en", source=WEB)
-    assert "live web search" in out and "goldtrack.ae" in out and "Offline evidence library" not in out
+    assert "Evidence retrieved from the web" in out and "goldtrack.ae" in out and "Offline evidence library" not in out

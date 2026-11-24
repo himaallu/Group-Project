@@ -30,7 +30,9 @@ from __future__ import annotations
 
 import argparse
 import html
+import io
 import re
+from pathlib import Path
 
 from src.demo import vision
 from src.demo.examples import EXAMPLES, TWIN_EXAMPLES
@@ -159,6 +161,19 @@ def format_results(results: list[dict], note: str = "", method: str = "") -> str
     return banner + "".join(claim_card(r) for r in results)
 
 
+def open_image(image) -> tuple:
+    """(PIL image, original file bytes) from the upload box (a file path) or a PIL image.
+
+    The original bytes are kept for the provenance-tag check (F11); a PIL image has none.
+    """
+    if image is None or not isinstance(image, (str, bytes)) and not hasattr(image, "__fspath__"):
+        return image, None
+    from PIL import Image
+
+    raw = Path(image).read_bytes()
+    return Image.open(io.BytesIO(raw)).convert("RGB"), raw
+
+
 def live_check(message: str, lang: str | None) -> tuple[list[dict], str]:
     """Check each claim against live web evidence (R10): (results, banner HTML).
 
@@ -173,10 +188,8 @@ def live_check(message: str, lang: str | None) -> tuple[list[dict], str]:
         results += check(claim, live.search(claim), lang)
         if live.last_error:
             errors.append(live.last_error)
-    banner = ('<div style="background:#ddf4ff;color:#1f2328;padding:6px 10px;border-radius:6px;margin:4px 0">'
-              '<b>Evidence: live web search</b> (DuckDuckGo; your claim is sent to it). Fact-checking '
-              'sites are removed and the reranker keeps the 5 most relevant results. Results change '
-              'over time; the reported experiments use the offline library.</div>')
+    banner = ('<div style="font-size:0.85em;opacity:0.8;margin:4px 0">Evidence retrieved from the web '
+              '(fact-checking sites removed; top 5 by the reranker).</div>')
     if errors:
         banner += ('<div style="background:#ffebe9;color:#1f2328;padding:6px 10px;border-radius:6px;'
                    f'margin:4px 0">{html.escape(errors[0])}</div>')
@@ -211,9 +224,10 @@ def run_check(message: str, evidence_text: str, lang: str, note: str = "", image
     """
     from src.pipeline import check
 
+    image, raw = open_image(image)
     lang = None if lang in (None, "", "auto") else lang
     if image is not None and not (message or "").strip():      # image only: no claim to check
-        card, _ = vision.image_check(image)
+        card, _ = vision.image_check(image, raw=raw)
         return (card + '<p style="opacity:0.8">Paste a message as well to check its claim; '
                        'the claim verdict comes from the text evidence only.</p>')
     if source == WEB and parse_evidence(evidence_text) is None:
@@ -224,7 +238,7 @@ def run_check(message: str, evidence_text: str, lang: str, note: str = "", image
     out = banner + format_results(results, note, verdict_method())
     if image is not None:
         ex = image_example or {}
-        card, image_result = vision.image_check(image, blob=ex.get("blob"), truth=ex.get("truth"))
+        card, image_result = vision.image_check(image, blob=ex.get("blob"), truth=ex.get("truth"), raw=raw)
         case = (f'<div style="margin:8px 0 0;opacity:0.85"><b>Case:</b> {html.escape(ex["case"])}</div>'
                 if ex.get("case") else "")
         out += case + card + summary_card(results, image_result) + image_note()
@@ -242,20 +256,16 @@ def build_app():
                     "and a short note citing the evidence.")
         with gr.Row():
             with gr.Column():
+                image = gr.Image(type="filepath", label="Image (optional)", height=240)
                 message = gr.Textbox(label="Message", lines=4,
                                      placeholder="Paste a message (English, Arabic or mixed)")
-                evidence = gr.Textbox(label="Evidence (optional, one snippet per line; "
-                                            "empty = search the offline library)", lines=4)
+                evidence = gr.Textbox(label="Evidence (optional, one snippet per line)", lines=3)
                 lang = gr.Dropdown(["auto", "en", "ar", "mixed"], value="auto", label="Language")
-                source = gr.Radio([OFFLINE, WEB], value=SOURCE["default"],
-                                  label="Evidence source when the evidence box is empty "
-                                        "(live web search: DuckDuckGo, demo only)")
-                image = gr.Image(type="pil", label="Image (optional)", height=220)
                 button = gr.Button("Check", variant="primary")
             with gr.Column():
                 output = gr.HTML()
-        button.click(lambda m, e, l, i, s: run_check(m, e, l, image=i, source=s),
-                     [message, evidence, lang, image, source], output)
+        button.click(lambda i, m, e, l: run_check(m, e, l, image=i, source=SOURCE["default"]),
+                     [image, message, evidence, lang], output)
 
         # Twin examples first: one claim and two of its twins, the core idea of the project.
         for heading, group in ((f"### Twin examples — {ILLUSTRATIVE}", TWIN_EXAMPLES),
@@ -352,11 +362,13 @@ def main() -> None:
     ap.add_argument("--jpeg-pool", default="models/F11/jpeg_pool.json",
                     help="F3 JPEG settings (src.vision.infer --pool-from-cache)")
     ap.add_argument("--demo-images", help="folder with examples.json + images for the image buttons")
+    ap.add_argument("--external-detector", default="Organika/sdxl-detector",
+                    help="second-opinion AI-image detector from the Hub, demo only ('none' = off)")
     ap.add_argument("--evidence-source", choices=["offline", "web"], default="offline",
                     help="start value of the evidence source (web = live DuckDuckGo search, R10)")
     args = ap.parse_args()
     SOURCE["default"] = WEB if args.evidence_source == "web" else OFFLINE
-    vision.configure(args.vision_ckpt, args.jpeg_pool, args.demo_images)
+    vision.configure(args.vision_ckpt, args.jpeg_pool, args.demo_images, args.external_detector)
     if args.run_examples:
         for row in run_examples(args.run_examples):
             got = ", ".join(c["label"] for c in row["claims"]) or "no claim"

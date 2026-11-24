@@ -176,7 +176,7 @@ def test_image_twin_keeps_the_claim_verdict(monkeypatch):
     monkeypatch.setenv("TWINCHECK_EXPLAINER", "template")
     monkeypatch.setenv("TWINCHECK_EXTRACTOR", "split")
     scores = iter([{"p_ai": 0.01, "label": "Real"}, {"p_ai": 0.93, "label": "AI-generated"}])
-    monkeypatch.setattr(vision, "image_check", lambda img, blob=None, truth=None: ("<div>card</div>", next(scores)))
+    monkeypatch.setattr(vision, "image_check", lambda img, blob=None, truth=None, raw=None: ("<div>card</div>", next(scores)))
     a, b = load_examples()[4:6]
     out_a = run_check(a["message"], "\n".join(a["evidence"]), a["lang"], image=a["image"], image_example=a)
     out_b = run_check(b["message"], "\n".join(b["evidence"]), b["lang"], image=b["image"], image_example=b)
@@ -198,3 +198,41 @@ def test_warning_when_library_missing_and_no_evidence(monkeypatch):
     assert library_warning("The RTA said the lines ran normally.") == ""      # pasted evidence
     monkeypatch.setattr("src.pipeline.component_status", lambda: {"get_evidence (R5)": "real"})
     assert library_warning("") == ""
+
+
+def test_provenance_tags():
+    from src.vision.provenance import ai_provenance
+
+    assert "generative AI" in ai_provenance(b"...<Iptc4xmpExt:DigitalSourceType>http://cv.iptc.org/"
+                                            b"newscodes/digitalsourcetype/trainedAlgorithmicMedia</...")
+    assert ai_provenance(b"Made with Google AI") == "Made with Google AI named in the file"
+    assert ai_provenance(b"\xff\xd8 ordinary camera jpeg Canon EOS") is None and ai_provenance(None) is None
+
+
+def test_external_class_names():
+    from src.vision.external import is_ai_class
+
+    assert is_ai_class("artificial") and is_ai_class("FAKE") and is_ai_class("AI-generated")
+    assert not is_ai_class("human") and not is_ai_class("real") and not is_ai_class("Realism")
+
+
+def test_combine_flags_ai_if_any_check_says_so():
+    ours_real = {"p_ai": 0.01, "label": "Real", "model": "ViT-B/16 (F5, seed 42)"}
+    vision.configure(None, None, external="Organika/sdxl-detector")
+    assert vision.combine(ours_real, 0.97, None)["flagged_by"] == ["external detector"]
+    assert vision.combine(ours_real, 0.10, "IPTC tag")["label"] == "AI-generated"
+    both_real = vision.combine(ours_real, 0.10, None)
+    assert both_real["label"] == "Real" and both_real["flagged_by"] == []
+    card = image_card(vision.combine(ours_real, 0.97, None), picture())
+    assert "External detector (Organika/sdxl-detector" in card and "not trained or tested by us" in card
+    assert "Our detector" in card and "Flagged as AI by: external detector" in card and "AI-generated" in card
+
+
+def test_upload_path_keeps_original_bytes(tmp_path):
+    from src.demo.app import open_image
+
+    path = tmp_path / "x.png"
+    picture().save(path)
+    image, raw = open_image(str(path))
+    assert image.size == (300, 200) and raw == path.read_bytes()
+    assert open_image(None) == (None, None)

@@ -29,8 +29,9 @@ import io
 from PIL import Image
 
 BADGE = {"AI-generated": "#cf222e", "Real": "#1a7f37"}      # same red / green as the claim cards
-CAVEAT = ("Trained on BigGAN; on new generators it misses most AI images (recall 0.13 on "
-          "Stable Diffusion v1.4), so 'Real' means no AI signal was found.")
+CAVEAT = ("Our detector was trained on BigGAN; on new generators it misses most AI images (recall "
+          "0.13 on Stable Diffusion v1.4). 'Real' means no check found an AI signal, not that the "
+          "image is proven authentic.")
 IMAGE_NOTE = ("The claim verdict uses the text evidence only; the image result is shown "
               "separately and does not change it.")
 CARD = "border:1px solid #d0d7de;border-radius:8px;padding:12px;margin:8px 0"   # as the claim cards
@@ -54,12 +55,33 @@ def truth_line(label: str, truth: str) -> str:
     return f'<div style="margin-top:6px">Known label: {html.escape(truth)} · {mark}</div>'
 
 
+def check_rows(result: dict) -> str:
+    """One line per check (our detector, external detector, provenance tag) for a combined result."""
+    if "ours_label" not in result:
+        return ""
+    rows = [f'Our detector ({html.escape(result.get("model", ""))}, trained by us): '
+            f'P(AI) = {float(result["p_ai"]):.2f} → {html.escape(result["ours_label"])}']
+    if result.get("external_model"):
+        ext = result.get("external")
+        rows.append(f'External detector ({html.escape(result["external_model"])}; public model, not trained '
+                    f'or tested by us): ' + ("not available" if ext is None else
+                                            f'P(AI) = {ext:.2f} → {"AI-generated" if ext >= 0.5 else "Real"}'))
+    rows.append("Provenance metadata: " + (html.escape(result["provenance"]) if result.get("provenance")
+                                           else "no AI tag found (tags are often removed by screenshots "
+                                                "and social media)"))
+    flagged = result.get("flagged_by") or []
+    rows.append("Flagged as AI by: " + (", ".join(flagged) if flagged else "none of the checks"))
+    return "".join(f'<div style="{MUTED};margin-top:4px">{r}</div>' for r in rows)
+
+
 def image_card(result: dict, image: Image.Image, heatmap: Image.Image | None = None,
                truth: str | None = None) -> str:
     """HTML card for one image check; ``heatmap`` (Grad-CAM) adds a "Show heatmap" toggle;
     ``truth`` (built-in examples) adds the known label and a ✓ / ✗."""
-    p_ai = float(result["p_ai"])
     label = result["label"]
+    # the bar shows the strongest AI signal among the checks
+    signals = [float(result["p_ai"])] + ([result["external"]] if result.get("external") is not None else [])
+    p_ai = 1.0 if result.get("provenance") else max(signals)
     colour = BADGE.get(label, "#57606a")
     pct = round(100 * p_ai)
     heat = ""
@@ -77,13 +99,13 @@ def image_card(result: dict, image: Image.Image, heatmap: Image.Image | None = N
         '<div style="flex:1;min-width:180px">'
         f'<div style="margin:2px 0 6px"><span style="background:{colour};color:#fff;'
         f'padding:2px 8px;border-radius:12px">{html.escape(label)}</span> '
-        f'P(AI) = {p_ai:.2f}</div>'
+        f'{"strongest " if "ours_label" in result else ""}P(AI) = {p_ai:.2f}</div>'
         f'<div role="progressbar" aria-valuenow="{pct}" aria-valuemin="0" aria-valuemax="100" '
         f'aria-label="P(AI) {pct}%" style="background:#eaeef2;border-radius:4px;height:8px">'
         f'<div style="background:{colour};width:{pct}%;height:8px;border-radius:4px"></div></div>'
-        f'<div style="{MUTED};margin-top:6px">Model: '
-        f'{html.escape(result.get("model", ""))} · threshold 0.5</div>'
-        f'<div style="{MUTED};margin-top:4px">{html.escape(CAVEAT)}</div>'
+        + (check_rows(result) if "ours_label" in result else
+           f'<div style="{MUTED};margin-top:6px">Model: {html.escape(result.get("model", ""))} · threshold 0.5</div>')
+        + f'<div style="{MUTED};margin-top:4px">{html.escape(CAVEAT)}</div>'
         f'{truth_line(label, truth) if truth else ""}'
         f'{heat}</div></div></div>')
 
@@ -113,12 +135,16 @@ def summary_card(claim_results: list[dict], image_result: dict | None) -> str:
     if image_result is None or not claim_results:
         return ""
     label, p_ai = image_result["label"], float(image_result["p_ai"])
+    if "flagged_by" in image_result:                   # combined result: say which checks flagged it
+        detail = ("flagged by " + ", ".join(image_result["flagged_by"])) if image_result["flagged_by"]             else "no check found an AI signal"
+    else:
+        detail = f"P(AI) = {p_ai:.2f}"
     rows = []
     for r in claim_results:
         verdict = VERDICT_WORDS.get(r["label"], r["label"])
         reading = READING.get((r["label"], label), "")
         rows.append(f'<li><b>Claim:</b> {verdict} ({round(100 * float(r["confidence"]))}%, from the text '
-                    f'evidence) · <b>Image:</b> {html.escape(label)} (P(AI) = {p_ai:.2f})<br>'
+                    f'evidence) · <b>Image:</b> {html.escape(label)} ({html.escape(detail)})<br>'
                     f'{html.escape(reading)}</li>')
     return (f'<div style="{CARD};border-width:2px">'
             '<div style="font-weight:600;margin-bottom:4px">Final result: text and image together</div>'
