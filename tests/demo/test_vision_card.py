@@ -100,3 +100,33 @@ def test_check_image_with_fake_model():
     at = check_image(picture(), Fake(0.0), POOL)                    # sigmoid(0) = 0.5 -> AI
     assert at["label"] == "AI-generated" and abs(at["p_ai"] - 0.5) < 1e-6
     assert check_image(picture(), Fake(-2.0), POOL)["label"] == "Real"
+
+
+def test_pool_from_cache_recovers_order(tmp_path):
+    import hashlib
+    import pickle
+
+    from src.vision.infer import pool_from_cache
+
+    true_pool = [[[[q] * 64, [q + 1] * 64], 2] for q in (5, 9, 13)]       # made-up pool of 3
+    md5s = [hashlib.md5(str(i).encode()).hexdigest() for i in range(30)]
+    a = square96(picture())
+    cache = {"md5": md5s, "jpeg": [encode_jpeg(a, m, true_pool) for m in md5s], "jpeg_settings": 3}
+    path = tmp_path / "cache.pkl"
+    path.write_bytes(pickle.dumps(cache))
+    assert pool_from_cache(path, tmp_path / "pool.json") == true_pool
+    assert json.loads((tmp_path / "pool.json").read_text()) == true_pool
+
+
+def test_lfs_pointer_gives_clear_message(tmp_path):
+    pointer = tmp_path / "vit.pt"
+    pointer.write_text("version https://git-lfs.github.com/spec/v1\noid sha256:abc\nsize 343000000\n")
+    vision.configure(str(pointer), "models/F11/jpeg_pool.json")
+    assert "git lfs pull" in vision.image_html(picture())
+
+
+def test_saved_pool_is_the_f3_size():
+    from src.vision.infer import DEFAULT_POOL, load_jpeg_pool
+
+    pool = load_jpeg_pool(DEFAULT_POOL)
+    assert len(pool) == 500 and all(len(t) >= 2 and s in (0, 1, 2) for t, s in pool)

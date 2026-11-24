@@ -49,6 +49,8 @@ def _load() -> tuple:
     ckpt, pool_path = SETTINGS["ckpt"], SETTINGS["jpeg_pool"]
     if not ckpt or not Path(ckpt).exists():
         _state["error"] = "Detector checkpoint not found (start the app with --vision-ckpt)."
+    elif Path(ckpt).stat().st_size < 1_000_000:       # a Git LFS pointer, not the weights
+        _state["error"] = "Detector checkpoint is a Git LFS pointer: run `git lfs pull` first."
     elif not pool_path or not Path(pool_path).exists():
         _state["error"] = "JPEG settings file not found (start the app with --jpeg-pool)."
     else:

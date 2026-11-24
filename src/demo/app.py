@@ -23,7 +23,7 @@ How to run (repo root)
     python -m src.demo.app            # http://127.0.0.1:7860
     python -m src.demo.app --share    # in Colab
     python -m src.demo.app --run-examples results/R6/examples.json   # record the 6 examples
-    python -m src.demo.app --share --vision-ckpt CKPT.pt --jpeg-pool POOL.json   # + image card
+    python -m src.demo.app --share     # image card uses models/F5/vit_b16_s42.pt (git lfs pull)
 """
 
 from __future__ import annotations
@@ -266,8 +266,10 @@ def main() -> None:
     ap.add_argument("--port", type=int, default=7860)
     ap.add_argument("--run-examples", metavar="JSON",
                     help="run the 6 examples, save the results here and exit")
-    ap.add_argument("--vision-ckpt", help="F5 detector checkpoint (image card, F11)")
-    ap.add_argument("--jpeg-pool", help="JPEG settings from src.vision.infer --build-pool")
+    ap.add_argument("--vision-ckpt", default="models/F5/vit_b16_s42.pt",
+                    help="F5 detector checkpoint (image card, F11; Git LFS)")
+    ap.add_argument("--jpeg-pool", default="models/F11/jpeg_pool.json",
+                    help="F3 JPEG settings (src.vision.infer --pool-from-cache)")
     ap.add_argument("--demo-images", help="folder with examples.json + images for the image buttons")
     args = ap.parse_args()
     vision.configure(args.vision_ckpt, args.jpeg_pool, args.demo_images)

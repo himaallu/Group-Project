@@ -10,26 +10,28 @@ What it does
       4. eval_transform() from src/vision/detectors.py (resize 256, crop 224, ImageNet norm).
     F3 also turned some training images grey to balance the classes. That is a step over
     the whole dataset, so it is not applied to a single image.
-    The F3 pool of JPEG settings was never saved; ``build_jpeg_pool`` rebuilds it exactly
-    (same manifests, same 500 real training photos, seed 42) and saves it as JSON. The JSON
-    holds only quantisation tables, no image data.
+    The F3 pool of JPEG settings was never saved. ``pool_from_cache`` recovers the exact
+    ordered pool from the cached 96 px images (each one records its setting; only a pool
+    of 500 fits all 13,000), and it is kept in git as models/F11/jpeg_pool.json (only
+    quantisation tables, no image data). ``build_jpeg_pool`` rebuilds it from the raw
+    training photos on Drive instead, the way F3 made it.
     Label: "AI-generated" if P(AI) >= 0.5 (the threshold in the report; never tuned on test).
     The claim verdict never uses this score (CLAUDE.md §3).
 
 Inputs
-    --ckpt       F5 checkpoint, e.g. MyDrive/TwinCheck/models/F5/vit_b16_s42.pt
-    --jpeg-pool  pool JSON made by --build-pool (keep it on Drive)
+    --ckpt       F5 checkpoint (default models/F5/vit_b16_s42.pt, Git LFS: run `git lfs pull`)
+    --jpeg-pool  pool JSON (default models/F11/jpeg_pool.json)
     --image      a picture to score
 
 Outputs
     check_image -> {"p_ai": float, "label": "AI-generated" | "Real", "model": str}
     --verify-cache / --verify-raw -> a CSV comparing our scores with results/F10.
 
-How to run (Colab with Drive mounted, repo root)
-    python -m src.vision.infer --build-pool --drive /content/drive/MyDrive/TwinCheck --jpeg-pool POOL.json
-    python -m src.vision.infer --ckpt CKPT.pt --jpeg-pool POOL.json --image photo.jpg
-    python -m src.vision.infer --ckpt CKPT.pt --jpeg-pool POOL.json --verify-cache CACHE.pkl --n 10
-    python -m src.vision.infer --ckpt CKPT.pt --jpeg-pool POOL.json --verify-raw --drive DRIVE --n 10
+How to run (repo root; `git lfs pull` first for the checkpoint)
+    python -m src.vision.infer --pool-from-cache data/processed/vision/genimage_debiased96_jpeg.pkl
+    python -m src.vision.infer --image photo.jpg
+    python -m src.vision.infer --verify-cache data/processed/vision/genimage_debiased96_jpeg.pkl --n 10
+    python -m src.vision.infer --verify-raw --drive /content/drive/MyDrive/TwinCheck --n 10   # needs Drive
 """
 
 from __future__ import annotations
@@ -47,6 +49,9 @@ SIZE = 96
 THRESHOLD = 0.5
 MODEL_NAME = "ViT-B/16 (F5, seed 42)"
 MANIFESTS = Path("data/processed/vision")
+DEFAULT_CKPT = "models/F5/vit_b16_s42.pt"
+DEFAULT_POOL = "models/F11/jpeg_pool.json"
+DEFAULT_CACHE = "data/processed/vision/genimage_debiased96_jpeg.pkl"
 F10_PREDS = Path("results/F10/preds_vit_b16_s42_check.csv")
 
 
@@ -82,6 +87,36 @@ def build_jpeg_pool(drive_root: str | Path, out_json: str | Path, seed: int = 42
     if not pool:
         raise ValueError("no usable JPEG settings found")
     Path(out_json).write_text(json.dumps(pool), encoding="utf-8")
+    return pool
+
+
+def pool_from_cache(cache_path: str | Path, out_json: str | Path | None = None) -> list:
+    """Recover F3's ordered JPEG pool from the cached debiased images (no raw photos needed).
+
+    Every cached image ``m`` was saved with ``pool[hash(m) % N]``, and its JPEG header
+    records that setting. Only the true pool size N gives each slot a single setting for
+    all 13,000 images; the cache's ``jpeg_settings`` field stores N (500). Raises if any
+    image disagrees, so a returned pool reproduces every cached setting exactly.
+    """
+    import pickle
+
+    with open(cache_path, "rb") as f:
+        cache = pickle.load(f)
+    n = int(cache["jpeg_settings"])
+    pool: list = [None] * n
+    for md5, blob in zip(cache["md5"], cache["jpeg"]):
+        with Image.open(io.BytesIO(blob)) as im:
+            setting = [[list(t) for t in im.quantization.values()], JpegImagePlugin.get_sampling(im)]
+        slot = int(hashlib.md5(md5.encode()).hexdigest()[:8], 16) % n
+        if pool[slot] is None:
+            pool[slot] = setting
+        elif pool[slot] != setting:
+            raise ValueError(f"cache does not fit a pool of {n}: slot {slot} has two settings")
+    if any(s is None for s in pool):
+        raise ValueError(f"{sum(s is None for s in pool)} pool slots never used in the cache")
+    if out_json:
+        Path(out_json).parent.mkdir(parents=True, exist_ok=True)
+        Path(out_json).write_text(json.dumps(pool, separators=(",", ":")), encoding="utf-8")
     return pool
 
 
@@ -246,10 +281,11 @@ def verify_raw(model, pool: list, drive_root: str | Path, cache_path: str | Path
 def main() -> None:
     """CLI: build the pool, score one image, or run the checks against F10."""
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--ckpt")
-    ap.add_argument("--jpeg-pool", required=True)
+    ap.add_argument("--ckpt", default=DEFAULT_CKPT)
+    ap.add_argument("--jpeg-pool", default=DEFAULT_POOL)
     ap.add_argument("--image")
-    ap.add_argument("--build-pool", action="store_true")
+    ap.add_argument("--build-pool", action="store_true", help="rebuild from raw photos (needs --drive)")
+    ap.add_argument("--pool-from-cache", metavar="PKL", help="recover the pool from the 96 px cache")
     ap.add_argument("--drive", help="Drive root, e.g. /content/drive/MyDrive/TwinCheck")
     ap.add_argument("--verify-cache", metavar="PKL")
     ap.add_argument("--verify-raw", action="store_true")
@@ -257,8 +293,9 @@ def main() -> None:
     ap.add_argument("--out", default="results/F11/preprocess_check.csv")
     args = ap.parse_args()
 
-    if args.build_pool:
-        pool = build_jpeg_pool(args.drive, args.jpeg_pool)
+    if args.build_pool or args.pool_from_cache:
+        pool = (pool_from_cache(args.pool_from_cache, args.jpeg_pool) if args.pool_from_cache
+                else build_jpeg_pool(args.drive, args.jpeg_pool))
         print(f"pool: {len(pool)} JPEG settings -> {args.jpeg_pool}")
         return
     pool, model = load_jpeg_pool(args.jpeg_pool), load_detector(args.ckpt)
