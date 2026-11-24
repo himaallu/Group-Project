@@ -178,21 +178,23 @@ def live_check(message: str, lang: str | None) -> tuple[list[dict], str]:
     """Check each claim against live web evidence (R10): (results, banner HTML).
 
     Claims are extracted as in ``check``; each claim gets its own search
-    (src/retrieval/live.py) and is then checked with that evidence. Demo only.
+    (src/retrieval/live.py) and is then checked with that evidence. If every search
+    engine fails, that claim uses the offline library and the banner says so. Demo only.
     """
     from src.pipeline import check, detect_language, extract_claims
     from src.retrieval import live
 
-    results, errors = [], []
+    results, fallback = [], False
     for claim in extract_claims(message, lang or detect_language(message)):
-        results += check(claim, live.search(claim), lang)
-        if live.last_error:
-            errors.append(live.last_error)
-    banner = ('<div style="font-size:0.85em;opacity:0.8;margin:4px 0">Evidence retrieved from the web '
-              '(fact-checking sites removed; top 5 by the reranker).</div>')
-    if errors:
-        banner += ('<div style="background:#ffebe9;color:#1f2328;padding:6px 10px;border-radius:6px;'
-                   f'margin:4px 0">{html.escape(errors[0])}</div>')
+        snippets = live.search(claim)
+        if not snippets and live.last_error:            # every engine failed: use the offline library
+            fallback = True
+            results += check(claim, None, lang)
+        else:
+            results += check(claim, snippets, lang)
+    note = ("Web search was unavailable, so evidence was taken from the offline library."
+            if fallback else "Evidence retrieved from the web (fact-checking sites removed; top 5 by the reranker).")
+    banner = f'<div style="font-size:0.85em;opacity:0.8;margin:4px 0">{note}</div>'
     return results, banner
 
 

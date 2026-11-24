@@ -79,7 +79,8 @@ def check_rows(result: dict) -> str:
 
 def image_card(result: dict, image: Image.Image, heatmap: Image.Image | None = None,
                truth: str | None = None) -> str:
-    """HTML card for one image check; ``heatmap`` (Grad-CAM) adds a "Show heatmap" toggle;
+    """HTML card for one image check (no thumbnail: the picture is already in the upload box);
+    ``heatmap`` (Grad-CAM) adds a "Show heatmap" toggle;
     ``truth`` (built-in examples) adds the known label and a ✓ / ✗."""
     label = result["label"]
     # the bar shows the strongest AI signal among the checks
@@ -97,8 +98,6 @@ def image_card(result: dict, image: Image.Image, heatmap: Image.Image | None = N
         f'<div style="{CARD}">'
         '<div style="font-weight:600;margin-bottom:6px">Image check (separate from the claim verdict)</div>'
         '<div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">'
-        f'<img src="{thumbnail(image)}" alt="uploaded image" '
-        'style="max-width:160px;max-height:160px;border-radius:6px">'
         '<div style="flex:1;min-width:180px">'
         f'<div style="margin:2px 0 6px"><span style="background:{colour};color:#fff;'
         f'padding:2px 8px;border-radius:12px">{html.escape(label)}</span> '

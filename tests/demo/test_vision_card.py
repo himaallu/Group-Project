@@ -33,7 +33,7 @@ def test_label_at_threshold():
 def test_card_contents():
     ai = image_card({"p_ai": 0.913, "label": "AI-generated", "model": "ViT-B/16 (F5, seed 42)"}, picture())
     assert "AI-generated" in ai and "#cf222e" in ai and "P(AI) = 0.91" in ai
-    assert 'aria-valuenow="91"' in ai and "data:image/jpeg;base64," in ai
+    assert 'aria-valuenow="91"' in ai and "data:image/jpeg;base64," not in ai   # no duplicate thumbnail
     assert "ViT-B/16 (F5, seed 42)" in ai and "Show heatmap" not in ai
     real = image_card({"p_ai": 0.02, "label": "Real", "model": "m"}, picture(), heatmap=picture(50, 50))
     assert "Real" in real and "#1a7f37" in real and CAVEAT.replace("'", "&#x27;") in real
